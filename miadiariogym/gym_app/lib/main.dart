@@ -251,9 +251,11 @@ class AdManager {
   InterstitialAd? _interstitialAd;
   bool _isAdLoaded = false;
 
-  // TODO: Sostituire con veri Ad Unit ID prima di rilasciare in produzione
-  static const String _interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712'; // TEST
-  static const String bannerAdUnitId = 'ca-app-pub-3940256099942544/6300978111'; // TEST
+  static const String _interstitialAdUnitId = 'ca-app-pub-2556899149200560/4751310597';
+  static const String bannerAdUnitId = 'ca-app-pub-2556899149200560/2699862325';
+
+  // Callback in attesa che l'ad venga caricata (per il primo allenamento)
+  VoidCallback? _pendingOnComplete;
 
   void loadInterstitial() {
     InterstitialAd.load(
@@ -277,10 +279,22 @@ class AdManager {
               loadInterstitial();
             },
           );
+          // Se c'era una callback in attesa (primo allenamento), mostro l'ad ora
+          if (_pendingOnComplete != null) {
+            final cb = _pendingOnComplete!;
+            _pendingOnComplete = null;
+            showInterstitialThenRun(cb);
+          }
         },
         onAdFailedToLoad: (error) {
           _isAdLoaded = false;
           debugPrint('Interstitial failed to load: $error');
+          // Se c'era una callback in attesa, eseguila lo stesso
+          if (_pendingOnComplete != null) {
+            final cb = _pendingOnComplete!;
+            _pendingOnComplete = null;
+            cb();
+          }
         },
       ),
     );
@@ -306,7 +320,15 @@ class AdManager {
       );
       _interstitialAd!.show();
     } else {
-      onComplete();
+      // Ad non ancora caricata: metti in coda e aspetta max 6 secondi
+      _pendingOnComplete = onComplete;
+      Future.delayed(const Duration(seconds: 6), () {
+        if (_pendingOnComplete != null) {
+          final cb = _pendingOnComplete!;
+          _pendingOnComplete = null;
+          cb();
+        }
+      });
     }
   }
 }
@@ -801,6 +823,21 @@ const Map<String, String> kBodyPartNames = {
   'glutei': 'Glutei',
   'altro': 'Altro',
 };
+
+const List<Map<String, String>> kMuscleImages = [
+  {'file': 'petto.png', 'label': 'Petto'},
+  {'file': 'dorso.png', 'label': 'Dorso'},
+  {'file': 'spalle.png', 'label': 'Spalle'},
+  {'file': 'braccia.png', 'label': 'Braccia'},
+  {'file': 'bicipiti.png', 'label': 'Bicipiti'},
+  {'file': 'tricipiti.png', 'label': 'Tricipiti'},
+  {'file': 'gambe.png', 'label': 'Gambe'},
+  {'file': 'quadricipiti.png', 'label': 'Quadricipiti'},
+  {'file': 'femorali.png', 'label': 'Femorali'},
+  {'file': 'glutei.png', 'label': 'Glutei'},
+  {'file': 'push.png', 'label': 'Push'},
+  {'file': 'pull.png', 'label': 'Pull'},
+];
 
 // --- DASHBOARD ---
 class ClientMainPage extends StatefulWidget {
@@ -2796,6 +2833,77 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
   void _aggiungiGiorno() {
     final nameCtrl = TextEditingController();
     final List<String> selectedParts = [];
+    String? selectedMuscleImage;
+
+    Future<void> pickMuscleImage(StateSetter setS) async {
+      await showDialog<void>(
+        context: context,
+        builder: (c) => StatefulBuilder(
+          builder: (c, setSInner) => AlertDialog(
+            backgroundColor: const Color(0xFF1C1C1E),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Immagine allenamento', style: TextStyle(color: Colors.white, fontSize: 16)),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: GridView.builder(
+                shrinkWrap: true,
+                itemCount: kMuscleImages.length + 1,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.75,
+                ),
+                itemBuilder: (_, i) {
+                  if (i == 0) {
+                    final bool sel = selectedMuscleImage == null;
+                    return GestureDetector(
+                      onTap: () { setSInner(() {}); setS(() => selectedMuscleImage = null); Navigator.pop(c); },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: sel ? appAccentNotifier.value.withAlpha(40) : Colors.white10,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: sel ? appAccentNotifier.value : Colors.transparent, width: 2),
+                        ),
+                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.hide_image_outlined, color: sel ? appAccentNotifier.value : Colors.white38, size: 28),
+                          const SizedBox(height: 4),
+                          Text('Nessuna', style: TextStyle(color: sel ? appAccentNotifier.value : Colors.white38, fontSize: 11)),
+                        ]),
+                      ),
+                    );
+                  }
+                  final img = kMuscleImages[i - 1];
+                  final bool sel = selectedMuscleImage == img['file'];
+                  return GestureDetector(
+                    onTap: () { setSInner(() {}); setS(() => selectedMuscleImage = img['file']); Navigator.pop(c); },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: sel ? appAccentNotifier.value : Colors.transparent, width: 2),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(9),
+                        child: Stack(fit: StackFit.expand, children: [
+                          Image.asset('assets/muscle/${img['file']}', fit: BoxFit.cover),
+                          Positioned(bottom: 0, left: 0, right: 0,
+                            child: Container(
+                              color: Colors.black54,
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(img['label']!, textAlign: TextAlign.center,
+                                style: TextStyle(color: sel ? appAccentNotifier.value : Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('ANNULLA'))],
+          ),
+        ),
+      );
+    }
+
     showDialog(
       context: context,
       builder: (c) => StatefulBuilder(
@@ -2803,35 +2911,67 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
           backgroundColor: const Color(0xFF1C1C1E),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(AppL.day, style: const TextStyle(color: Colors.white)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtrl,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: AppL.day,
-                  labelStyle: const TextStyle(color: Colors.white54),
-                  enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: appAccentNotifier.value)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameCtrl,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: AppL.day,
+                    labelStyle: const TextStyle(color: Colors.white54),
+                    enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: appAccentNotifier.value)),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8, runSpacing: 8,
-                children: kBodyPartNames.entries.where((e) => e.key != 'nessuno').map((e) {
-                  final sel = selectedParts.contains(e.key);
-                  return FilterChip(
-                    label: Text('${kBodyPartIcons[e.key] ?? ''} ${e.value}', style: TextStyle(fontSize: 12, color: sel ? Colors.black : Colors.white70)),
-                    selected: sel,
-                    onSelected: (v) => setS(() { if (v) selectedParts.add(e.key); else selectedParts.remove(e.key); }),
-                    backgroundColor: Colors.white10,
-                    selectedColor: appAccentNotifier.value,
-                    checkmarkColor: Colors.black,
-                  );
-                }).toList(),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8, runSpacing: 8,
+                  children: kBodyPartNames.entries.where((e) => e.key != 'nessuno').map((e) {
+                    final sel = selectedParts.contains(e.key);
+                    return FilterChip(
+                      label: Text('${kBodyPartIcons[e.key] ?? ''} ${e.value}', style: TextStyle(fontSize: 12, color: sel ? Colors.black : Colors.white70)),
+                      selected: sel,
+                      onSelected: (v) => setS(() { if (v) selectedParts.add(e.key); else selectedParts.remove(e.key); }),
+                      backgroundColor: Colors.white10,
+                      selectedColor: appAccentNotifier.value,
+                      checkmarkColor: Colors.black,
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+                // Selezione immagine muscolo
+                GestureDetector(
+                  onTap: () => pickMuscleImage(setS),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white10,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: appAccentNotifier.value.withAlpha(80)),
+                    ),
+                    child: Row(children: [
+                      if (selectedMuscleImage != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset('assets/muscle/$selectedMuscleImage', width: 48, height: 48, fit: BoxFit.cover),
+                        )
+                      else
+                        const Icon(Icons.image_outlined, color: Colors.white38, size: 48),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(
+                        selectedMuscleImage != null
+                            ? (kMuscleImages.firstWhere((m) => m['file'] == selectedMuscleImage, orElse: () => {'label': selectedMuscleImage!})['label'] ?? selectedMuscleImage!)
+                            : (AppL.lang == 'en' ? 'Tap to choose muscle image' : 'Tocca per scegliere immagine muscolo'),
+                        style: TextStyle(color: selectedMuscleImage != null ? Colors.white : Colors.white38, fontSize: 13),
+                      )),
+                      Icon(Icons.chevron_right, color: appAccentNotifier.value),
+                    ]),
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(c), child: Text(AppL.cancel, style: const TextStyle(color: Colors.white54))),
@@ -2841,7 +2981,7 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                 if (name.isEmpty) return;
                 Navigator.pop(c);
                 setState(() {
-                  _days.add(WorkoutDay(dayName: name, bodyParts: List.from(selectedParts), exercises: []));
+                  _days.add(WorkoutDay(dayName: name, bodyParts: List.from(selectedParts), muscleImage: selectedMuscleImage, exercises: []));
                 });
                 _save();
               },
