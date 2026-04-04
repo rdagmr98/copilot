@@ -242,6 +242,34 @@ class AppL {
   static String get repsPerSet => _lang == 'en' ? 'Reps per set' : 'Reps per serie';
   static String get muscleGroup => _lang == 'en' ? 'Muscle group' : 'Gruppo muscolare';
   static String get chooseExercise => _lang == 'en' ? 'Choose exercise' : 'Scegli esercizio';
+  static String get noScheduleYet => _lang == 'en' ? 'No days yet' : 'Nessun giorno ancora';
+  static String get addFirstDay => _lang == 'en' ? 'Press + to add the first day' : 'Premi + per aggiungere il primo giorno';
+  static String get deleteDay => _lang == 'en' ? 'Delete day?' : 'Elimina giorno?';
+  static String get delete => _lang == 'en' ? 'DELETE' : 'ELIMINA';
+  static String get circuit => _lang == 'en' ? 'Superset / Circuit' : 'Superserie / Circuito';
+  static String get circuitHint => _lang == 'en' ? 'Assign the same number to exercises done back-to-back without rest. 0 = normal, 1/2/3 = superset/circuit group.' : 'Assegna lo stesso numero agli esercizi da fare in sequenza senza recupero. 0 = normale, 1/2/3 = gruppo superserie/circuito.';
+  static String get exerciseName => _lang == 'en' ? 'Exercise name' : 'Nome esercizio';
+  static String get pauseSec => _lang == 'en' ? 'Pause (s)' : 'Pausa (s)';
+  static String get tapToChooseMuscle => _lang == 'en' ? 'Tap to choose muscle image' : 'Tocca per scegliere immagine muscolo';
+  static String get noScheduleMsg => _lang == 'en' ? 'No schedule yet.\nCreate your first workout!' : 'Nessuna scheda.\nCrea il tuo primo allenamento!';
+  static String get history => _lang == 'en' ? 'History' : 'Storico';
+  static String get workoutOf => _lang == 'en' ? 'Workout of' : 'Allenamento del';
+  static String get restTimer => _lang == 'en' ? 'Rest timer' : 'Timer recupero';
+  static String get nextSet => _lang == 'en' ? 'Next set' : 'Prossima serie';
+  static String get done => _lang == 'en' ? 'Done' : 'Fatto';
+  static String get skip => _lang == 'en' ? 'Skip' : 'Salta';
+  static String get confirm => _lang == 'en' ? 'Confirm' : 'Conferma';
+  static String get workout => _lang == 'en' ? 'Workout' : 'Allenamento';
+  static String get totalVolume => _lang == 'en' ? 'Total volume' : 'Volume totale';
+  static String get personalBest => _lang == 'en' ? 'Personal best' : 'Record personale';
+  static String get language => _lang == 'en' ? 'Language' : 'Lingua';
+  static String get italian => _lang == 'en' ? 'Italian' : 'Italiano';
+  static String get english => _lang == 'en' ? 'English' : 'Inglese';
+  static String get accentColor => _lang == 'en' ? 'Accent color' : 'Colore accento';
+  static String get chooseLanguage => _lang == 'en' ? 'Choose your language' : 'Scegli la tua lingua';
+  static String get continueBtn => _lang == 'en' ? 'Continue' : 'Continua';
+  static String get welcomeTitle => _lang == 'en' ? 'Welcome to GymApp' : 'Benvenuto in GymApp';
+  static String get setGroup => _lang == 'en' ? 'Group' : 'Gruppo';
 }
 
 class AdManager {
@@ -2963,7 +2991,7 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       Expanded(child: Text(
                         selectedMuscleImage != null
                             ? (kMuscleImages.firstWhere((m) => m['file'] == selectedMuscleImage, orElse: () => {'label': selectedMuscleImage!})['label'] ?? selectedMuscleImage!)
-                            : (AppL.lang == 'en' ? 'Tap to choose muscle image' : 'Tocca per scegliere immagine muscolo'),
+                            : AppL.tapToChooseMuscle,
                         style: TextStyle(color: selectedMuscleImage != null ? Colors.white : Colors.white38, fontSize: 13),
                       )),
                       Icon(Icons.chevron_right, color: appAccentNotifier.value),
@@ -2998,10 +3026,10 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: const Text('Elimina giorno?', style: TextStyle(color: Colors.white)),
+        title: Text(AppL.deleteDay, style: const TextStyle(color: Colors.white)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppL.cancel)),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('ELIMINA', style: TextStyle(color: Colors.redAccent))),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(AppL.delete, style: const TextStyle(color: Colors.redAccent))),
         ],
       ),
     );
@@ -3016,6 +3044,8 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     final setsCtrl = TextEditingController(text: '3');
     final recoveryCtrl = TextEditingController(text: '60');
     final pausaCtrl = TextEditingController(text: '120');
+    final noteCtrl = TextEditingController();
+    int supersetGroup = 0;
 
     int currentSets = 3;
     List<TextEditingController> repsCtrls = List.generate(3, (_) => TextEditingController(text: '10'));
@@ -3063,7 +3093,7 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                     controller: nameCtrl,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      labelText: AppL.lang == 'en' ? 'Exercise name' : 'Nome esercizio',
+                      labelText: AppL.exerciseName,
                       labelStyle: const TextStyle(color: Colors.white54),
                       suffixIcon: nameCtrl.text.isNotEmpty
                           ? IconButton(icon: const Icon(Icons.clear, color: Colors.white38), onPressed: () { nameCtrl.clear(); setS(() { suggestions = []; selectedExInfo = null; }); })
@@ -3181,7 +3211,7 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       keyboardType: TextInputType.number,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        labelText: AppL.lang == 'en' ? 'Pause (s)' : 'Pausa (s)',
+                        labelText: AppL.pauseSec,
                         labelStyle: const TextStyle(color: Colors.white54),
                         filled: true, fillColor: Colors.black26,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -3214,6 +3244,60 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                     )),
                   ),
 
+                  const SizedBox(height: 16),
+
+                  // — Note
+                  TextField(
+                    controller: noteCtrl,
+                    maxLines: 3,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: AppL.notes,
+                      labelStyle: const TextStyle(color: Colors.white54),
+                      filled: true, fillColor: Colors.black26,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // — Superserie / Circuito
+                  Text(
+                    '🔗  ${AppL.circuit}',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    AppL.circuitHint,
+                    style: const TextStyle(color: Colors.white38, fontSize: 11),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: List.generate(6, (i) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () => setS(() => supersetGroup = i),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: supersetGroup == i ? accent : Colors.white10,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '$i',
+                              style: TextStyle(
+                                color: supersetGroup == i ? Colors.black : Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )),
+                  ),
+
                   const SizedBox(height: 20),
 
                   SizedBox(
@@ -3232,8 +3316,9 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                           repsList: repsList,
                           recoveryTime: recovery,
                           interExercisePause: pausa,
-                          notePT: '',
+                          notePT: noteCtrl.text.trim(),
                           noteCliente: '',
+                          supersetGroup: supersetGroup,
                           gifFilename: selectedExInfo?.gifFilename,
                         );
                         Navigator.pop(c);
@@ -3409,9 +3494,9 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                 children: [
                   Icon(Icons.fitness_center_rounded, color: accent.withAlpha(60), size: 64),
                   const SizedBox(height: 16),
-                  const Text('Nessun giorno ancora', style: TextStyle(color: Colors.white38, fontSize: 16)),
+                  Text(AppL.noScheduleYet, style: const TextStyle(color: Colors.white38, fontSize: 16)),
                   const SizedBox(height: 8),
-                  const Text('Premi + per aggiungere il primo giorno', style: TextStyle(color: Colors.white24, fontSize: 13)),
+                  Text(AppL.addFirstDay, style: const TextStyle(color: Colors.white24, fontSize: 13)),
                 ],
               ),
             )
