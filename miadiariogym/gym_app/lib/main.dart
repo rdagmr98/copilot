@@ -89,36 +89,11 @@ class _YouTubeSearchViewState extends State<YouTubeSearchView> {
   }
 }
 
-void main() async {
+// Flag globale: notifiche pronte
+bool _notificationsReady = false;
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb) MobileAds.instance.initialize();
-
-  // Inizializzazione fusi orari
-
-  // 1. Definisci i settings per Android
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('ic_notification');
-
-  // 2. Uniscili (Qui c'era l'errore 'settings')
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-
-  // 3. Inizializza (Usa il parametro corretto)
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  // --- MODIFICA QUI: Richiesta permessi esplicita ---
-  if (!kIsWeb && Platform.isAndroid) {
-    final androidPlugin = flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
-
-    // Questo farà apparire il popup "Consenti a questa app di inviare notifiche"
-    await androidPlugin?.requestNotificationsPermission();
-    // Questo è necessario per i timer precisi al secondo
-    await androidPlugin?.requestExactAlarmsPermission();
-  }
-  // --------------------------------------------------
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -126,7 +101,49 @@ void main() async {
       statusBarIconBrightness: Brightness.light,
     ),
   );
+
+  // Avvia subito l'app — nessun await che blocchi
   runApp(const ClientGymApp());
+
+  // Inizializza plugin in background (errori non crashano l'app)
+  _initPluginsBackground();
+}
+
+Future<void> _initPluginsBackground() async {
+  // AdMob
+  try {
+    if (!kIsWeb) await MobileAds.instance.initialize();
+  } catch (_) {}
+
+  // Notifiche
+  try {
+    const AndroidInitializationSettings initAndroid =
+        AndroidInitializationSettings('ic_notification');
+    const InitializationSettings initSettings = InitializationSettings(
+      android: initAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initSettings);
+    _notificationsReady = true;
+  } catch (_) {}
+
+  // Permessi (solo Android)
+  if (!kIsWeb && Platform.isAndroid) {
+    try {
+      final androidPlugin = flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      await androidPlugin?.requestNotificationsPermission();
+      await androidPlugin?.requestExactAlarmsPermission();
+    } catch (_) {}
+  }
+
+  // Precarica annuncio interstitial
+  if (!kIsWeb) {
+    try {
+      AdManager.instance.loadInterstitial();
+    } catch (_) {}
+  }
 }
 
 class ClientGymApp extends StatefulWidget {
@@ -662,7 +679,7 @@ class _ClientMainPageState extends State<ClientMainPage>
     _loadMainSettings();
     _loadLanguage();
     _loadBannerAd();
-    AdManager.instance.loadInterstitial();
+    try { AdManager.instance.loadInterstitial(); } catch (_) {}
   }
 
   @override
@@ -690,20 +707,24 @@ class _ClientMainPageState extends State<ClientMainPage>
 
   void _loadBannerAd() {
     if (kIsWeb) return;
-    _bannerAd = BannerAd(
-      adUnitId: AdManager.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (_) {
-          if (mounted) setState(() => _bannerAdLoaded = true);
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          _bannerAd = null;
-        },
-      ),
-    )..load();
+    try {
+      _bannerAd = BannerAd(
+        adUnitId: AdManager.bannerAdUnitId,
+        request: const AdRequest(),
+        size: AdSize.banner,
+        listener: BannerAdListener(
+          onAdLoaded: (_) {
+            if (mounted) setState(() => _bannerAdLoaded = true);
+          },
+          onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+            _bannerAd = null;
+          },
+        ),
+      )..load();
+    } catch (_) {
+      _bannerAd = null;
+    }
   }
 
   void _apriCostruttoreScheda() {
@@ -3059,6 +3080,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
   bool _timerSoundEnabled = true;
   bool _vibrationEnabled = true;
   bool _wakelockEnabled = true;
+  // Contatore generazione notifica (annulla notifiche di timer precedenti)
+  int _notifGen = 0;
+  // ID univoco sessione (per separare sessioni stessa giornata nei grafici)
+  late final String _sessionId;
   bool _autoStartTimer = true;
   bool _confirmSeriesEnabled = true;
   bool _showWeightSuggestion = true;
@@ -3066,6 +3091,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
   @override
   void initState() {
     super.initState();
+    _sessionId = DateTime.now().millisecondsSinceEpoch.toString();
     exI = 0;
     currentExSeries = [];
     setN = 1;
@@ -3263,9 +3289,11 @@ class _WorkoutEngineState extends State<WorkoutEngine>
 
   // --- NUOVA FUNZIONE NOTIFICA ---
   Future<void> _programmaNotificaFine(int secondi) async {
+    final gen = ++_notifGen;
     try {
-      // Aspetta i secondi del timer
       await Future.delayed(Duration(seconds: secondi));
+      if (gen != _notifGen) return;
+      if (!mounted) return;
 
       const androidDetails = AndroidNotificationDetails(
         'timer_gym',
@@ -3641,11 +3669,8 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       timerActive = true;
     });
 
-    // 2. Programmiamo la notifica
+    // 2. Programmiamo la notifica (una sola, con _notifGen per annullare precedenti)
     _programmaNotificaFine(sec);
-    if (!kIsWeb) {
-      _programmaNotificaFine(sec);
-    }
 
     // 3. Timer visivo
     _bgTimer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -3984,6 +4009,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
               'series': s,
               'date': DateTime.now().toIso8601String(),
               'dayName': widget.day.dayName,
+              'session_id': _sessionId,
             });
             if (!eserciziCompletati.contains(widget.day.exercises[i].name))
               eserciziCompletati.add(widget.day.exercises[i].name);
@@ -4048,6 +4074,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         'series': List.from(currentExSeries),
         'date': DateTime.now().toIso8601String(),
         'dayName': widget.day.dayName,
+        'session_id': _sessionId,
       });
       if (!eserciziCompletati.contains(currentEx.name)) {
         eserciziCompletati.add(currentEx.name);
@@ -5052,34 +5079,19 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     );
   }
 
+  // Suggerisce peso/reps dalla sessione PRECEDENTE (snapshot in _previousResults)
   Map<String, dynamic> _getSuggest(String ex, int s) {
     try {
-      var logs = widget.history.where((h) => h['exercise'] == ex).toList();
-      // Se non c'è storico, usa i pesi carryover (da scheda precedente)
-      if (logs.isEmpty) {
+      final prevSeries = _previousResults[ex];
+      if (prevSeries == null || prevSeries.isEmpty) {
         final carry = widget.carryoverWeights[ex];
         if (carry != null) return carry;
         return {'w': 0.0, 'r': 0};
       }
-
-      var lastEntry = logs.last;
-      if (lastEntry['series'] == null) return {'w': 0.0, 'r': 0};
-
-      var lastS = lastEntry['series'] as List;
-      if (s <= lastS.length) {
-        var setDetails = lastS[s - 1];
-        // Mappatura flessibile: legge sia 'w' che 'weight'
-        double weight = (setDetails['w'] ?? setDetails['weight'] ?? 0.0)
-            .toDouble();
-        int reps = (setDetails['r'] ?? setDetails['reps'] ?? 0).toInt();
-        return {'w': weight, 'r': reps};
-      } else {
-        var lastSetDetails = lastS.last;
-        double weight = (lastSetDetails['w'] ?? lastSetDetails['weight'] ?? 0.0)
-            .toDouble();
-        int reps = (lastSetDetails['r'] ?? lastSetDetails['reps'] ?? 0).toInt();
-        return {'w': weight, 'r': reps};
-      }
+      final setData = s <= prevSeries.length ? prevSeries[s - 1] : prevSeries.last;
+      final double weight = (setData['w'] ?? setData['weight'] ?? 0.0).toDouble();
+      final int reps = (setData['r'] ?? setData['reps'] ?? 0).toInt();
+      return {'w': weight, 'r': reps};
     } catch (e) {
       debugPrint("Errore suggerimenti: $e");
       return {'w': 0.0, 'r': 0};
@@ -5280,8 +5292,17 @@ class _DrumPickers extends StatefulWidget {
 
 class _DrumPickersState extends State<_DrumPickers>
     with SingleTickerProviderStateMixin {
-  static final List<double> _kgValues = List.generate(121, (i) => i * 2.5);
+  // 0-100 kg a step di 2.5, poi 105-300 a step di 5
+  static final List<double> _kgValues = [
+    ...List.generate(41, (i) => i * 2.5),
+    ...List.generate(40, (i) => 105.0 + i * 5.0),
+  ];
   static final List<int> _repsValues = List.generate(50, (i) => i + 1);
+
+  static int _kgToIndex(double kg) {
+    if (kg <= 100) return (kg / 2.5).round().clamp(0, 40);
+    return (40 + ((kg - 100) / 5).round()).clamp(0, 80);
+  }
 
   late FixedExtentScrollController _kgCtrl;
   late FixedExtentScrollController _repsCtrl;
@@ -5296,7 +5317,7 @@ class _DrumPickersState extends State<_DrumPickers>
   @override
   void initState() {
     super.initState();
-    _selKg = (widget.initialKg / 2.5).round().clamp(0, 120);
+    _selKg = _kgToIndex(widget.initialKg);
     _selReps = (widget.initialReps - 1).clamp(0, 49);
     _kgCtrl = FixedExtentScrollController(initialItem: _selKg);
     _repsCtrl = FixedExtentScrollController(initialItem: _selReps);
@@ -5622,14 +5643,20 @@ class _WorkoutProgressChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final exerciseNames = day.exercises.map((e) => e.name).toSet();
 
-    // Raggruppa la history per data (yyyy-MM-dd), solo esercizi di questo allenamento
-    final Map<String, Map<String, double>> byDate = {};
+    // Raggruppa per session_id (separa più sessioni stesso giorno)
+    final Map<String, Map<String, double>> bySession = {};
+    final Map<String, String> sessionDate = {};
     for (final h in history) {
       final exName = h['exercise'] as String? ?? '';
       if (!exerciseNames.contains(exName)) continue;
       final dateRaw = h['date'] as String? ?? '';
       if (dateRaw.isEmpty) continue;
-      final dateKey = dateRaw.substring(0, 10); // yyyy-MM-dd
+      final dateOnly = dateRaw.substring(0, 10);
+      final sessionKey =
+          (h['session_id'] as String?)?.isNotEmpty == true
+              ? h['session_id'] as String
+              : dateOnly;
+      sessionDate.putIfAbsent(sessionKey, () => dateOnly);
       final series = h['series'] as List? ?? [];
       double maxEst1RM = 0;
       for (final s in series) {
@@ -5638,10 +5665,10 @@ class _WorkoutProgressChart extends StatelessWidget {
         final est1RM = r > 0 ? w * (1 + r / 30.0) : w;
         if (est1RM > maxEst1RM) maxEst1RM = est1RM;
       }
-      byDate.putIfAbsent(dateKey, () => {})[exName] = maxEst1RM;
+      bySession.putIfAbsent(sessionKey, () => {})[exName] = maxEst1RM;
     }
 
-    if (byDate.isEmpty) {
+    if (bySession.isEmpty) {
       return const Center(
         child: Text(
           'Nessun dato registrato',
@@ -5650,18 +5677,34 @@ class _WorkoutProgressChart extends StatelessWidget {
       );
     }
 
-    // Per ogni data: score = somma degli 1RM stimati (Epley: w*(1+r/30)) degli esercizi presenti
-    final dates = byDate.keys.toList()..sort();
-    final scores = dates
-        .map((d) => byDate[d]!.values.fold(0.0, (a, b) => a + b))
+    final sessions = bySession.keys.toList()
+      ..sort((a, b) => (sessionDate[a] ?? a).compareTo(sessionDate[b] ?? b));
+    final scores = sessions
+        .map((s) => bySession[s]!.values.fold(0.0, (a, b) => a + b))
         .toList();
+
+    final Map<String, int> dateTotal = {};
+    for (final s in sessions) {
+      final d = sessionDate[s] ?? '';
+      dateTotal[d] = (dateTotal[d] ?? 0) + 1;
+    }
+    final Map<String, int> dateCounter = {};
+    final labels = sessions.map((s) {
+      final d = sessionDate[s] ?? s;
+      final dd = d.length >= 10 ? '${d.substring(8, 10)}/${d.substring(5, 7)}' : d;
+      if ((dateTotal[d] ?? 1) > 1) {
+        dateCounter[d] = (dateCounter[d] ?? 0) + 1;
+        return '$dd(${dateCounter[d]})';
+      }
+      return dd;
+    }).toList();
 
     final minS = scores.reduce((a, b) => a < b ? a : b);
     final maxS = scores.reduce((a, b) => a > b ? a : b);
 
     return CustomPaint(
       painter: _WorkoutProgressPainter(
-        dates: dates,
+        labels: labels,
         scores: scores,
         minS: minS,
         maxS: maxS,
@@ -5672,12 +5715,12 @@ class _WorkoutProgressChart extends StatelessWidget {
 }
 
 class _WorkoutProgressPainter extends CustomPainter {
-  final List<String> dates;
+  final List<String> labels;
   final List<double> scores;
   final double minS, maxS;
   final Color accent;
   _WorkoutProgressPainter({
-    required this.dates,
+    required this.labels,
     required this.scores,
     required this.minS,
     required this.maxS,
@@ -5686,7 +5729,7 @@ class _WorkoutProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (dates.isEmpty) return;
+    if (labels.isEmpty) return;
 
     final double range = (maxS - minS).abs();
     final bool flat = range < 1.0;
@@ -5717,7 +5760,7 @@ class _WorkoutProgressPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final path = Path();
-    final n = dates.length;
+    final n = labels.length;
 
     for (int i = 0; i < n; i++) {
       final x = n == 1 ? size.width / 2 : size.width / (n - 1) * i;
@@ -5738,15 +5781,10 @@ class _WorkoutProgressPainter extends CustomPainter {
       canvas.drawCircle(Offset(x, y), 5, dotBg);
       canvas.drawCircle(Offset(x, y), 4, dotPaint);
 
-      // Etichetta data (solo mese/giorno)
       if (n <= 8 || i % ((n / 6).ceil()) == 0) {
-        final d = dates[i];
-        final label = d.length >= 10
-            ? '${d.substring(8, 10)}/${d.substring(5, 7)}'
-            : d;
         final tp = TextPainter(
           text: TextSpan(
-            text: label,
+            text: labels[i],
             style: const TextStyle(color: Colors.white38, fontSize: 9),
           ),
           textDirection: TextDirection.ltr,
