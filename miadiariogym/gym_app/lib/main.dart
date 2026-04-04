@@ -270,6 +270,109 @@ class AppL {
   static String get continueBtn => _lang == 'en' ? 'Continue' : 'Continua';
   static String get welcomeTitle => _lang == 'en' ? 'Welcome to GymApp' : 'Benvenuto in GymApp';
   static String get setGroup => _lang == 'en' ? 'Group' : 'Gruppo';
+
+  // Onboarding pages
+  static String get onboardingWelcomeText => _lang == 'en' ? 'Your smart workout app, wherever you are.' : 'La tua app per allenarsi in modo intelligente, ovunque tu sia.';
+  static String get onboardingScheduleTitle => _lang == 'en' ? 'Build your schedule' : 'Crea la tua scheda';
+  static String get onboardingScheduleText => _lang == 'en' ? 'Build your personalized routine with exercises from our database of 1200+ movements with animated GIFs.' : 'Costruisci la tua routine personalizzata con esercizi dal nostro database di 1200+ movimenti con GIF animate.';
+  static String get onboardingTrainTitle => _lang == 'en' ? 'Train & track' : 'Allena e registra';
+  static String get onboardingTrainText => _lang == 'en' ? 'Follow each set with automatic timer, record weights and reps, view your progress over time.' : 'Segui ogni serie con timer automatico, registra pesi e ripetizioni, visualizza i tuoi progressi nel tempo.';
+  static String get onboardingProgressTitle => _lang == 'en' ? 'Monitor progress' : 'Monitora i progressi';
+  static String get onboardingProgressText => _lang == 'en' ? 'Charts for each exercise, session history and automatic suggestions to increase loads.' : 'Grafici per ogni esercizio, storico delle sessioni e suggerimenti automatici per aumentare i carichi.';
+  static String get onboardingProText => _lang == 'en' ? 'Take your clients to the next level with the complete ecosystem: PT app to create schedules and monitor all your athletes from a single dashboard.' : 'Porta i tuoi clienti al livello successivo con l\'ecosistema completo: app PT per creare schede e monitorare tutti i tuoi atleti da un\'unica dashboard.';
+  static String get contactGianmarco => _lang == 'en' ? 'Contact Gianmarco' : 'Contatta Gianmarco';
+  static String get proInfoText => _lang == 'en' ? 'Write for info on the GymApp Pro ecosystem' : 'Scrivi per info sull\'ecosistema GymApp Pro';
+  static String get startBtn => _lang == 'en' ? 'START' : 'INIZIA';
+  static String get nextBtn => _lang == 'en' ? 'NEXT' : 'AVANTI';
+  static String get chooseMuscleImage => _lang == 'en' ? 'Workout image' : 'Immagine allenamento';
+  static String get noImage => _lang == 'en' ? 'None' : 'Nessuna';
+  static String get promoText => _lang == 'en' ? 'Take your clients to the next level with the GymApp Pro ecosystem.' : 'Porta i tuoi clienti al livello successivo con l\'ecosistema GymApp Pro.';
+  static String get noScheduleLoaded => _lang == 'en' ? 'No schedule loaded' : 'Nessuna scheda caricata';
+  static String get editOrCreate => _lang == 'en' ? 'Edit / Create new schedule' : 'Modifica / Crea nuova scheda';
+  static String get trainNow => _lang == 'en' ? 'TRAIN NOW' : 'ALLENATI ORA';
+  static String get train2 => _lang == 'en' ? 'TRAIN' : 'ALLENATI';
+  static String get chooseAndStart => _lang == 'en' ? 'Choose and start your workout' : 'Scegli e inizia il tuo allenamento';
+  static String get createFirstSchedule => _lang == 'en' ? 'Create your schedule before training' : 'Crea la tua scheda prima di allenarti';
+  static String get workoutProgress => _lang == 'en' ? 'WORKOUT PROGRESS' : 'ANDAMENTO ALLENAMENTO';
+  static String get neverTrained => _lang == 'en' ? 'Never trained' : 'Mai allenato';
+  static String get today => _lang == 'en' ? 'Today' : 'Oggi';
+  static String get yesterday => _lang == 'en' ? 'Yesterday' : 'Ieri';
+  static String get daysAgo => _lang == 'en' ? 'days ago' : 'giorni fa';
+  static String get others => _lang == 'en' ? 'others' : 'altri';
+  static String get timerSound => _lang == 'en' ? 'Timer sound' : 'Suono fine timer';
+  static String get timerVibration => _lang == 'en' ? 'Timer vibration' : 'Vibrazione fine timer';
+  static String get autoStartTimer => _lang == 'en' ? 'Auto-start timer' : 'Avvia timer automaticamente';
+  static String get screenAlwaysOn => _lang == 'en' ? 'Screen always on' : 'Schermo sempre acceso';
+  static String get confirmSeriesWindow => _lang == 'en' ? 'Set confirmation window' : 'Finestra di conferma serie';
+  static String get weightSuggestion => _lang == 'en' ? 'Weight increase suggestion' : 'Suggerimento aumento peso';
+  static String get dataManagement => _lang == 'en' ? 'Data Management' : 'Gestione Dati';
+  static String get insertKg => _lang == 'en' ? 'Enter KG' : 'Inserisci KG';
+  static String get insertReps => _lang == 'en' ? 'Enter REPS' : 'Inserisci REPS';
+  static String get enterKgReps => _lang == 'en' ? 'Enter kg and reps before confirming' : 'Inserisci kg e reps prima di confermare';
+  static String get saveSeries => _lang == 'en' ? 'SAVE SET' : 'SALVA SERIE';
+  static String get confirmSeries => _lang == 'en' ? 'CONFIRM SET' : 'CONFERMA SERIE';
+  static String get quitWorkout => _lang == 'en' ? 'Quit?' : 'Interrompere?';
+  static String get quitWorkoutMsg => _lang == 'en' ? 'Do you really want to exit? Progress made so far is saved.' : 'Vuoi davvero uscire dall\'allenamento? I progressi fin qui fatti sono comunque salvati.';
+  static String get exitAndSave => _lang == 'en' ? 'EXIT & SAVE' : 'ESCI E SALVA';
+  static String get exerciseComplete => _lang == 'en' ? 'EXERCISE COMPLETED' : 'ESERCIZIO COMPLETATO';
+  static String get exerciseCompleteMsg => _lang == 'en' ? 'Data has been saved and cannot be modified.' : 'I dati sono stati salvati e non sono più modificabili.';
+  static String get nextInfo => _lang == 'en' ? 'NEXT' : 'PROSSIMA';
+  static String get lastTime => _lang == 'en' ? 'LAST TIME' : 'ULTIMA VOLTA';
+  static String get increaseWeight => _lang == 'en' ? 'INCREASE WEIGHT' : 'AUMENTA IL PESO';
+  static String get increase => _lang == 'en' ? 'INCREASE' : 'AUMENTA';
+  static String get workoutComplete => _lang == 'en' ? 'WORKOUT COMPLETE!' : 'ALLENAMENTO COMPLETATO!';
+  static String get firstSession => _lang == 'en' ? 'First session!' : 'Prima sessione!';
+  static String get improving => _lang == 'en' ? 'Improving!' : 'In miglioramento!';
+  static String get declining => _lang == 'en' ? 'Declining' : 'In calo';
+  static String get plateau => _lang == 'en' ? 'Plateau' : 'Stallo';
+  static String get details => _lang == 'en' ? 'DETAILS' : 'DETTAGLI';
+  static String get greatWork => _lang == 'en' ? 'GREAT JOB!' : 'OTTIMO LAVORO!';
+  static String get workoutSummary => _lang == 'en' ? 'Workout summary' : 'Riepilogo allenamento';
+  static String get close => _lang == 'en' ? 'CLOSE' : 'CHIUDI';
+  static String get totalSeries => _lang == 'en' ? 'Total sets' : 'Serie totali';
+  static String get exercisesLabel => _lang == 'en' ? 'Exercises' : 'Esercizi';
+  static String get primaryMuscle => _lang == 'en' ? 'PRIMARY MUSCLE' : 'MUSCOLO PRINCIPALE';
+  static String get secondaryMuscles => _lang == 'en' ? 'SECONDARY MUSCLES' : 'MUSCOLI SECONDARI';
+  static String get execution => _lang == 'en' ? '📋 EXECUTION' : '📋 ESECUZIONE';
+  static String get tips => _lang == 'en' ? '💡 TIPS' : '💡 CONSIGLI';
+  static String get notInCatalog => _lang == 'en' ? 'Exercise not in catalog.\nUse YouTube to watch the technique.' : 'Esercizio non in catalogo.\nUsa YouTube per vedere la tecnica.';
+  static String get notInCatalogShort => _lang == 'en' ? 'Exercise not in catalog.' : 'Esercizio non in catalogo.';
+  static String get watchOnYoutube => _lang == 'en' ? 'Watch on YouTube' : 'Guarda su YouTube';
+  static String get progressOverTime => _lang == 'en' ? 'Progress over time — one line per set' : 'Progressi nel tempo — una linea per serie';
+  static String get noData => _lang == 'en' ? 'No data' : 'Nessun dato';
+  static String get noDataRegistered => _lang == 'en' ? 'No recorded data' : 'Nessun dato registrato';
+  static String get myNotes => _lang == 'en' ? 'My notes...' : 'Le mie note...';
+  static String get coachNotes => _lang == 'en' ? 'COACH' : 'COACH';
+  static String get setsDone => _lang == 'en' ? 'SETS DONE' : 'SERIE FATTE';
+  static String get of => _lang == 'en' ? 'OF' : 'DI';
+  static String get changeExercise => _lang == 'en' ? 'CHANGE EXERCISE' : 'CAMBIO ESERCIZIO';
+  static String get noHistory => _lang == 'en' ? 'No history' : 'Nessuno storico presente';
+  static String get deleteSelected => _lang == 'en' ? 'Delete selected' : 'Elimina selezionati';
+  static String get totalReset => _lang == 'en' ? 'TOTAL RESET' : 'RESET TOTALE';
+  static String get fullReset => _lang == 'en' ? 'Full data reset' : 'Reset completo dati';
+  static String get fullResetTitle => _lang == 'en' ? 'Full reset' : 'Reset completo';
+  static String get fullResetMsg => _lang == 'en' ? 'Will delete ALL data: schedule, history and settings.' : 'Eliminerà TUTTI i dati: scheda, storico e impostazioni.';
+  static String get continueLabel => _lang == 'en' ? 'CONTINUE' : 'CONTINUA';
+  static String get areYouSure => _lang == 'en' ? 'Are you sure?' : 'Sei sicuro?';
+  static String get irreversible => _lang == 'en' ? 'This operation is irreversible.' : 'Operazione irreversibile.';
+  static String get deleteAll => _lang == 'en' ? 'DELETE ALL' : 'CANCELLA TUTTO';
+  static String get noSession => _lang == 'en' ? 'No sessions' : 'Nessuna sessione';
+  static String get deleteSession => _lang == 'en' ? 'Delete session?' : 'Elimina sessione?';
+  static String get deleteSessionMsg => _lang == 'en' ? 'All data from this session will be deleted.' : 'Tutti i dati di questa sessione verranno eliminati.';
+  static String get sessionDeleted => _lang == 'en' ? 'Session deleted' : 'Sessione eliminata';
+  static String get deleteSeries => _lang == 'en' ? 'Delete set?' : 'Elimina serie?';
+  static String get dataDeleted => _lang == 'en' ? 'Data deleted' : 'Dati eliminati';
+  static String get skipUseButton => _lang == 'en' ? 'Use the SKIP button to return to the exercise' : 'Usa il tasto \'SKIP\' per tornare all\'esercizio';
+  static String get restoreWorkout => _lang == 'en' ? '♻️ Previous workout restored' : '♻️ Allenamento precedente ripristinato';
+  static String get workoutNotDone => _lang == 'en' ? 'You completed this exercise, but there are more! Use the arrows.' : 'Hai completato questo esercizio, ma ne mancano altri! Usa le frecce.';
+  static String get proFeature1 => _lang == 'en' ? '✅ Personalized schedules for each athlete' : '✅ Schede personalizzate per ogni atleta';
+  static String get proFeature2 => _lang == 'en' ? '✅ Real-time progress monitoring' : '✅ Monitoraggio progressi in tempo reale';
+  static String get proFeature3 => _lang == 'en' ? '✅ Shared exercise database' : '✅ Database esercizi condiviso';
+  static String get proFeature4 => _lang == 'en' ? '✅ No monthly subscriptions' : '✅ Senza abbonamenti mensili';
+  static String get gymAppPro => _lang == 'en' ? 'GymApp Pro - For PT' : 'GymApp Pro - Per PT';
+  static String get recoverySuffix => _lang == 'en' ? 's rest' : 's riposo';
+  static String get sessionCount => _lang == 'en' ? 'session' : 'session';
+  static String get sessionCountPlural => _lang == 'en' ? 'sessions' : 'sessioni';
 }
 
 class AdManager {
@@ -485,31 +588,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageCtrl = PageController();
   int _currentPage = 0;
 
-  final List<_OnboardingPage> _pages = [
+  List<_OnboardingPage> get _pages => [
     _OnboardingPage(
       icon: '🏋️',
-      title: 'Benvenuto in GymApp',
-      text: 'La tua app per allenarsi in modo intelligente, ovunque tu sia.',
+      title: AppL.welcomeTitle,
+      text: AppL.onboardingWelcomeText,
     ),
     _OnboardingPage(
       icon: '📋',
-      title: 'Crea la tua scheda',
-      text: 'Costruisci la tua routine personalizzata con esercizi dal nostro database di 1200+ movimenti con GIF animate.',
+      title: AppL.onboardingScheduleTitle,
+      text: AppL.onboardingScheduleText,
     ),
     _OnboardingPage(
       icon: '⏱️',
-      title: 'Allena e registra',
-      text: 'Segui ogni serie con timer automatico, registra pesi e ripetizioni, visualizza i tuoi progressi nel tempo.',
+      title: AppL.onboardingTrainTitle,
+      text: AppL.onboardingTrainText,
     ),
     _OnboardingPage(
       icon: '📊',
-      title: 'Monitora i progressi',
-      text: 'Grafici per ogni esercizio, storico delle sessioni e suggerimenti automatici per aumentare i carichi.',
+      title: AppL.onboardingProgressTitle,
+      text: AppL.onboardingProgressText,
     ),
     _OnboardingPage(
       icon: '👨‍💼',
-      title: 'Sei un Personal Trainer?',
-      text: 'Porta i tuoi clienti al livello successivo con l\'ecosistema completo: app PT per creare schede e monitorare tutti i tuoi atleti da un\'unica dashboard.',
+      title: AppL.proTrainer,
+      text: AppL.onboardingProText,
       isPromo: true,
     ),
   ];
@@ -565,7 +668,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
-                        child: const Text('INIZIA', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 2)),
+                        child: Text(AppL.startBtn, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 2)),
                       ),
                     )
                   : SizedBox(
@@ -578,7 +681,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
-                        child: const Text('AVANTI', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                        child: Text(AppL.nextBtn, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                       ),
                     ),
             ),
@@ -615,7 +718,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 if (await canLaunchUrl(uri)) await launchUrl(uri);
               },
               icon: const Text('📧', style: TextStyle(fontSize: 18)),
-              label: const Text('Contatta Gianmarco'),
+              label: Text(AppL.contactGianmarco),
               style: OutlinedButton.styleFrom(
                 foregroundColor: accent,
                 side: BorderSide(color: accent.withAlpha(120)),
@@ -624,9 +727,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Scrivi per info sull\'ecosistema GymApp Pro',
-              style: TextStyle(color: Colors.white30, fontSize: 12),
+            Text(
+              AppL.proInfoText,
+              style: const TextStyle(color: Colors.white30, fontSize: 12),
               textAlign: TextAlign.center,
             ),
           ],
@@ -692,14 +795,23 @@ List<ExerciseInfo> searchExercisesWithItalian(String query, {int limit = 6}) {
     if (seen.add(ex.name) && results.length < limit) results.add(ex);
   }
 
-  // 1. Match diretto su nome italiano o inglese
+  // 1. Match diretto nel catalogo italiano (kExerciseCatalog) — nomi IT come "Trazioni"
+  for (final ex in kExerciseCatalog) {
+    if (ex.name.toLowerCase().contains(q) ||
+        ex.nameEn.toLowerCase().contains(q) ||
+        ex.aliases.any((a) => a.toLowerCase().contains(q))) {
+      tryAdd(ex);
+    }
+  }
+
+  // 2. Match diretto nel catalogo GIF (nomi EN) — es. "Pull-Up", "Bench Press"
   for (final ex in kGifCatalog) {
     if (ex.name.toLowerCase().contains(q) || ex.nameEn.toLowerCase().contains(q)) {
       tryAdd(ex);
     }
   }
 
-  // 2. Match tramite parole chiave italiane
+  // 3. Match tramite parole chiave italiane → inglese
   if (results.length < limit) {
     for (final entry in kItalianKeywords.entries) {
       if (entry.key.contains(q) || q.contains(entry.key)) {
@@ -972,19 +1084,19 @@ class _ClientMainPageState extends State<ClientMainPage>
           children: [
             const Text('👨‍💼', style: TextStyle(fontSize: 56)),
             const SizedBox(height: 16),
-            const Text(
-              'Sei un Personal Trainer?',
-              style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+            Text(
+              AppL.proTrainer,
+              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Porta i tuoi clienti al livello successivo con l\'ecosistema GymApp Pro.',
-              style: TextStyle(color: Colors.white60, fontSize: 15, height: 1.5),
+            Text(
+              AppL.promoText,
+              style: const TextStyle(color: Colors.white60, fontSize: 15, height: 1.5),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            ...['✅ Schede personalizzate per ogni atleta', '✅ Monitoraggio progressi in tempo reale', '✅ Database esercizi condiviso', '✅ Senza abbonamenti mensili'].map((v) =>
+            ...[AppL.proFeature1, AppL.proFeature2, AppL.proFeature3, AppL.proFeature4].map((v) =>
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(children: [
@@ -1001,7 +1113,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                   if (await canLaunchUrl(uri)) await launchUrl(uri);
                 },
                 icon: const Text('📧', style: TextStyle(fontSize: 16)),
-                label: const Text('Contatta Gianmarco'),
+                label: Text(AppL.contactGianmarco),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accent,
                   foregroundColor: Colors.black,
@@ -1060,9 +1172,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                         ),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
-                        'Impostazioni',
-                        style: TextStyle(color: Colors.white38, fontSize: 12),
+                      Text(
+                        AppL.settings,
+                        style: const TextStyle(color: Colors.white38, fontSize: 12),
                       ),
                     ],
                   );
@@ -1084,7 +1196,7 @@ class _ClientMainPageState extends State<ClientMainPage>
               ),
               _mainSettingRow(
                 Icons.notifications_active_outlined,
-                'Suono fine timer',
+                AppL.timerSound,
                 _stTimerSound,
                 (v) {
                   setState(() => _stTimerSound = v);
@@ -1093,7 +1205,7 @@ class _ClientMainPageState extends State<ClientMainPage>
               ),
               _mainSettingRow(
                 Icons.vibration,
-                'Vibrazione fine timer',
+                AppL.timerVibration,
                 _stVibration,
                 (v) {
                   setState(() => _stVibration = v);
@@ -1115,7 +1227,7 @@ class _ClientMainPageState extends State<ClientMainPage>
               ),
               _mainSettingRow(
                 Icons.timer_outlined,
-                'Avvia timer automaticamente',
+                AppL.autoStartTimer,
                 _stAutoTimer,
                 (v) {
                   setState(() => _stAutoTimer = v);
@@ -1124,7 +1236,7 @@ class _ClientMainPageState extends State<ClientMainPage>
               ),
               _mainSettingRow(
                 Icons.screen_lock_portrait_outlined,
-                'Schermo sempre acceso',
+                AppL.screenAlwaysOn,
                 _stWakelock,
                 (v) {
                   setState(() => _stWakelock = v);
@@ -1146,7 +1258,7 @@ class _ClientMainPageState extends State<ClientMainPage>
               ),
               _mainSettingRow(
                 Icons.check_circle_outline,
-                'Finestra di conferma serie',
+                AppL.confirmSeriesWindow,
                 _stConfirmSeries,
                 (v) {
                   setState(() => _stConfirmSeries = v);
@@ -1155,7 +1267,7 @@ class _ClientMainPageState extends State<ClientMainPage>
               ),
               _mainSettingRow(
                 Icons.trending_up,
-                'Suggerimento aumento peso',
+                AppL.weightSuggestion,
                 _stWeightHint,
                 (v) {
                   setState(() => _stWeightHint = v);
@@ -1260,7 +1372,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   icon: const Text('👨‍💼', style: TextStyle(fontSize: 16)),
-                  label: const Text('GymApp Pro - Per PT', style: TextStyle(color: Colors.white70)),
+                  label: Text(AppL.gymAppPro, style: const TextStyle(color: Colors.white70)),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.white24),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1291,9 +1403,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                     Icons.storage_rounded,
                     color: Colors.redAccent,
                   ),
-                  label: const Text(
-                    'Gestione Dati',
-                    style: TextStyle(color: Colors.redAccent),
+                  label: Text(
+                    AppL.dataManagement,
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.redAccent),
@@ -1473,14 +1585,14 @@ class _ClientMainPageState extends State<ClientMainPage>
         unselectedItemColor: Colors.white24,
         type: BottomNavigationBarType.fixed,
         onTap: (i) => setState(() => _currentIndex = i),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.view_list_rounded),
-            label: "Scheda",
+            icon: const Icon(Icons.view_list_rounded),
+            label: AppL.mySchedule,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center_rounded),
-            label: "Allenati",
+            icon: const Icon(Icons.fitness_center_rounded),
+            label: AppL.train,
           ),
         ],
       ),
@@ -1500,9 +1612,9 @@ class _ClientMainPageState extends State<ClientMainPage>
               size: 64,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Nessuna scheda caricata',
-              style: TextStyle(color: Colors.white38, fontSize: 16),
+            Text(
+              AppL.noScheduleLoaded,
+              style: const TextStyle(color: Colors.white38, fontSize: 16),
             ),
             const SizedBox(height: 20),
             OutlinedButton.icon(
@@ -1533,7 +1645,7 @@ class _ClientMainPageState extends State<ClientMainPage>
           child: TextButton.icon(
             onPressed: _apriCostruttoreScheda,
             icon: const Icon(Icons.edit_note_rounded, size: 16),
-            label: const Text('Modifica / Crea nuova scheda'),
+            label: Text(AppL.editOrCreate),
             style: TextButton.styleFrom(foregroundColor: Colors.white38),
           ),
         ),
@@ -1722,7 +1834,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                       _showDayDetail(day);
                     },
                     icon: const Icon(Icons.list_alt_rounded, size: 16),
-                    label: const Text('Esercizi'),
+                    label: Text(AppL.exercises),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white54,
                     ),
@@ -1778,9 +1890,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                     size: 16,
                   ),
                   const SizedBox(width: 6),
-                  const Text(
-                    'ANDAMENTO ALLENAMENTO',
-                    style: TextStyle(
+                  Text(
+                    AppL.workoutProgress,
+                    style: const TextStyle(
                       color: Colors.white38,
                       fontSize: 11,
                       letterSpacing: 1.2,
@@ -1910,7 +2022,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                     ),
                   ),
                   Text(
-                    '${day.exercises.length} esercizi',
+                    '${day.exercises.length} ${AppL.exercises.toLowerCase()}',
                     style: const TextStyle(color: Colors.white24, fontSize: 12),
                   ),
                 ],
@@ -2178,26 +2290,26 @@ class _ClientMainPageState extends State<ClientMainPage>
             if (info != null) ...[
               _infoTile(
                 Icons.fitness_center_rounded,
-                'MUSCOLO PRINCIPALE',
+                AppL.primaryMuscle,
                 info.primaryMuscle,
                 accent,
               ),
               if (info.secondaryMuscles.isNotEmpty)
                 _infoTile(
                   Icons.grain_rounded,
-                  'MUSCOLI SECONDARI',
+                  AppL.secondaryMuscles,
                   info.secondaryMuscles,
                   Colors.white54,
                 ),
               const SizedBox(height: 12),
               _sectionCard(
-                '📋 ESECUZIONE',
+                AppL.execution,
                 info.execution,
                 const Color(0xFF1C1C1E),
               ),
               const SizedBox(height: 8),
               _sectionCard(
-                '💡 CONSIGLI',
+                AppL.tips,
                 info.tips,
                 Colors.amber.withAlpha(15),
               ),
@@ -2208,9 +2320,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                   color: Colors.white.withAlpha(5),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Esercizio non in catalogo.\nUsa YouTube per vedere la tecnica.',
-                  style: TextStyle(color: Colors.white38, fontSize: 13),
+                child: Text(
+                  AppL.notInCatalog,
+                  style: const TextStyle(color: Colors.white38, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -2220,7 +2332,7 @@ class _ClientMainPageState extends State<ClientMainPage>
             Row(
               children: [
                 _statChip(
-                  '${ex.targetSets} serie',
+                  '${ex.targetSets} ${AppL.sets.toLowerCase()}',
                   Icons.repeat_rounded,
                   accent,
                 ),
@@ -2233,7 +2345,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                 if (ex.recoveryTime > 0) ...[
                   const SizedBox(width: 8),
                   _statChip(
-                    '${ex.recoveryTime}s riposo',
+                    '${ex.recoveryTime}s ${AppL.recoverySuffix}',
                     Icons.timer_outlined,
                     Colors.white38,
                   ),
@@ -2280,9 +2392,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                   Icons.play_circle_outline_rounded,
                   color: Colors.red,
                 ),
-                label: const Text(
-                  'Guarda su YouTube',
-                  style: TextStyle(color: Colors.red),
+                label: Text(
+                  AppL.watchOnYoutube,
+                  style: const TextStyle(color: Colors.red),
                 ),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.red.withAlpha(80)),
@@ -2412,9 +2524,9 @@ class _ClientMainPageState extends State<ClientMainPage>
               ],
             ),
             const SizedBox(height: 6),
-            const Text(
-              'Progressi nel tempo — una linea per serie',
-              style: TextStyle(color: Colors.white24, fontSize: 11),
+            Text(
+              AppL.progressOverTime,
+              style: const TextStyle(color: Colors.white24, fontSize: 11),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -2508,11 +2620,11 @@ class _ClientMainPageState extends State<ClientMainPage>
         }
       }
     }
-    if (latest == null) return 'Mai allenato';
+    if (latest == null) return AppL.neverTrained;
     final diff = DateTime.now().difference(latest).inDays;
-    if (diff == 0) return 'Oggi';
-    if (diff == 1) return 'Ieri';
-    return '$diff giorni fa';
+    if (diff == 0) return AppL.today;
+    if (diff == 1) return AppL.yesterday;
+    return '$diff ${AppL.daysAgo}';
   }
 
   void _startWorkout(WorkoutDay d) async {
@@ -2559,14 +2671,14 @@ class _ClientMainPageState extends State<ClientMainPage>
           children: [
             Icon(Icons.fitness_center, color: accent.withAlpha(80), size: 64),
             const SizedBox(height: 16),
-            const Text(
-              'Nessuna scheda caricata',
-              style: TextStyle(color: Colors.white38, fontSize: 16),
+            Text(
+              AppL.noScheduleLoaded,
+              style: const TextStyle(color: Colors.white38, fontSize: 16),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Crea la tua scheda prima di allenarti',
-              style: TextStyle(color: Colors.white24, fontSize: 13),
+            Text(
+              AppL.createFirstSchedule,
+              style: const TextStyle(color: Colors.white24, fontSize: 13),
             ),
           ],
         ),
@@ -2592,7 +2704,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'ALLENATI',
+                      AppL.train2,
                       style: TextStyle(
                         color: accent,
                         fontSize: 22,
@@ -2603,9 +2715,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                   ],
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Scegli e inizia il tuo allenamento',
-                  style: TextStyle(color: Colors.white38, fontSize: 13),
+                Text(
+                  AppL.chooseAndStart,
+                  style: const TextStyle(color: Colors.white38, fontSize: 13),
                 ),
               ],
             ),
@@ -2617,7 +2729,7 @@ class _ClientMainPageState extends State<ClientMainPage>
             delegate: SliverChildBuilderDelegate((_, i) {
               final d = myRoutine[i];
               final label = _lastTrainedLabel(d);
-              final isToday = label == 'Oggi';
+              final isToday = label == AppL.today;
               return GestureDetector(
                 onTap: () => _mostraAdEAvviaAllenamento(d),
                 child: Container(
@@ -2684,7 +2796,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                                       const SizedBox(width: 4),
                                       Flexible(
                                         child: Text(
-                                          '${d.exercises.length} esercizi',
+                                          '${d.exercises.length} ${AppL.exercises.toLowerCase()}',
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                           style: const TextStyle(
@@ -2702,7 +2814,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                                       const SizedBox(width: 4),
                                       Flexible(
                                         child: Text(
-                                          '${d.exercises.fold(0, (s, ex) => s + ex.targetSets)} serie',
+                                          '${d.exercises.fold(0, (s, ex) => s + ex.targetSets)} ${AppL.sets.toLowerCase()}',
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                           style: const TextStyle(
@@ -2769,7 +2881,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    '+ ${d.exercises.length - 4} altri',
+                                    '+ ${d.exercises.length - 4} ${AppL.others}',
                                     style: TextStyle(
                                       color: accent.withAlpha(150),
                                       fontSize: 12,
@@ -2791,9 +2903,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                               Icons.play_arrow_rounded,
                               size: 22,
                             ),
-                            label: const Text(
-                              'ALLENATI ORA',
-                              style: TextStyle(
+                            label: Text(
+                              AppL.trainNow,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w900,
                                 fontSize: 15,
                                 letterSpacing: 1,
@@ -2870,7 +2982,7 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
           builder: (c, setSInner) => AlertDialog(
             backgroundColor: const Color(0xFF1C1C1E),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Text('Immagine allenamento', style: TextStyle(color: Colors.white, fontSize: 16)),
+            title: Text(AppL.chooseMuscleImage, style: const TextStyle(color: Colors.white, fontSize: 16)),
             content: SizedBox(
               width: double.maxFinite,
               child: GridView.builder(
@@ -2893,7 +3005,7 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                           Icon(Icons.hide_image_outlined, color: sel ? appAccentNotifier.value : Colors.white38, size: 28),
                           const SizedBox(height: 4),
-                          Text('Nessuna', style: TextStyle(color: sel ? appAccentNotifier.value : Colors.white38, fontSize: 11)),
+                          Text(AppL.noImage, style: TextStyle(color: sel ? appAccentNotifier.value : Colors.white38, fontSize: 11)),
                         ]),
                       ),
                     );
@@ -3750,10 +3862,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('♻️ Allenamento precedente ripristinato'),
-            duration: Duration(seconds: 3),
-            backgroundColor: Color(0xFF1C1C2E),
+          SnackBar(
+            content: Text(AppL.restoreWorkout),
+            duration: const Duration(seconds: 3),
+            backgroundColor: const Color(0xFF1C1C2E),
           ),
         );
       }
@@ -3795,20 +3907,20 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: const Color(0xFF1C1C1E),
-            title: const Text(
-              "Interrompere?",
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              AppL.quitWorkout,
+              style: const TextStyle(color: Colors.white),
             ),
-            content: const Text(
-              "Vuoi davvero uscire dall'allenamento? I progressi fin qui fatti sono comunque salvati.",
-              style: TextStyle(color: Colors.white70),
+            content: Text(
+              AppL.quitWorkoutMsg,
+              style: const TextStyle(color: Colors.white70),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text(
-                  "ANNULLA",
-                  style: TextStyle(color: Colors.white38),
+                child: Text(
+                  AppL.cancel.toUpperCase(),
+                  style: const TextStyle(color: Colors.white38),
                 ),
               ),
               // Nel metodo _mostraDialogConfermaUscita
@@ -3821,7 +3933,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                   await _saveAndExit();
                 },
                 child: Text(
-                  "ESCI E SALVA",
+                  AppL.exitAndSave,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                   ),
@@ -3925,7 +4037,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         backgroundColor: const Color(0xFF1C1C1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Riepilogo allenamento',
+          AppL.workoutSummary,
           style: TextStyle(
             color: Theme.of(c).colorScheme.primary,
             fontSize: 16,
@@ -4029,7 +4141,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           TextButton(
             onPressed: () => Navigator.pop(c),
             child: Text(
-              'CHIUDI',
+              AppL.close,
               style: TextStyle(color: Theme.of(c).colorScheme.primary),
             ),
           ),
@@ -4059,19 +4171,19 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         if (!hasPrev) {
           perfIcon = Icons.fitness_center;
           perfColor = Theme.of(c).colorScheme.primary;
-          perfLabel = 'Prima sessione!';
+          perfLabel = AppL.firstSession;
         } else if (score > 0) {
           perfIcon = Icons.trending_up;
           perfColor = Colors.greenAccent;
-          perfLabel = 'In miglioramento!';
+          perfLabel = AppL.improving;
         } else if (score < 0) {
           perfIcon = Icons.trending_down;
           perfColor = Colors.redAccent;
-          perfLabel = 'In calo';
+          perfLabel = AppL.declining;
         } else {
           perfIcon = Icons.trending_flat;
           perfColor = Colors.orangeAccent;
-          perfLabel = 'Stallo';
+          perfLabel = AppL.plateau;
         }
         return AlertDialog(
           backgroundColor: const Color(0xFF1C1C1E),
@@ -4083,7 +4195,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
               Icon(perfIcon, color: perfColor, size: 52),
               const SizedBox(height: 8),
               Text(
-                'ALLENAMENTO COMPLETATO!',
+                AppL.workoutComplete,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Theme.of(c).colorScheme.primary,
@@ -4109,10 +4221,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
               const SizedBox(height: 8),
               _recapRow(
                 Icons.fitness_center,
-                'Esercizi',
+                AppL.exercisesLabel,
                 '${_allCompletedExercises.length}',
               ),
-              _recapRow(Icons.repeat, 'Serie totali', '$totalSeries'),
+              _recapRow(Icons.repeat, AppL.totalSeries, '$totalSeries'),
               const SizedBox(height: 8),
               const Divider(color: Colors.white24),
               const SizedBox(height: 4),
@@ -4134,9 +4246,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                   ),
                 ),
                 onPressed: () => _showDettagliMiglioramenti(c),
-                child: const Text(
-                  'DETTAGLI',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  AppL.details,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -4154,9 +4266,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                   Navigator.pop(c);
                   Navigator.pop(context);
                 },
-                child: const Text(
-                  'OTTIMO LAVORO!',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  AppL.greatWork,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -4309,10 +4421,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     final int r = int.tryParse(rC.text) ?? 0;
     if (w < 0 || r <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Inserisci kg e reps prima di confermare"),
+        SnackBar(
+          content: Text(AppL.enterKgReps),
           backgroundColor: Colors.orange,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       return;
@@ -4372,7 +4484,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
             ),
             const SizedBox(height: 8),
             Text(
-              "Serie $setN",
+              "${AppL.sets} $setN",
               style: const TextStyle(color: Colors.white38, fontSize: 13),
             ),
             const SizedBox(height: 16),
@@ -4404,7 +4516,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text("ANNULLA"),
+                    child: Text(AppL.cancel.toUpperCase()),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -4424,8 +4536,8 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      "SALVA SERIE",
+                    child: Text(
+                      AppL.saveSeries,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -4673,10 +4785,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         _triggerTimer(pauseTime, force: true); // fine esercizio: sempre pausa inter-esercizio
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             backgroundColor: Colors.orange,
             content: Text(
-              "Hai completato questo esercizio, ma ne mancano altri! Usa le frecce.",
+              AppL.workoutNotDone,
             ),
           ),
         );
@@ -4740,17 +4852,17 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           children: [
             const Icon(Icons.check_circle, color: Color(0xFF00FF88), size: 50),
             const SizedBox(height: 15),
-            const Text(
-              "ESERCIZIO COMPLETATO",
-              style: TextStyle(
+            Text(
+              AppL.exerciseComplete,
+              style: const TextStyle(
                 color: Color(0xFF00FF88),
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const Text(
-              "I dati sono stati salvati e non sono più modificabili.",
+            Text(
+              AppL.exerciseCompleteMsg,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white38, fontSize: 12),
+              style: const TextStyle(color: Colors.white38, fontSize: 12),
             ),
           ],
         ),
@@ -4760,14 +4872,14 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     // 2. CALCOLIAMO COSA FARE DOPO(Logica originale)
     if (setN <= ex.targetSets) {
       _infoProssimo =
-          "${ex.name.toUpperCase()}\nSerie $setN di ${ex.targetSets}";
+          "${ex.name.toUpperCase()}\n${AppL.sets} $setN ${AppL.of} ${ex.targetSets}";
       _prossimoNome = ex.name;
     } else if (exI < widget.day.exercises.length - 1) {
       var prossimoEs = widget.day.exercises[exI + 1];
-      _infoProssimo = "CAMBIO ESERCIZIO:\n${prossimoEs.name.toUpperCase()}";
+      _infoProssimo = "${AppL.changeExercise}:\n${prossimoEs.name.toUpperCase()}";
       _prossimoNome = prossimoEs.name;
     } else {
-      _infoProssimo = "ALLENAMENTO COMPLETATO!";
+      _infoProssimo = AppL.workoutComplete;
       _prossimoNome = '';
     }
 
@@ -4778,8 +4890,8 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         onPopInvokedWithResult: (didPop, result) {
           if (didPop) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Usa il tasto 'SKIP' per tornare all'esercizio"),
+            SnackBar(
+              content: Text(AppL.skipUseButton),
             ),
           );
         },
@@ -4860,7 +4972,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                       height: 4,
                     ), // Un po' di spazio tra nome e progresso
                     Text(
-                      "SERIE FATTE: ${currentExSeries.length} DI ${ex.targetSets}",
+                      "${AppL.setsDone}: ${currentExSeries.length} ${AppL.of} ${ex.targetSets}",
                       style: TextStyle(
                         color: currentExSeries.length >= ex.targetSets
                             ? const Color(0xFF00FF88) // Verde se hai finito
@@ -5017,7 +5129,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                     height: 56,
                     child: ElevatedButton(
                       onPressed: _confermaSerie,
-                      child: const Text("CONFERMA SERIE"),
+                      child: Text(AppL.confirmSeries),
                     ),
                   ),
                 ),
@@ -5073,7 +5185,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    'ULTIMA VOLTA: ${lastW % 1 == 0 ? lastW.toInt() : lastW} kg × $lastR reps',
+                    '${AppL.lastTime}: ${lastW % 1 == 0 ? lastW.toInt() : lastW} kg × $lastR reps',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: const TextStyle(color: Colors.white60, fontSize: 13),
@@ -5091,18 +5203,18 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                       border: Border.all(color: Colors.amber),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.trending_up_rounded,
                           color: Colors.amber,
                           size: 13,
                         ),
-                        SizedBox(width: 3),
+                        const SizedBox(width: 3),
                         Text(
-                          'AUMENTA',
-                          style: TextStyle(
+                          AppL.increase,
+                          style: const TextStyle(
                             color: Colors.amber,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -5147,10 +5259,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           const Divider(color: Colors.white10, height: 10),
           TextField(
             style: const TextStyle(fontSize: 12, color: Colors.white54),
-            decoration: const InputDecoration(
-              hintText: 'Le mie note...',
-              hintStyle: TextStyle(color: Colors.white24, fontSize: 12),
-              prefixIcon: Icon(
+            decoration: InputDecoration(
+              hintText: AppL.myNotes,
+              hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+              prefixIcon: const Icon(
                 Icons.edit_note,
                 size: 16,
                 color: Colors.white24,
@@ -5300,7 +5412,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'MUSCOLO PRINCIPALE',
+                            AppL.primaryMuscle,
                             style: TextStyle(
                               color: accent.withAlpha(180),
                               fontSize: 10,
@@ -5332,7 +5444,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '📋 ESECUZIONE',
+                      AppL.execution,
                       style: TextStyle(
                         color: accent,
                         fontSize: 11,
@@ -5363,7 +5475,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '💡 CONSIGLI',
+                      AppL.tips,
                       style: TextStyle(
                         color: Colors.amber,
                         fontSize: 11,
@@ -5390,9 +5502,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                   color: Colors.white.withAlpha(5),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Esercizio non in catalogo.',
-                  style: TextStyle(color: Colors.white38, fontSize: 13),
+                child: Text(
+                  AppL.notInCatalogShort,
+                  style: const TextStyle(color: Colors.white38, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -5528,7 +5640,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'PROSSIMA',
+                                  AppL.nextInfo,
                                   style: TextStyle(
                                     color: Colors.white.withAlpha(70),
                                     fontSize: 15,
@@ -5584,7 +5696,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'ULTIMA VOLTA\n${lastW}kg × ${lastR} reps',
+                                    '${AppL.lastTime}\n${lastW}kg × ${lastR} reps',
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 3,
@@ -5739,23 +5851,23 @@ class _AumentaPesoWidgetState extends State<_AumentaPesoWidget>
                   ]
                 : [],
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('🔥', style: TextStyle(fontSize: 20)),
-              SizedBox(width: 10),
+              const Text('🔥', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: 10),
               Text(
-                'AUMENTA IL PESO',
-                style: TextStyle(
+                AppL.increaseWeight,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
                   fontSize: 15,
                   letterSpacing: 1.5,
                 ),
               ),
-              SizedBox(width: 10),
-              Text('🔥', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: 10),
+              const Text('🔥', style: TextStyle(fontSize: 20)),
             ],
           ),
         ),
@@ -5921,7 +6033,7 @@ class _DrumPickersState extends State<_DrumPickers>
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1E),
         title: Text(
-          isKg ? 'Inserisci KG' : 'Inserisci REPS',
+          isKg ? AppL.insertKg : AppL.insertReps,
           style: const TextStyle(color: Colors.white),
         ),
         content: TextField(
@@ -5946,9 +6058,9 @@ class _DrumPickersState extends State<_DrumPickers>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'Annulla',
-              style: TextStyle(color: Colors.white38),
+            child: Text(
+              AppL.cancel,
+              style: const TextStyle(color: Colors.white38),
             ),
           ),
           TextButton(
@@ -6227,10 +6339,10 @@ class _WorkoutProgressChart extends StatelessWidget {
     }
 
     if (bySession.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'Nessun dato registrato',
-          style: TextStyle(color: Colors.white38),
+          AppL.noDataRegistered,
+          style: const TextStyle(color: Colors.white38),
         ),
       );
     }
@@ -6388,7 +6500,7 @@ class PTGraphWidget extends StatelessWidget {
         .map((e) => Map<String, dynamic>.from(e))
         .toList();
 
-    if (logs.isEmpty) return const Center(child: Text("Nessun dato"));
+    if (logs.isEmpty) return Center(child: Text(AppL.noData));
 
     // 1. Troviamo il numero massimo di serie per questo esercizio
     int maxSetsFound = 0;
@@ -6467,7 +6579,7 @@ class PTGraphWidget extends StatelessWidget {
         SizedBox(
           height: 160,
           child: logs.isEmpty
-              ? const Center(child: Text("Nessun dato"))
+              ? Center(child: Text(AppL.noData))
               : CustomPaint(
                   size: Size.infinite,
                   painter: PTChartPainter(logs: logs, colors: seriesColors),
@@ -6618,8 +6730,8 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
       _selected.clear();
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Dati eliminati'),
+      SnackBar(
+        content: Text(AppL.dataDeleted),
         backgroundColor: Colors.redAccent,
       ),
     );
@@ -6630,24 +6742,24 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: const Text(
-          'Reset completo',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          AppL.fullResetTitle,
+          style: const TextStyle(color: Colors.white),
         ),
-        content: const Text(
-          'Eliminerà TUTTI i dati: scheda, storico e impostazioni.',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          AppL.fullResetMsg,
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('ANNULLA'),
+            child: Text(AppL.cancel.toUpperCase()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'CONTINUA',
-              style: TextStyle(color: Colors.redAccent),
+            child: Text(
+              AppL.continueLabel,
+              style: const TextStyle(color: Colors.redAccent),
             ),
           ),
         ],
@@ -6658,21 +6770,21 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: const Text('Sei sicuro?', style: TextStyle(color: Colors.white)),
-        content: const Text(
-          'Operazione irreversibile.',
-          style: TextStyle(color: Colors.red),
+        title: Text(AppL.areYouSure, style: const TextStyle(color: Colors.white)),
+        content: Text(
+          AppL.irreversible,
+          style: const TextStyle(color: Colors.red),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('ANNULLA'),
+            child: Text(AppL.cancel.toUpperCase()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'CANCELLA TUTTO',
-              style: TextStyle(color: Colors.redAccent),
+            child: Text(
+              AppL.deleteAll,
+              style: const TextStyle(color: Colors.redAccent),
             ),
           ),
         ],
@@ -6719,13 +6831,13 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white70),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.storage_rounded, color: Colors.redAccent, size: 20),
-            SizedBox(width: 8),
+            const Icon(Icons.storage_rounded, color: Colors.redAccent, size: 20),
+            const SizedBox(width: 8),
             Text(
-              'Gestione Dati',
-              style: TextStyle(
+              AppL.dataManagement,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -6741,7 +6853,7 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
             child: days.isEmpty
                 ? Center(
                     child: Text(
-                      'Nessuno storico presente',
+                      AppL.noHistory,
                       style: TextStyle(
                         color: Colors.white.withAlpha(80),
                         fontSize: 15,
@@ -6834,7 +6946,7 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
                                     ),
                                   ),
                                   subtitle: Text(
-                                    '${sessions.length} session${sessions.length == 1 ? 'e' : 'i'}',
+                                    '${sessions.length} ${sessions.length == 1 ? AppL.sessionCount : AppL.sessionCountPlural}',
                                     style: TextStyle(
                                       color: Colors.white.withAlpha(100),
                                       fontSize: 12,
@@ -6864,7 +6976,7 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
                     color: Colors.white,
                   ),
                   label: Text(
-                    'Elimina selezionati (${_selected.length})',
+                    '${AppL.deleteSelected} (${_selected.length})',
                     style: const TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -6882,7 +6994,7 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Text(
-              'RESET TOTALE',
+              AppL.totalReset,
               style: TextStyle(
                 color: Colors.white.withAlpha(100),
                 fontSize: 11,
@@ -6899,9 +7011,9 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
                   Icons.delete_forever_outlined,
                   color: Colors.redAccent,
                 ),
-                label: const Text(
-                  'Reset completo dati',
-                  style: TextStyle(color: Colors.redAccent),
+                label: Text(
+                  AppL.fullReset,
+                  style: const TextStyle(color: Colors.redAccent),
                 ),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.redAccent),
@@ -6955,24 +7067,24 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: const Text(
-          'Elimina sessione?',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          AppL.deleteSession,
+          style: const TextStyle(color: Colors.white),
         ),
-        content: const Text(
-          'Tutti i dati di questa sessione verranno eliminati.',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          AppL.deleteSessionMsg,
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('ANNULLA'),
+            child: Text(AppL.cancel.toUpperCase()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'ELIMINA',
-              style: TextStyle(color: Colors.redAccent),
+            child: Text(
+              AppL.delete,
+              style: const TextStyle(color: Colors.redAccent),
             ),
           ),
         ],
@@ -6983,8 +7095,8 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
     await _save();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sessione eliminata'),
+        SnackBar(
+          content: Text(AppL.sessionDeleted),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -6996,20 +7108,20 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: const Text(
-          'Elimina serie?',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          AppL.deleteSeries,
+          style: const TextStyle(color: Colors.white),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('ANNULLA'),
+            child: Text(AppL.cancel.toUpperCase()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'ELIMINA',
-              style: TextStyle(color: Colors.redAccent),
+            child: Text(
+              AppL.delete,
+              style: const TextStyle(color: Colors.redAccent),
             ),
           ),
         ],
@@ -7050,10 +7162,10 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
                 decimal: true,
               ),
               style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'Peso (kg)',
-                labelStyle: TextStyle(color: Colors.white54),
-                enabledBorder: UnderlineInputBorder(
+              decoration: InputDecoration(
+                labelText: AppL.weight,
+                labelStyle: const TextStyle(color: Colors.white54),
+                enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.white24),
                 ),
               ),
@@ -7076,7 +7188,7 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('ANNULLA'),
+            child: Text(AppL.cancel.toUpperCase()),
           ),
           TextButton(
             onPressed: () async {
@@ -7093,9 +7205,9 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
               await _save();
               if (mounted) Navigator.pop(context);
             },
-            child: const Text(
-              'SALVA',
-              style: TextStyle(color: Color(0xFF00F2FF)),
+            child: Text(
+              AppL.save.toUpperCase(),
+              style: const TextStyle(color: Color(0xFF00F2FF)),
             ),
           ),
         ],
@@ -7126,7 +7238,7 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
       body: _sessions.isEmpty
           ? Center(
               child: Text(
-                'Nessuna sessione',
+                AppL.noSession,
                 style: TextStyle(
                   color: Colors.white.withAlpha(80),
                   fontSize: 15,
