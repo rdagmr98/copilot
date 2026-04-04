@@ -1,0 +1,45 @@
+name: gym_app
+description: "GymApp - Track your workouts, build your own schedule"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.3.2
+  vibration: ^2.0.1
+  wakelock_plus: ^1.2.11
+  url_launcher: ^6.3.1
+  webview_flutter: ^4.10.0
+  flutter_local_notifications: ^17.2.3
+  path_provider: ^2.1.5
+  file_picker: ^10.3.10
+  google_fonts: ^6.2.1
+  google_mobile_ads: ^5.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/muscle/
+    - assets/gif/
+    - assets/videos/
+    - assets/icon_client.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon_client.png"
+  adaptive_icon_background: "#0A0A0A"
+  adaptive_icon_foreground: "assets/icon_client.png"
