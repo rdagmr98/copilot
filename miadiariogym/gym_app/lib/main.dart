@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'gif_exercise_catalog.dart';
+import 'exercise_catalog.dart';
 
 // Colore accento globale (tema)
 final ValueNotifier<Color> appAccentNotifier = ValueNotifier<Color>(
@@ -236,6 +237,11 @@ class AppL {
   static String get weight => _lang == 'en' ? 'Weight (kg)' : 'Peso (kg)';
   static String get startWorkout => _lang == 'en' ? 'Start Workout' : 'Inizia Allenamento';
   static String get proTrainer => _lang == 'en' ? 'Are you a Personal Trainer?' : 'Sei un Personal Trainer?';
+  static String get pause => _lang == 'en' ? 'Pause between exercises (s)' : 'Pausa tra esercizi (s)';
+  static String get browseArchive => _lang == 'en' ? 'Browse archive' : 'Sfoglia archivio';
+  static String get repsPerSet => _lang == 'en' ? 'Reps per set' : 'Reps per serie';
+  static String get muscleGroup => _lang == 'en' ? 'Muscle group' : 'Gruppo muscolare';
+  static String get chooseExercise => _lang == 'en' ? 'Choose exercise' : 'Scegli esercizio';
 }
 
 class AdManager {
@@ -313,6 +319,7 @@ class GymAppHome extends StatefulWidget {
 
 class _GymAppHomeState extends State<GymAppHome> {
   bool _loading = true;
+  bool _langChosen = false;
   bool _onboardingDone = false;
 
   @override
@@ -323,8 +330,11 @@ class _GymAppHomeState extends State<GymAppHome> {
 
   Future<void> _checkOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
+    final langChosen = prefs.getBool('lang_chosen') ?? false;
     final done = prefs.getBool('onboarding_done') ?? false;
-    if (mounted) setState(() { _onboardingDone = done; _loading = false; });
+    final lang = prefs.getString('app_lang') ?? 'it';
+    AppL.setLang(lang);
+    if (mounted) setState(() { _langChosen = langChosen; _onboardingDone = done; _loading = false; });
   }
 
   @override
@@ -335,10 +345,83 @@ class _GymAppHomeState extends State<GymAppHome> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+    if (!_langChosen) {
+      return const LanguagePickerScreen();
+    }
     if (!_onboardingDone) {
       return const OnboardingScreen();
     }
     return const ClientMainPage();
+  }
+}
+
+class LanguagePickerScreen extends StatelessWidget {
+  const LanguagePickerScreen({super.key});
+
+  Future<void> _choose(BuildContext context, String lang) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('app_lang', lang);
+    await prefs.setBool('lang_chosen', true);
+    AppL.setLang(lang);
+    if (!context.mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0A),
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('🌍', style: TextStyle(fontSize: 72)),
+                const SizedBox(height: 32),
+                const Text(
+                  'Scegli la lingua\nChoose your language',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.4),
+                ),
+                const SizedBox(height: 48),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () => _choose(context, 'it'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00F2FF),
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    child: const Text('🇮🇹  Italiano', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () => _choose(context, 'en'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white12,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: Colors.white24)),
+                    ),
+                    child: const Text('🇬🇧  English', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -509,6 +592,80 @@ class _OnboardingPage {
   final String text;
   final bool isPromo;
   const _OnboardingPage({required this.icon, required this.title, required this.text, this.isPromo = false});
+}
+
+/// Mappa parole chiave italiane → termini inglesi per la ricerca esercizi
+const Map<String, List<String>> kItalianKeywords = {
+  'panca': ['bench'],
+  'petto': ['chest', 'pec', 'bench', 'fly', 'push'],
+  'dorsale': ['lat', 'pulldown', 'pull', 'row'],
+  'rematore': ['row'],
+  'tirate': ['pulldown', 'pull'],
+  'bicipite': ['curl', 'bicep'],
+  'tricipite': ['tricep', 'extension', 'pushdown', 'dip'],
+  'spalla': ['shoulder', 'press', 'raise', 'delt', 'arnold'],
+  'squat': ['squat'],
+  'affondi': ['lunge'],
+  'stacco': ['deadlift'],
+  'curl': ['curl'],
+  'croci': ['fly', 'flye', 'crossover'],
+  'pressa': ['press', 'leg press'],
+  'gambe': ['leg', 'squat', 'lunge'],
+  'glutei': ['glute', 'hip', 'bridge'],
+  'addome': ['ab', 'crunch', 'plank', 'core'],
+  'plank': ['plank'],
+  'polpaccio': ['calf', 'raise'],
+  'pull': ['pull', 'pulldown', 'pullup'],
+  'push': ['push', 'press'],
+  'dip': ['dip'],
+  'manubri': ['dumbbell'],
+  'bilanciere': ['barbell'],
+  'cavo': ['cable'],
+  'corda': ['rope'],
+  'kettlebell': ['kettlebell'],
+  'alzate': ['raise', 'lateral', 'front'],
+  'lat': ['lat', 'pulldown'],
+  'lombari': ['back extension', 'hyperextension', 'deadlift'],
+  'adduttori': ['adductor'],
+  'abduttori': ['abductor'],
+};
+
+/// Cerca esercizi nel catalogo con supporto parole chiave italiane.
+/// Restituisce al massimo [limit] risultati.
+List<ExerciseInfo> searchExercisesWithItalian(String query, {int limit = 6}) {
+  if (query.length < 2) return [];
+  final q = query.toLowerCase().trim();
+  final results = <ExerciseInfo>[];
+  final seen = <String>{};
+
+  void tryAdd(ExerciseInfo ex) {
+    if (seen.add(ex.name) && results.length < limit) results.add(ex);
+  }
+
+  // 1. Match diretto su nome italiano o inglese
+  for (final ex in kGifCatalog) {
+    if (ex.name.toLowerCase().contains(q) || ex.nameEn.toLowerCase().contains(q)) {
+      tryAdd(ex);
+    }
+  }
+
+  // 2. Match tramite parole chiave italiane
+  if (results.length < limit) {
+    for (final entry in kItalianKeywords.entries) {
+      if (entry.key.contains(q) || q.contains(entry.key)) {
+        for (final eng in entry.value) {
+          for (final ex in kGifCatalog) {
+            if (ex.name.toLowerCase().contains(eng) || ex.nameEn.toLowerCase().contains(eng)) {
+              tryAdd(ex);
+              if (results.length >= limit) return results;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return results;
 }
 
 // --- MODELLI DATI (SINCRONIZZATI AL 100% CON APP PT) ---
@@ -2717,11 +2874,13 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     final accent = appAccentNotifier.value;
     final nameCtrl = TextEditingController();
     final setsCtrl = TextEditingController(text: '3');
-    final repsCtrl = TextEditingController(text: '10');
     final recoveryCtrl = TextEditingController(text: '60');
-    final noteCtrl = TextEditingController();
-    String? selectedGif;
-    List<String> suggestions = [];
+    final pausaCtrl = TextEditingController(text: '120');
+
+    int currentSets = 3;
+    List<TextEditingController> repsCtrls = List.generate(3, (_) => TextEditingController(text: '10'));
+    ExerciseInfo? selectedExInfo;
+    List<ExerciseInfo> suggestions = [];
 
     showModalBottomSheet(
       context: context,
@@ -2729,194 +2888,344 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       backgroundColor: const Color(0xFF1C1C1E),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (c) => StatefulBuilder(
-        builder: (ctx, setS) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-                Text(AppL.exercises, style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: nameCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Nome esercizio',
-                    labelStyle: const TextStyle(color: Colors.white54),
-                    filled: true, fillColor: Colors.black26,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        builder: (ctx, setS) {
+          void updateSets(String val) {
+            final n = (int.tryParse(val) ?? 1).clamp(1, 20);
+            setS(() {
+              currentSets = n;
+              while (repsCtrls.length < n) {
+                repsCtrls.add(TextEditingController(text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10'));
+              }
+              while (repsCtrls.length > n) {
+                repsCtrls.last.dispose();
+                repsCtrls.removeLast();
+              }
+            });
+          }
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.9,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (_, scrollCtrl) => ListView(
+                controller: scrollCtrl,
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                children: [
+                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
+                  Text(AppL.exercises, style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 16),
+
+                  // — Nome esercizio
+                  TextField(
+                    controller: nameCtrl,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: AppL.lang == 'en' ? 'Exercise name' : 'Nome esercizio',
+                      labelStyle: const TextStyle(color: Colors.white54),
+                      suffixIcon: nameCtrl.text.isNotEmpty
+                          ? IconButton(icon: const Icon(Icons.clear, color: Colors.white38), onPressed: () { nameCtrl.clear(); setS(() { suggestions = []; selectedExInfo = null; }); })
+                          : null,
+                      filled: true, fillColor: Colors.black26,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
+                    onChanged: (v) => setS(() => suggestions = searchExercisesWithItalian(v, limit: 6)),
                   ),
-                  onChanged: (v) {
-                    if (v.length < 2) { setS(() => suggestions = []); return; }
-                    final q = v.toLowerCase();
-                    final results = <String>[];
-                    for (final ex in kGifCatalog) {
-                      if (ex.name.toLowerCase().contains(q)) results.add(ex.name);
-                      else if (ex.nameEn.toLowerCase().contains(q)) results.add(ex.name);
-                      if (results.length >= 5) break;
-                    }
-                    setS(() => suggestions = results);
-                  },
-                ),
-                if (suggestions.isNotEmpty)
-                  Container(
-                    decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(8)),
-                    child: Column(
-                      children: suggestions.map((s) => ListTile(
-                        dense: true,
-                        title: Text(s, style: const TextStyle(color: Colors.white, fontSize: 13)),
-                        onTap: () {
-                          nameCtrl.text = s;
-                          final info = findAnyExercise(s);
-                          if (info != null) { setS(() { suggestions = []; selectedGif = info.gifFilename ?? ''; }); }
-                          else setS(() => suggestions = []);
+
+                  // — Suggerimenti con GIF
+                  if (suggestions.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(12)),
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
+                        itemCount: suggestions.length,
+                        separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 1),
+                        itemBuilder: (_, i) {
+                          final ex = suggestions[i];
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            leading: ex.gifFilename != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.asset(
+                                      'assets/gif/${ex.gifFilename}.gif',
+                                      width: 64, height: 64, fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => const SizedBox(width: 64, height: 64, child: Icon(Icons.fitness_center, color: Colors.white30)),
+                                    ),
+                                  )
+                                : const SizedBox(width: 64, height: 64, child: Icon(Icons.fitness_center, color: Colors.white30)),
+                            title: Text(ex.name, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                            subtitle: ex.primaryMuscle.isNotEmpty && ex.primaryMuscle != 'Muscolatura principale coinvolta'
+                                ? Text(ex.primaryMuscle, style: const TextStyle(color: Colors.white38, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)
+                                : null,
+                            onTap: () {
+                              nameCtrl.text = ex.name;
+                              setS(() { suggestions = []; selectedExInfo = ex; });
+                            },
+                          );
                         },
-                      )).toList(),
+                      ),
                     ),
-                  ),
-                const SizedBox(height: 12),
-                Row(children: [
-                  Expanded(child: TextField(
-                    controller: setsCtrl, keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: AppL.sets, labelStyle: const TextStyle(color: Colors.white54),
-                      filled: true, fillColor: Colors.black26,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                  )),
-                  const SizedBox(width: 12),
-                  Expanded(child: TextField(
-                    controller: repsCtrl, keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: AppL.reps, labelStyle: const TextStyle(color: Colors.white54),
-                      filled: true, fillColor: Colors.black26,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                  )),
-                  const SizedBox(width: 12),
-                  Expanded(child: TextField(
-                    controller: recoveryCtrl, keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: AppL.recovery, labelStyle: const TextStyle(color: Colors.white54),
-                      filled: true, fillColor: Colors.black26,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                  )),
-                ]),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: noteCtrl,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                  decoration: InputDecoration(
-                    labelText: AppL.notes, labelStyle: const TextStyle(color: Colors.white54),
-                    filled: true, fillColor: Colors.black26,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                if (selectedGif != null) ...[
-                  Text('GIF: $selectedGif', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+
                   const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset('assets/gif/$selectedGif.gif', height: 100, fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+
+                  // — Sfoglia archivio per gruppo muscolare
+                  OutlinedButton.icon(
+                    onPressed: () => _apriArchivioEsercizi(ctx, setS, (ex) {
+                      nameCtrl.text = ex.name;
+                      setS(() { selectedExInfo = ex; suggestions = []; });
+                    }),
+                    icon: const Icon(Icons.library_books_rounded, size: 18),
+                    label: Text(AppL.browseArchive),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: accent,
+                      side: BorderSide(color: accent.withAlpha(80)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   ),
-                  const SizedBox(height: 8),
+
+                  const SizedBox(height: 12),
+
+                  // — Preview GIF selezionata
+                  if (selectedExInfo != null && selectedExInfo!.gifFilename != null) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/gif/${selectedExInfo!.gifFilename}.gif',
+                        height: 160, width: double.infinity, fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      ),
+                    ),
+                    if (selectedExInfo!.primaryMuscle.isNotEmpty && selectedExInfo!.primaryMuscle != 'Muscolatura principale coinvolta')
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text('💪 ${selectedExInfo!.primaryMuscle}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                      ),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // — Serie
+                  Row(children: [
+                    Expanded(child: TextField(
+                      controller: setsCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: AppL.sets,
+                        labelStyle: const TextStyle(color: Colors.white54),
+                        filled: true, fillColor: Colors.black26,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      ),
+                      onChanged: updateSets,
+                    )),
+                    const SizedBox(width: 12),
+                    Expanded(child: TextField(
+                      controller: recoveryCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: AppL.recovery,
+                        labelStyle: const TextStyle(color: Colors.white54),
+                        filled: true, fillColor: Colors.black26,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      ),
+                    )),
+                    const SizedBox(width: 12),
+                    Expanded(child: TextField(
+                      controller: pausaCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: AppL.lang == 'en' ? 'Pause (s)' : 'Pausa (s)',
+                        labelStyle: const TextStyle(color: Colors.white54),
+                        filled: true, fillColor: Colors.black26,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      ),
+                    )),
+                  ]),
+
+                  const SizedBox(height: 12),
+
+                  // — Reps per serie
+                  Text(AppL.repsPerSet, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8, runSpacing: 8,
+                    children: List.generate(currentSets, (i) => SizedBox(
+                      width: 58,
+                      child: TextField(
+                        controller: repsCtrls[i],
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        decoration: InputDecoration(
+                          labelText: 'S${i + 1}',
+                          labelStyle: const TextStyle(color: Colors.white38, fontSize: 11),
+                          filled: true, fillColor: Colors.black26,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                        ),
+                      ),
+                    )),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final name = nameCtrl.text.trim();
+                        if (name.isEmpty) return;
+                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(1, 20);
+                        final repsList = repsCtrls.map((c) => int.tryParse(c.text) ?? 10).toList();
+                        final recovery = int.tryParse(recoveryCtrl.text) ?? 60;
+                        final pausa = int.tryParse(pausaCtrl.text) ?? 120;
+                        final ex = ExerciseConfig(
+                          name: name,
+                          targetSets: sets,
+                          repsList: repsList,
+                          recoveryTime: recovery,
+                          interExercisePause: pausa,
+                          notePT: '',
+                          noteCliente: '',
+                          gifFilename: selectedExInfo?.gifFilename,
+                        );
+                        Navigator.pop(c);
+                        setState(() => _days[dayIdx].exercises.add(ex));
+                        _save();
+                      },
+                      child: Text(AppL.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ),
                 ],
-                OutlinedButton.icon(
-                  onPressed: () => _selezionaGif(setS, (gif) => selectedGif = gif),
-                  icon: const Icon(Icons.image_search_rounded, size: 18),
-                  label: const Text('Seleziona GIF'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: accent,
-                    side: BorderSide(color: accent.withAlpha(80)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      final name = nameCtrl.text.trim();
-                      if (name.isEmpty) return;
-                      final sets = int.tryParse(setsCtrl.text) ?? 3;
-                      final reps = int.tryParse(repsCtrl.text) ?? 10;
-                      final recovery = int.tryParse(recoveryCtrl.text) ?? 60;
-                      final ex = ExerciseConfig(
-                        name: name,
-                        targetSets: sets,
-                        repsList: List.filled(sets, reps),
-                        recoveryTime: recovery,
-                        notePT: '',
-                        noteCliente: noteCtrl.text.trim(),
-                        gifFilename: selectedGif,
-                      );
-                      Navigator.pop(c);
-                      setState(() => _days[dayIdx].exercises.add(ex));
-                      _save();
-                    },
-                    child: Text(AppL.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  void _selezionaGif(StateSetter setS, Function(String) onSelect) {
-    final gifList = kGifCatalog.take(50).toList();
+  void _apriArchivioEsercizi(BuildContext context, StateSetter setS, Function(ExerciseInfo) onSelect) {
+    String? selectedCategory;
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1C1C1E),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (c) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text('Seleziona GIF', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 12),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, mainAxisSpacing: 8, crossAxisSpacing: 8),
-                itemCount: gifList.length,
-                itemBuilder: (_, i) {
-                  final gif = gifList[i];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.pop(c);
-                      setS(() => onSelect(gif.gifFilename ?? ''));
-                    },
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.asset('assets/gif/${gif.gifFilename}.gif', fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(color: Colors.white10, child: const Icon(Icons.fitness_center, color: Colors.white30))),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(gif.name, style: const TextStyle(color: Colors.white54, fontSize: 9), maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
-                      ],
+      builder: (c) => StatefulBuilder(
+        builder: (ctx, setA) {
+          // Categorie disponibili (escludi 'altro')
+          final cats = kGifCatalog
+              .map((e) => e.category)
+              .toSet()
+              .where((c) => c.isNotEmpty)
+              .toList()..sort();
+
+          final exercisesInCat = selectedCategory != null
+              ? kGifCatalog.where((e) => e.category == selectedCategory).toList()
+              : <ExerciseInfo>[];
+
+          return Container(
+            height: MediaQuery.of(ctx).size.height * 0.78,
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 12), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
+                if (selectedCategory != null)
+                  Row(children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+                      onPressed: () => setA(() => selectedCategory = null),
                     ),
-                  );
-                },
-              ),
+                    Text(selectedCategory!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  ])
+                else
+                  Text(AppL.muscleGroup, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 12),
+                if (selectedCategory == null)
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        spacing: 8, runSpacing: 8,
+                        children: cats.map((cat) {
+                          final icon = kBodyPartIcons[cat] ?? '⚡';
+                          final label = kBodyPartNames[cat] ?? cat;
+                          return ActionChip(
+                            avatar: Text(icon, style: const TextStyle(fontSize: 18)),
+                            label: Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                            backgroundColor: Colors.white10,
+                            side: const BorderSide(color: Colors.white12),
+                            onPressed: () => setA(() => selectedCategory = cat),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.85,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                      ),
+                      itemCount: exercisesInCat.length,
+                      itemBuilder: (_, i) {
+                        final ex = exercisesInCat[i];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pop(c);
+                            setS(() => onSelect(ex));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white10,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                    child: ex.gifFilename != null
+                                        ? Image.asset(
+                                            'assets/gif/${ex.gifFilename}.gif',
+                                            fit: BoxFit.cover, width: double.infinity,
+                                            errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.fitness_center, color: Colors.white30, size: 32)),
+                                          )
+                                        : const Center(child: Icon(Icons.fitness_center, color: Colors.white30, size: 32)),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(6),
+                                  child: Text(
+                                    ex.name,
+                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -3003,7 +3312,19 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                                 )
                               : const Icon(Icons.fitness_center_rounded, color: Colors.white30),
                           title: Text(ex.name, style: const TextStyle(color: Colors.white, fontSize: 14)),
-                          subtitle: Text('${ex.targetSets}x${ex.repsList.isNotEmpty ? ex.repsList.first : "?"} | ${ex.recoveryTime}s', style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                          subtitle: Builder(builder: (context) {
+                            final exInfo = findAnyExercise(ex.name);
+                            return Row(
+                              children: [
+                                Text('${ex.targetSets}x${ex.repsList.isNotEmpty ? ex.repsList.first : "?"} | ${ex.recoveryTime}s', style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                                if (exInfo != null && exInfo.muscleImages.isNotEmpty) ...[
+                                  const SizedBox(width: 6),
+                                  Image.asset('assets/muscle/${exInfo.muscleImages.first}', height: 20, width: 20, fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                                ],
+                              ],
+                            );
+                          }),
                           trailing: IconButton(
                             icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 20),
                             onPressed: () => _eliminaEsercizio(dayIdx, e.key),
@@ -4033,7 +4354,13 @@ class _WorkoutEngineState extends State<WorkoutEngine>
             }
             await prefs.setString('client_routine', jsonEncode(full));
           }
-          if (mounted) _showRecapDialog();
+          if (mounted) {
+            if (!kIsWeb) {
+              AdManager.instance.showInterstitialThenRun(_showRecapDialog);
+            } else {
+              _showRecapDialog();
+            }
+          }
           return; // Non salvare stato dopo workout completato
         } else if (groupEnd + 1 < widget.day.exercises.length) {
           final pause = widget.day.exercises[groupEnd].interExercisePause > 0
@@ -4098,7 +4425,13 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           }
           await prefs.setString('client_routine', jsonEncode(full));
         }
-        if (mounted) _showRecapDialog();
+        if (mounted) {
+          if (!kIsWeb) {
+            AdManager.instance.showInterstitialThenRun(_showRecapDialog);
+          } else {
+            _showRecapDialog();
+          }
+        }
         return; // Non salvare stato dopo workout completato
       } else if (exI < widget.day.exercises.length - 1) {
         final pauseTime = currentEx.interExercisePause > 0
