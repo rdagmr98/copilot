@@ -11,6 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'gif_exercise_catalog.dart';
 import 'exercise_catalog.dart';
@@ -23,6 +25,20 @@ final ValueNotifier<Color> appAccentNotifier = ValueNotifier<Color>(
 // Istanza globale del plugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
+String _limitToOneEmoji(String s) {
+  final RegExp emojiRe = RegExp(
+    r'[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FE0F}]',
+    unicode: true,
+  );
+  final matches = emojiRe.allMatches(s).toList();
+  if (matches.length <= 1) return s;
+  String result = s;
+  for (int i = matches.length - 1; i >= 1; i--) {
+    result = result.replaceRange(matches[i].start, matches[i].end, '');
+  }
+  return result.trim();
+}
 
 // Channel per leggere file content:// da WhatsApp/Telegram via ContentResolver
 const _gymFileChannel = MethodChannel('gym_file_reader');
@@ -93,7 +109,7 @@ class _YouTubeSearchViewState extends State<YouTubeSearchView> {
 // Flag globale: notifiche pronte
 bool _notificationsReady = false;
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setSystemUIOverlayStyle(
@@ -103,21 +119,19 @@ void main() {
     ),
   );
 
-  // Avvia subito l'app — nessun await che blocchi
+  // Inizializza notifiche prima del runApp — garantisce canali con importanza corretta
+  await _initNotifications();
+
+  // Avvia l'app
   runApp(const ClientGymApp());
 
-  // Inizializza plugin in background (errori non crashano l'app)
+  // Inizializza altri plugin in background
   _initPluginsBackground();
 }
 
-Future<void> _initPluginsBackground() async {
-  // AdMob
+Future<void> _initNotifications() async {
   try {
-    if (!kIsWeb) await MobileAds.instance.initialize();
-  } catch (_) {}
-
-  // Notifiche
-  try {
+    tz_data.initializeTimeZones();
     const AndroidInitializationSettings initAndroid =
         AndroidInitializationSettings('ic_notification');
     const InitializationSettings initSettings = InitializationSettings(
@@ -125,19 +139,40 @@ Future<void> _initPluginsBackground() async {
     );
     await flutterLocalNotificationsPlugin.initialize(initSettings);
     _notificationsReady = true;
-  } catch (_) {}
 
-  // Permessi (solo Android)
-  if (!kIsWeb && Platform.isAndroid) {
-    try {
+    // Crea i canali esplicitamente con la giusta importanza
+    if (!kIsWeb && Platform.isAndroid) {
       final androidPlugin = flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
+              AndroidFlutterLocalNotificationsPlugin>();
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+            'timer_gym_v2', 'Timer Recupero',
+            importance: Importance.max),
+      );
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+            'timer_gym_cd', 'Timer in corso',
+            importance: Importance.defaultImportance),
+      );
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+            'streak_reminder', 'Streak Reminder',
+            importance: Importance.high),
+      );
       await androidPlugin?.requestNotificationsPermission();
       await androidPlugin?.requestExactAlarmsPermission();
-    } catch (_) {}
+    }
+  } catch (e) {
+    debugPrint('Notification init: $e');
   }
+}
+
+Future<void> _initPluginsBackground() async {
+  // AdMob
+  try {
+    if (!kIsWeb) await MobileAds.instance.initialize();
+  } catch (_) {}
 
   // Precarica annuncio interstitial
   if (!kIsWeb) {
@@ -502,13 +537,21 @@ class AppL {
   static String get sessionCount => _lang == 'en' ? 'session' : 'session';
   static String get sessionCountPlural =>
       _lang == 'en' ? 'sessions' : 'sessioni';
-  static String get loadExample => _lang == 'en' ? 'Load example' : 'Carica esempio';
-  static String get renameSession => _lang == 'en' ? 'Rename session' : 'Rinomina sessione';
-  static String get sessionName => _lang == 'en' ? 'Session name' : 'Nome sessione';
-  static String get editExercise => _lang == 'en' ? 'Edit exercise' : 'Modifica esercizio';
-  static String get streakWeeks => _lang == 'en' ? 'Week streak' : 'Settimane di fila';
-  static String get streakMsg => _lang == 'en' ? '🔥 Keep your streak alive!' : '🔥 Mantieni la tua streak!';
-  static String get newRecord => _lang == 'en' ? 'NEW RECORD!' : 'NUOVO RECORD!';
+  static String get loadExample =>
+      _lang == 'en' ? 'Load example' : 'Carica esempio';
+  static String get renameSession =>
+      _lang == 'en' ? 'Rename session' : 'Rinomina sessione';
+  static String get sessionName =>
+      _lang == 'en' ? 'Session name' : 'Nome sessione';
+  static String get editExercise =>
+      _lang == 'en' ? 'Edit exercise' : 'Modifica esercizio';
+  static String get streakWeeks =>
+      _lang == 'en' ? 'Week streak' : 'Settimane di fila';
+  static String get streakMsg => _lang == 'en'
+      ? '🔥 Keep your streak alive!'
+      : '🔥 Mantieni la tua streak!';
+  static String get newRecord =>
+      _lang == 'en' ? 'NEW RECORD!' : 'NUOVO RECORD!';
 }
 
 class AdManager {
@@ -1086,24 +1129,32 @@ Future<int> updateStreak(String dayName, List<String> totalSessionNames) async {
 
   // Se è una nuova settimana, valuta la precedente e resetta
   if (lastWeek.isNotEmpty && lastWeek != thisWeek) {
-    // Recupera le sessioni della settimana precedente
     final prevCompletedJson = prefs.getString('streak_prev_completed') ?? '[]';
     Set<String> prevCompleted = Set<String>.from(jsonDecode(prevCompletedJson));
-    final allDone = totalSessionNames.every((n) => prevCompleted.contains(n));
-    if (allDone) {
+    // Usa il conteggio richiesto salvato (robusto a cambi di scheda)
+    final prevRequired =
+        prefs.getInt('streak_required_count') ?? totalSessionNames.length;
+    if (prevCompleted.length >= prevRequired && prevRequired > 0) {
       streak++;
     } else {
       streak = 0;
     }
     await prefs.setInt('streak_count', streak);
-    // Sposta completed come prev, resetta
-    await prefs.setString('streak_prev_completed', jsonEncode(completed.toList()));
+    await prefs.setString(
+      'streak_prev_completed',
+      jsonEncode(completed.toList()),
+    );
     completed = {};
   }
 
+  // Salva il conteggio richiesto per questa settimana
+  await prefs.setInt('streak_required_count', totalSessionNames.length);
   completed.add(dayName);
   await prefs.setString('streak_last_week', thisWeek);
-  await prefs.setString('streak_completed_sessions', jsonEncode(completed.toList()));
+  await prefs.setString(
+    'streak_completed_sessions',
+    jsonEncode(completed.toList()),
+  );
   // Aggiorna data ultimo allenamento per notifiche
   await prefs.setString('last_workout_date', now.toIso8601String());
 
@@ -1114,6 +1165,15 @@ Future<int> updateStreak(String dayName, List<String> totalSessionNames) async {
 Future<int> getStreak() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getInt('streak_count') ?? 0;
+}
+
+/// Legge streak count + sessioni completate questa settimana.
+Future<({int count, Set<String> done})> getStreakData() async {
+  final prefs = await SharedPreferences.getInstance();
+  final count = prefs.getInt('streak_count') ?? 0;
+  final json = prefs.getString('streak_completed_sessions') ?? '[]';
+  final done = Set<String>.from(jsonDecode(json));
+  return (count: count, done: done);
 }
 
 /// Controlla se l'utente non si allena da più di 2 giorni e mostra notifica giornaliera.
@@ -1128,22 +1188,61 @@ Future<void> checkAndScheduleStreakNotification(String lang) async {
   if (daysSince >= 2) {
     const channelId = 'streak_reminder';
     const androidDetails = AndroidNotificationDetails(
-      channelId, 'Streak Reminder',
+      channelId,
+      'Streak Reminder',
       channelDescription: 'Remind user to train to keep their streak',
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@drawable/ic_notification',
+      icon: 'ic_notification',
     );
-    final title = lang == 'en' ? '🔥 Keep your streak alive!' : '🔥 Non perdere la tua streak!';
+    final title = lang == 'en'
+        ? '🔥 Keep your streak alive!'
+        : '🔥 Non perdere i tuoi progressi!';
     final body = lang == 'en'
         ? "You haven't trained in $daysSince days. Train today to keep your progress!"
         : "Non ti alleni da $daysSince giorni. Allenati oggi per non perdere i tuoi progressi!";
     await flutterLocalNotificationsPlugin.show(
-      9901,
+      9902,
       title,
       body,
       const NotificationDetails(android: androidDetails),
     );
+  }
+}
+
+/// Pianifica notifica streak giornaliera 48h dopo l'ultimo allenamento, poi ripete ogni giorno.
+/// Chiamare dopo ogni allenamento completato per resettare il timer.
+Future<void> scheduleStreakReminder(String lang) async {
+  if (kIsWeb) return;
+  try {
+    await flutterLocalNotificationsPlugin.cancel(9901);
+    final scheduledDate = tz.TZDateTime.now(tz.UTC).add(const Duration(hours: 48));
+    final title = lang == 'en' ? '🔥 Keep your streak alive!' : '🔥 Non perdere i tuoi progressi!';
+    final body = lang == 'en'
+        ? "You haven't trained in 2 days. Train today to keep your progress!"
+        : "Non ti alleni da 2 giorni. Allenati oggi per non perdere i tuoi progressi!";
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      9901,
+      title,
+      body,
+      scheduledDate,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'streak_reminder',
+          'Streak Reminder',
+          channelDescription: 'Remind user to train to keep their streak',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: 'ic_notification',
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  } catch (e) {
+    debugPrint('scheduleStreakReminder: $e');
   }
 }
 
@@ -1487,6 +1586,894 @@ const List<Map<String, String>> kMuscleImages = [
   {'file': 'pull.png', 'label': 'Pull'},
 ];
 
+const List<Map<String, dynamic>> kWorkoutTemplates = [
+  {
+    'name': 'Full Body A/B',
+    'desc': '2 days · full body split',
+    'icon': '💪',
+    'days': [
+      {
+        'dayName': 'Full Body A',
+        'bodyParts': ['petto', 'schiena', 'spalle', 'braccia', 'gambe'],
+        'muscleImage': 'push.png',
+        'exercises': [
+          {
+            'name': 'Squat / Leg Press',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'squat_con_bilanciere',
+          },
+          {
+            'name': 'Panca piana / Chest Press',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'bench-press',
+          },
+          {
+            'name': 'Lat Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'lat_machine',
+          },
+          {
+            'name': 'Shoulder Press',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'dumbbell-shoulder-press',
+          },
+          {
+            'name': 'Curl bilanciere',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'barbell-curl',
+          },
+          {
+            'name': 'Tricep Extension Machine',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'triceps-extension-machine',
+          },
+        ],
+      },
+      {
+        'dayName': 'Full Body B',
+        'bodyParts': ['petto', 'schiena', 'spalle', 'braccia', 'gambe'],
+        'muscleImage': 'pull.png',
+        'exercises': [
+          {
+            'name': 'Stacco / Hip Thrust',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'barbell-hip-thrusts',
+          },
+          {
+            'name': 'Panca inclinata / Distensioni manubri',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'incline-dumbbell-press',
+          },
+          {
+            'name': 'Pulley / Row Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'seated-cable-row',
+          },
+          {
+            'name': 'Alzate laterali',
+            'targetSets': 3,
+            'repsList': [12, 12, 12],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'alzate_laterali',
+          },
+          {
+            'name': 'Curl hammer',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'hammer-curl',
+          },
+          {
+            'name': 'French Press',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'french_press',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    'name': 'Push Pull Legs',
+    'desc': '3 days · classic split',
+    'icon': '🔄',
+    'days': [
+      {
+        'dayName': 'Push',
+        'bodyParts': ['petto', 'spalle', 'braccia'],
+        'muscleImage': 'push.png',
+        'exercises': [
+          {
+            'name': 'Panca piana / Chest Press',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'bench-press',
+          },
+          {
+            'name': 'Croci ai cavi',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'croci_ai_cavi',
+          },
+          {
+            'name': 'Shoulder Press',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'dumbbell-shoulder-press',
+          },
+          {
+            'name': 'Alzate laterali',
+            'targetSets': 4,
+            'repsList': [12, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'alzate_laterali',
+          },
+          {
+            'name': 'Tricep Extension Machine',
+            'targetSets': 4,
+            'repsList': [10, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'triceps-extension-machine',
+          },
+          {
+            'name': 'French Press',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'french_press',
+          },
+        ],
+      },
+      {
+        'dayName': 'Pull',
+        'bodyParts': ['schiena', 'braccia'],
+        'muscleImage': 'pull.png',
+        'exercises': [
+          {
+            'name': 'Trazioni / Lat Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'lat_machine',
+          },
+          {
+            'name': 'Pulley / Row Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'seated-cable-row',
+          },
+          {
+            'name': 'Pulldown barra',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'lat_machine',
+          },
+          {
+            'name': 'Curl bilanciere',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'barbell-curl',
+          },
+          {
+            'name': 'Curl hammer',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'hammer-curl',
+          },
+          {
+            'name': 'Curl cavi dal basso',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'cable-pulldown-biceps-curl',
+          },
+        ],
+      },
+      {
+        'dayName': 'Legs',
+        'bodyParts': ['gambe'],
+        'muscleImage': 'gambe.png',
+        'exercises': [
+          {
+            'name': 'Squat / Leg Press',
+            'targetSets': 4,
+            'repsList': [6, 8, 8, 10],
+            'recoveryTime': 120,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'squat_con_bilanciere',
+          },
+          {
+            'name': 'Stacco Rumeno',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'romanian_deadlift',
+          },
+          {
+            'name': 'Leg Extension',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-extension',
+          },
+          {
+            'name': 'Leg Curl',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-curl',
+          },
+          {
+            'name': 'Calf Raises',
+            'targetSets': 3,
+            'repsList': [15, 15, 15],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'standing-calf-raise',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    'name': 'Upper / Lower',
+    'desc': '4 days · upper/lower split',
+    'icon': '⚡',
+    'days': [
+      {
+        'dayName': 'Upper A',
+        'bodyParts': ['petto', 'schiena', 'spalle', 'braccia'],
+        'muscleImage': 'push.png',
+        'exercises': [
+          {
+            'name': 'Panca piana / Chest Press',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'bench-press',
+          },
+          {
+            'name': 'Trazioni / Lat Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'lat_machine',
+          },
+          {
+            'name': 'Shoulder Press',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'dumbbell-shoulder-press',
+          },
+          {
+            'name': 'Curl bilanciere',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'barbell-curl',
+          },
+          {
+            'name': 'Tricep Extension Machine',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'triceps-extension-machine',
+          },
+        ],
+      },
+      {
+        'dayName': 'Lower A',
+        'bodyParts': ['gambe'],
+        'muscleImage': 'gambe.png',
+        'exercises': [
+          {
+            'name': 'Squat / Leg Press',
+            'targetSets': 4,
+            'repsList': [6, 8, 8, 10],
+            'recoveryTime': 120,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'squat_con_bilanciere',
+          },
+          {
+            'name': 'Stacco Rumeno',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'romanian_deadlift',
+          },
+          {
+            'name': 'Leg Extension',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-extension',
+          },
+          {
+            'name': 'Leg Curl',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-curl',
+          },
+          {
+            'name': 'Calf Raises',
+            'targetSets': 3,
+            'repsList': [15, 15, 15],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'standing-calf-raise',
+          },
+        ],
+      },
+      {
+        'dayName': 'Upper B',
+        'bodyParts': ['petto', 'schiena', 'spalle', 'braccia'],
+        'muscleImage': 'pull.png',
+        'exercises': [
+          {
+            'name': 'Croci ai cavi / Pectoral Machine',
+            'targetSets': 4,
+            'repsList': [10, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'croci_ai_cavi',
+          },
+          {
+            'name': 'Pulley / Row Machine',
+            'targetSets': 4,
+            'repsList': [10, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'seated-cable-row',
+          },
+          {
+            'name': 'Alzate laterali',
+            'targetSets': 4,
+            'repsList': [12, 12, 12, 12],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'alzate_laterali',
+          },
+          {
+            'name': 'Curl hammer',
+            'targetSets': 3,
+            'repsList': [12, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'hammer-curl',
+          },
+          {
+            'name': 'French Press',
+            'targetSets': 3,
+            'repsList': [12, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'french_press',
+          },
+        ],
+      },
+      {
+        'dayName': 'Lower B',
+        'bodyParts': ['gambe', 'glutei'],
+        'muscleImage': 'gambe.png',
+        'exercises': [
+          {
+            'name': 'Hack Squat / Leg Press',
+            'targetSets': 4,
+            'repsList': [10, 10, 10, 10],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-press',
+          },
+          {
+            'name': 'Hip Thrust',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'barbell-hip-thrusts',
+          },
+          {
+            'name': 'Leg Curl',
+            'targetSets': 3,
+            'repsList': [12, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-curl',
+          },
+          {
+            'name': 'Glutes Machine / Abductor',
+            'targetSets': 3,
+            'repsList': [12, 12, 12],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'hip_abductor',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    'name': 'Chest / Back / Legs / Shoulders / Arms',
+    'desc': '5 days · advanced split',
+    'icon': '🏆',
+    'days': [
+      {
+        'dayName': 'Chest',
+        'bodyParts': ['petto'],
+        'muscleImage': 'petto.png',
+        'exercises': [
+          {
+            'name': 'Panca piana',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'bench-press',
+          },
+          {
+            'name': 'Distensioni manubri',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'distensioni_con_manubri',
+          },
+          {
+            'name': 'Croci ai cavi',
+            'targetSets': 4,
+            'repsList': [10, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'croci_ai_cavi',
+          },
+          {
+            'name': 'Pectoral machine',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'pec-deck-fly',
+          },
+        ],
+      },
+      {
+        'dayName': 'Back',
+        'bodyParts': ['schiena'],
+        'muscleImage': 'dorso.png',
+        'exercises': [
+          {
+            'name': 'Lat Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'lat_machine',
+          },
+          {
+            'name': 'Row Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'seated-row-machine',
+          },
+          {
+            'name': 'Pulley',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'seated-cable-row',
+          },
+          {
+            'name': 'Pulldown barra',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'lat_machine',
+          },
+        ],
+      },
+      {
+        'dayName': 'Legs',
+        'bodyParts': ['gambe'],
+        'muscleImage': 'gambe.png',
+        'exercises': [
+          {
+            'name': 'Squat / Leg Press',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 120,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'squat_con_bilanciere',
+          },
+          {
+            'name': 'Leg Extension',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-extension',
+          },
+          {
+            'name': 'Leg Curl',
+            'targetSets': 4,
+            'repsList': [10, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'leg-curl',
+          },
+          {
+            'name': 'Hip Thrust / Glutes Machine',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'barbell-hip-thrusts',
+          },
+        ],
+      },
+      {
+        'dayName': 'Shoulders',
+        'bodyParts': ['spalle'],
+        'muscleImage': 'spalle.png',
+        'exercises': [
+          {
+            'name': 'Shoulder Press / Lento avanti',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 8],
+            'recoveryTime': 90,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'lento_avanti',
+          },
+          {
+            'name': 'Alzate laterali',
+            'targetSets': 4,
+            'repsList': [12, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'alzate_laterali',
+          },
+          {
+            'name': 'Alzate frontali',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'alzate_frontali',
+          },
+          {
+            'name': 'Alzate laterali posteriori',
+            'targetSets': 3,
+            'repsList': [12, 12, 12],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'bent-over-lateral-raise',
+          },
+        ],
+      },
+      {
+        'dayName': 'Arms',
+        'bodyParts': ['braccia'],
+        'muscleImage': 'braccia.png',
+        'exercises': [
+          {
+            'name': 'Curl bilanciere',
+            'targetSets': 4,
+            'repsList': [8, 8, 8, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'barbell-curl',
+          },
+          {
+            'name': 'Curl hammer',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'hammer-curl',
+          },
+          {
+            'name': 'Curl cavi dal basso',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'cable-pulldown-biceps-curl',
+          },
+          {
+            'name': 'Tricep Extension Machine',
+            'targetSets': 4,
+            'repsList': [10, 10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'triceps-extension-machine',
+          },
+          {
+            'name': 'French Press',
+            'targetSets': 3,
+            'repsList': [10, 10, 10],
+            'recoveryTime': 60,
+            'interExercisePause': 120,
+            'notePT': '',
+            'noteCliente': '',
+            'supersetGroup': 0,
+            'gifFilename': 'french_press',
+          },
+        ],
+      },
+    ],
+  },
+];
+
 // --- DASHBOARD ---
 class ClientMainPage extends StatefulWidget {
   const ClientMainPage({super.key});
@@ -1501,6 +2488,7 @@ class _ClientMainPageState extends State<ClientMainPage>
   Map<String, Map<String, dynamic>> _carryoverWeights = {};
   int _currentIndex = 0;
   int _streak = 0; // streak corrente
+  Set<String> _streakDone = {}; // sessioni completate questa settimana
 
   // Impostazioni
   bool _stTimerSound = true;
@@ -1522,7 +2510,13 @@ class _ClientMainPageState extends State<ClientMainPage>
     _loadMainSettings();
     _loadLanguage();
     _loadBannerAd();
-    getStreak().then((v) => setState(() => _streak = v));
+    getStreakData().then((d) {
+      if (mounted)
+        setState(() {
+          _streak = d.count;
+          _streakDone = d.done;
+        });
+    });
     checkAndScheduleStreakNotification(_appLang);
     try {
       AdManager.instance.loadInterstitial();
@@ -2336,15 +3330,6 @@ class _ClientMainPageState extends State<ClientMainPage>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      // Edit session name
-                      GestureDetector(
-                        onTap: () => _renameSession(index),
-                        child: const Padding(
-                          padding: EdgeInsets.all(4),
-                          child: Icon(Icons.edit_rounded, color: Colors.white38, size: 20),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -2563,221 +3548,232 @@ class _ClientMainPageState extends State<ClientMainPage>
       ),
       builder: (c) => StatefulBuilder(
         builder: (ctx2, setSheet) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        child: Column(
-          children: [
-            // Handle bar
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 4),
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.white12,
-                  borderRadius: BorderRadius.circular(10),
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: Column(
+            children: [
+              // Handle bar
+              Padding(
+                padding: const EdgeInsets.only(top: 12, bottom: 4),
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white12,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
-            ),
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 3,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: accent,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      day.dayName.toUpperCase(),
-                      style: TextStyle(
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 3,
+                      height: 24,
+                      decoration: BoxDecoration(
                         color: accent,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                  ),
-                  Text(
-                    '${day.exercises.length} ${AppL.exercises.toLowerCase()}',
-                    style: const TextStyle(color: Colors.white24, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            Divider(color: Colors.white.withAlpha(10), height: 1),
-            // Exercise list
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: day.exercises.length,
-                separatorBuilder: (_, __) => Divider(
-                  color: Colors.white.withAlpha(8),
-                  height: 1,
-                  indent: 24,
-                  endIndent: 24,
-                ),
-                itemBuilder: (ctx, idx) {
-                  final ex = day.exercises[idx];
-                  final scheme = _repsSchemeText(ex);
-                  final isSuperset = ex.supersetGroup > 0;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 6,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        day.dayName.toUpperCase(),
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2,
+                        ),
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        // YouTube button
-                        InkWell(
-                          borderRadius: BorderRadius.circular(22),
-                          onTap: () {
-                            if (kIsWeb) {
-                              cercaEsercizioSuYoutube(ex.name);
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      YouTubeSearchView(esercizio: ex.name),
+                    Text(
+                      '${day.exercises.length} ${AppL.exercises.toLowerCase()}',
+                      style: const TextStyle(
+                        color: Colors.white24,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(color: Colors.white.withAlpha(10), height: 1),
+              // Exercise list
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: day.exercises.length,
+                  separatorBuilder: (_, __) => Divider(
+                    color: Colors.white.withAlpha(8),
+                    height: 1,
+                    indent: 24,
+                    endIndent: 24,
+                  ),
+                  itemBuilder: (ctx, idx) {
+                    final ex = day.exercises[idx];
+                    final scheme = _repsSchemeText(ex);
+                    final isSuperset = ex.supersetGroup > 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      child: Row(
+                        children: [
+                          // YouTube button
+                          InkWell(
+                            borderRadius: BorderRadius.circular(22),
+                            onTap: () {
+                              if (kIsWeb) {
+                                cercaEsercizioSuYoutube(ex.name);
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        YouTubeSearchView(esercizio: ex.name),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: Colors.red.withAlpha(18),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.red.withAlpha(40),
                                 ),
-                              );
-                            }
-                          },
-                          child: Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: Colors.red.withAlpha(18),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.red.withAlpha(40),
+                              ),
+                              child: const Icon(
+                                Icons.play_arrow_rounded,
+                                color: Colors.red,
+                                size: 20,
                               ),
                             ),
-                            child: const Icon(
-                              Icons.play_arrow_rounded,
-                              color: Colors.red,
-                              size: 20,
-                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Exercise info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  if (isSuperset)
-                                    Container(
-                                      margin: const EdgeInsets.only(right: 6),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                        vertical: 1,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.deepPurple.withAlpha(80),
-                                        borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(
+                          const SizedBox(width: 12),
+                          // Exercise info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    if (isSuperset)
+                                      Container(
+                                        margin: const EdgeInsets.only(right: 6),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 5,
+                                          vertical: 1,
+                                        ),
+                                        decoration: BoxDecoration(
                                           color: Colors.deepPurple.withAlpha(
-                                            100,
+                                            80,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.deepPurple.withAlpha(
+                                              100,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'S${ex.supersetGroup}',
+                                          style: const TextStyle(
+                                            fontSize: 9,
+                                            color: Colors.purpleAccent,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
-                                      child: Text(
-                                        'S${ex.supersetGroup}',
-                                        style: const TextStyle(
-                                          fontSize: 9,
-                                          color: Colors.purpleAccent,
-                                          fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () =>
+                                            _showExerciseDetail(context, ex),
+                                        borderRadius: BorderRadius.circular(6),
+                                        child: Text(
+                                          ex.name,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ),
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () =>
-                                          _showExerciseDetail(context, ex),
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: Text(
-                                        ex.name,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                scheme,
-                                style: TextStyle(
-                                  color: Colors.white.withAlpha(100),
-                                  fontSize: 12,
+                                  ],
                                 ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  scheme,
+                                  style: TextStyle(
+                                    color: Colors.white.withAlpha(100),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Edit exercise button
+                          InkWell(
+                            borderRadius: BorderRadius.circular(22),
+                            onTap: () async {
+                              Navigator.pop(c);
+                              final dayIdx = myRoutine.indexOf(day);
+                              if (dayIdx >= 0) await _editExercise(dayIdx, idx);
+                              if (mounted) _showDayDetail(day);
+                            },
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Colors.white10,
+                                shape: BoxShape.circle,
                               ),
-                            ],
-                          ),
-                        ),
-                        // Edit exercise button
-                        InkWell(
-                          borderRadius: BorderRadius.circular(22),
-                          onTap: () async {
-                            Navigator.pop(c);
-                            final dayIdx = myRoutine.indexOf(day);
-                            if (dayIdx >= 0) await _editExercise(dayIdx, idx);
-                            if (mounted) _showDayDetail(day);
-                          },
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.white10,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.edit_rounded, color: Colors.white38, size: 16),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        // Chart button
-                        InkWell(
-                          borderRadius: BorderRadius.circular(22),
-                          onTap: () {
-                            _showGraph(ex.name);
-                          },
-                          child: Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: accent.withAlpha(18),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: accent.withAlpha(40)),
-                            ),
-                            child: Icon(
-                              Icons.insights_rounded,
-                              color: accent,
-                              size: 18,
+                              child: const Icon(
+                                Icons.edit_rounded,
+                                color: Colors.white38,
+                                size: 16,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                          const SizedBox(width: 6),
+                          // Chart button
+                          InkWell(
+                            borderRadius: BorderRadius.circular(22),
+                            onTap: () {
+                              _showGraph(ex.name);
+                            },
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: accent.withAlpha(18),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: accent.withAlpha(40)),
+                              ),
+                              child: Icon(
+                                Icons.insights_rounded,
+                                color: accent,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -3256,8 +4252,6 @@ class _ClientMainPageState extends State<ClientMainPage>
             final prefs2 = await SharedPreferences.getInstance();
             await prefs2.setString('client_history', jsonEncode(history));
             _loadData();
-            // Aggiorna streak UI
-            getStreak().then((v) { if (mounted) setState(() => _streak = v); });
           },
         ),
         transitionsBuilder: (c, anim, _, child) => SlideTransition(
@@ -3267,6 +4261,126 @@ class _ClientMainPageState extends State<ClientMainPage>
           ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
           child: child,
         ),
+      ),
+    ).then((_) async {
+      // Ricarica streak aggiornata quando si torna dalla schermata allenamento
+      final d = await getStreakData();
+      if (mounted) setState(() { _streak = d.count; _streakDone = d.done; });
+    });
+  }
+
+  void _showStreakInfo() {
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Column(
+          children: [
+            const Text('🔥', style: TextStyle(fontSize: 36)),
+            const SizedBox(height: 4),
+            Text(
+              '$_streak',
+              style: const TextStyle(
+                color: Colors.orange,
+                fontSize: 48,
+                fontWeight: FontWeight.w900,
+                height: 1.0,
+              ),
+            ),
+            Text(
+              AppL.lang == 'en'
+                  ? (_streak == 1 ? 'week streak' : 'weeks streak')
+                  : (_streak == 1 ? 'settimana' : 'settimane'),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.orange,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppL.lang == 'en'
+                  ? 'Complete ALL sessions in your plan every week to increase your streak counter.\n\nMiss even one session in a week and your streak resets to 0.\n\nStay consistent — every week counts! 💪'
+                  : 'Completa TUTTE le sessioni della tua scheda ogni settimana per incrementare il contatore.\n\nSe salti anche solo una sessione in una settimana, la streak si azzera.\n\nSii costante — ogni settimana conta! 💪',
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 14),
+            // Mini progress strip
+            if (myRoutine.isNotEmpty) ...[
+              Text(
+                '${_streakDone.where((n) => myRoutine.any((d) => d.dayName == n)).length}/${myRoutine.length} ${AppL.lang == 'en' ? 'sessions this week' : 'sessioni questa settimana'}',
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
+              const SizedBox(height: 6),
+              LayoutBuilder(
+                builder: (ctx, constraints) {
+                  final n = myRoutine.length;
+                  final iconSize = n > 0
+                      ? (constraints.maxWidth / n - 8).clamp(20.0, 48.0)
+                      : 48.0;
+                  return Row(
+                    children: List.generate(n, (i) {
+                      final name = myRoutine[i].dayName;
+                      final done = _streakDone.contains(name);
+                      return Expanded(
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: iconSize,
+                            height: iconSize,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              gradient: done
+                                  ? const LinearGradient(
+                                      colors: [
+                                        Color(0xFFFF6B00),
+                                        Color(0xFFFFAB00),
+                                      ],
+                                    )
+                                  : null,
+                              color: done ? null : const Color(0xFF2C2C2E),
+                              boxShadow: done
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.orange.withAlpha(80),
+                                        blurRadius: 6,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Opacity(
+                                opacity: done ? 1.0 : 0.2,
+                                child: Image.asset(
+                                  'assets/icon_client.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  );
+                },
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c),
+            child: const Text('OK', style: TextStyle(color: Colors.orange)),
+          ),
+        ],
       ),
     );
   }
@@ -3328,26 +4442,213 @@ class _ClientMainPageState extends State<ClientMainPage>
                   AppL.chooseAndStart,
                   style: const TextStyle(color: Colors.white38, fontSize: 13),
                 ),
-                if (_streak > 0) ...[
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFFFF6B00), Color(0xFFFFAA00)]),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('🔥', style: TextStyle(fontSize: 18)),
-                        const SizedBox(width: 6),
-                        Text(
-                          AppL.lang == 'en'
-                              ? '$_streak week${_streak == 1 ? '' : 's'} streak — keep it up!'
-                              : '$_streak ${_streak == 1 ? 'settimana' : 'settimane'} di fila — continua così!',
-                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                if (myRoutine.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: _showStreakInfo,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1C1C1E),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _streak > 0
+                              ? const Color(0xFFFF6B00).withAlpha(80)
+                              : Colors.white12,
                         ),
-                      ],
+                      ),
+                      child: LayoutBuilder(
+                        builder: (ctx, bannerConstraints) {
+                          final n = myRoutine.length;
+                          final sideIconsWidth =
+                              bannerConstraints.maxWidth - 68 - 10 - 6 - 18;
+                          final fullIconsWidth = bannerConstraints.maxWidth;
+                          final fitsSide =
+                              n == 0 ||
+                              (n * 38.0 + (n - 1) * 6.0) <= sideIconsWidth;
+                          final fitsFull =
+                              n == 0 ||
+                              (n * 38.0 + (n - 1) * 6.0) <= fullIconsWidth;
+
+                          final Widget Function(double)
+                          buildIconRow = (availWidth) {
+                            final iconSize = n > 0
+                                ? (availWidth / n - 8).clamp(20.0, 48.0)
+                                : 48.0;
+                            return Row(
+                              children: List.generate(n, (i) {
+                                final name = myRoutine[i].dayName;
+                                final done = _streakDone.contains(name);
+                                return Expanded(
+                                  child: Center(
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 300),
+                                      width: iconSize,
+                                      height: iconSize,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        gradient: done
+                                            ? const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFFF6B00),
+                                                  Color(0xFFFFAB00),
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                              )
+                                            : null,
+                                        color: done
+                                            ? null
+                                            : const Color(0xFF2C2C2E),
+                                        boxShadow: done
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.orange.withAlpha(
+                                                    100,
+                                                  ),
+                                                  blurRadius: 6,
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Opacity(
+                                          opacity: done ? 1.0 : 0.2,
+                                          child: Image.asset(
+                                            'assets/icon_client.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            );
+                          };
+
+                          final doneCount = _streakDone
+                              .where(
+                                (nm) => myRoutine.any((d) => d.dayName == nm),
+                              )
+                              .length;
+
+                          if (fitsSide) {
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: 68,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Text(
+                                            '🔥',
+                                            style: TextStyle(fontSize: 22),
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text(
+                                            '$_streak',
+                                            style: const TextStyle(
+                                              color: Colors.orange,
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.w900,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        AppL.lang == 'en'
+                                            ? (_streak == 1 ? 'week' : 'weeks')
+                                            : (_streak == 1
+                                                  ? 'settimana'
+                                                  : 'settimane'),
+                                        style: const TextStyle(
+                                          color: Colors.white38,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '$doneCount/${myRoutine.length}',
+                                        style: TextStyle(
+                                          color: doneCount >= myRoutine.length
+                                              ? Colors.orange
+                                              : Colors.white38,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(child: buildIconRow(sideIconsWidth)),
+                                const SizedBox(width: 6),
+                                const Icon(
+                                  Icons.info_outline,
+                                  color: Colors.white24,
+                                  size: 15,
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      '🔥',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '$_streak ${AppL.lang == 'en' ? (_streak == 1 ? 'week' : 'weeks') : (_streak == 1 ? 'settimana' : 'settimane')}',
+                                      style: const TextStyle(
+                                        color: Colors.orange,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      '$doneCount/${myRoutine.length}',
+                                      style: TextStyle(
+                                        color: doneCount >= myRoutine.length
+                                            ? Colors.orange
+                                            : Colors.white38,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    const Icon(
+                                      Icons.info_outline,
+                                      color: Colors.white24,
+                                      size: 15,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                buildIconRow(
+                                  fitsFull ? fullIconsWidth : fullIconsWidth,
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -3406,7 +4707,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${d.bodyParts.map((k) => kBodyPartIcons[k] ?? '').where((e) => e.isNotEmpty).join(' ')} ${d.dayName.toUpperCase()}'
+                                    '${d.bodyParts.map((k) => kBodyPartIcons[k] ?? '').where((e) => e.isNotEmpty).take(2).join(' ')} ${d.dayName.toUpperCase()}'
                                         .trim(),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
@@ -3588,12 +4889,19 @@ class _ClientMainPageState extends State<ClientMainPage>
           autofocus: true,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: accent.withAlpha(100))),
-            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: accent)),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: accent.withAlpha(100)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: accent),
+            ),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppL.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppL.cancel),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, ctrl.text.trim()),
             style: ElevatedButton.styleFrom(backgroundColor: accent),
@@ -3613,8 +4921,12 @@ class _ClientMainPageState extends State<ClientMainPage>
     final original = myRoutine[dayIdx].exercises[exIdx];
     final nameCtrl = TextEditingController(text: original.name);
     final setsCtrl = TextEditingController(text: '${original.targetSets}');
-    final recoveryCtrl = TextEditingController(text: '${original.recoveryTime}');
-    final pausaCtrl = TextEditingController(text: '${original.interExercisePause}');
+    final recoveryCtrl = TextEditingController(
+      text: '${original.recoveryTime}',
+    );
+    final pausaCtrl = TextEditingController(
+      text: '${original.interExercisePause}',
+    );
     final noteCtrl = TextEditingController(text: original.notePT);
     int supersetGroup = original.supersetGroup;
     int currentSets = original.targetSets;
@@ -3632,93 +4944,313 @@ class _ClientMainPageState extends State<ClientMainPage>
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF1C1C1E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (c) => StatefulBuilder(
         builder: (ctx, setS) {
           void updateSets(String val) {
             final n = (int.tryParse(val) ?? 1).clamp(1, 20);
             setS(() {
               currentSets = n;
-              while (repsCtrls.length < n) repsCtrls.add(TextEditingController(text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10'));
-              while (repsCtrls.length > n) { repsCtrls.last.dispose(); repsCtrls.removeLast(); }
+              while (repsCtrls.length < n)
+                repsCtrls.add(
+                  TextEditingController(
+                    text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10',
+                  ),
+                );
+              while (repsCtrls.length > n) {
+                repsCtrls.last.dispose();
+                repsCtrls.removeLast();
+              }
             });
           }
 
           return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            ),
             child: DraggableScrollableSheet(
-              initialChildSize: 0.9, minChildSize: 0.5, maxChildSize: 0.95, expand: false,
+              initialChildSize: 0.9,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
               builder: (_, scrollCtrl) => ListView(
                 controller: scrollCtrl,
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 children: [
-                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-                  Text(AppL.lang == 'en' ? 'Edit Exercise' : 'Modifica Esercizio', style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    AppL.lang == 'en' ? 'Edit Exercise' : 'Modifica Esercizio',
+                    style: TextStyle(
+                      color: accent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: nameCtrl,
                     style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(labelText: AppL.exerciseName, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
-                    onChanged: (v) => setS(() => suggestions = searchExercisesWithItalian(v, limit: 6)),
+                    decoration: InputDecoration(
+                      labelText: AppL.exerciseName,
+                      labelStyle: const TextStyle(color: Colors.white54),
+                      filled: true,
+                      fillColor: Colors.black26,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: (v) => setS(
+                      () =>
+                          suggestions = searchExercisesWithItalian(v, limit: 6),
+                    ),
                   ),
                   if (suggestions.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(top: 4),
-                      decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2C2C2E),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       constraints: const BoxConstraints(maxHeight: 240),
                       child: ListView.separated(
-                        shrinkWrap: true, physics: const ClampingScrollPhysics(),
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
                         itemCount: suggestions.length,
-                        separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 1),
+                        separatorBuilder: (_, __) =>
+                            const Divider(color: Colors.white10, height: 1),
                         itemBuilder: (_, i) {
                           final ex = suggestions[i];
                           return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            leading: ex.gifFilename != null ? ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.asset('assets/gif/${ex.gifFilename}.gif', width: 48, height: 48, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, color: Colors.white30))) : const Icon(Icons.fitness_center, color: Colors.white30),
-                            title: Text(ex.name, style: const TextStyle(color: Colors.white, fontSize: 13)),
-                            onTap: () { nameCtrl.text = ex.name; setS(() { suggestions = []; selectedExInfo = ex; }); },
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            leading: ex.gifFilename != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.asset(
+                                      'assets/gif/${ex.gifFilename}.gif',
+                                      width: 48,
+                                      height: 48,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => const Icon(
+                                        Icons.fitness_center,
+                                        color: Colors.white30,
+                                      ),
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.fitness_center,
+                                    color: Colors.white30,
+                                  ),
+                            title: Text(
+                              ex.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
+                            onTap: () {
+                              nameCtrl.text = ex.name;
+                              setS(() {
+                                suggestions = [];
+                                selectedExInfo = ex;
+                              });
+                            },
                           );
                         },
                       ),
                     ),
                   const SizedBox(height: 8),
-                  if (selectedExInfo != null && selectedExInfo!.gifFilename != null) ...[
-                    ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/gif/${selectedExInfo!.gifFilename}.gif', height: 140, width: double.infinity, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
-                    const SizedBox(height: 12),
-                  ],
-                  Row(children: [
-                    Expanded(child: TextField(controller: setsCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.sets, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)), onChanged: updateSets)),
-                    const SizedBox(width: 12),
-                    Expanded(child: TextField(controller: recoveryCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.recovery, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
-                    const SizedBox(width: 12),
-                    Expanded(child: TextField(controller: pausaCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.pauseSec, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
-                  ]),
-                  const SizedBox(height: 12),
-                  Text(AppL.repsPerSet, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                  const SizedBox(height: 6),
-                  Wrap(spacing: 8, runSpacing: 8, children: List.generate(currentSets, (i) => SizedBox(
-                    width: 58,
-                    child: TextField(controller: repsCtrls[i], keyboardType: TextInputType.number, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 13),
-                      decoration: InputDecoration(labelText: 'S${i+1}', labelStyle: const TextStyle(color: Colors.white38, fontSize: 11), filled: true, fillColor: Colors.black26, contentPadding: const EdgeInsets.symmetric(vertical: 8), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none))),
-                  ))),
-                  const SizedBox(height: 16),
-                  TextField(controller: noteCtrl, maxLines: 3, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.notes, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none))),
-                  const SizedBox(height: 16),
-                  Text('🔗  ${AppL.circuit}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 4),
-                  Text(AppL.circuitHint, style: const TextStyle(color: Colors.white38, fontSize: 11)),
-                  const SizedBox(height: 8),
-                  Row(children: List.generate(6, (i) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: GestureDetector(
-                      onTap: () => setS(() => supersetGroup = i),
-                      child: Container(
-                        width: 40, height: 40,
-                        decoration: BoxDecoration(color: supersetGroup == i ? accent : Colors.white10, borderRadius: BorderRadius.circular(10)),
-                        child: Center(child: Text('$i', style: TextStyle(color: supersetGroup == i ? Colors.black : Colors.white, fontWeight: FontWeight.bold))),
+                  if (selectedExInfo != null &&
+                      selectedExInfo!.gifFilename != null) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/gif/${selectedExInfo!.gifFilename}.gif',
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                       ),
                     ),
-                  ))),
+                    const SizedBox(height: 12),
+                  ],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: setsCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.sets,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onChanged: updateSets,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: recoveryCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.recovery,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: pausaCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.pauseSec,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    AppL.repsPerSet,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: List.generate(
+                      currentSets,
+                      (i) => SizedBox(
+                        width: 58,
+                        child: TextField(
+                          controller: repsCtrls[i],
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: 'S${i + 1}',
+                            labelStyle: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 11,
+                            ),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: noteCtrl,
+                    maxLines: 3,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: AppL.notes,
+                      labelStyle: const TextStyle(color: Colors.white54),
+                      filled: true,
+                      fillColor: Colors.black26,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '🔗  ${AppL.circuit}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    AppL.circuitHint,
+                    style: const TextStyle(color: Colors.white38, fontSize: 11),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: List.generate(
+                      6,
+                      (i) => Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: GestureDetector(
+                          onTap: () => setS(() => supersetGroup = i),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: supersetGroup == i
+                                  ? accent
+                                  : Colors.white10,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$i',
+                                style: TextStyle(
+                                  color: supersetGroup == i
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
@@ -3726,19 +5258,42 @@ class _ClientMainPageState extends State<ClientMainPage>
                       onPressed: () {
                         final name = nameCtrl.text.trim();
                         if (name.isEmpty) return;
-                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(1, 20);
-                        final repsList = repsCtrls.map((c) => int.tryParse(c.text) ?? 10).toList();
+                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(
+                          1,
+                          20,
+                        );
+                        final repsList = repsCtrls
+                            .map((c) => int.tryParse(c.text) ?? 10)
+                            .toList();
                         final recovery = int.tryParse(recoveryCtrl.text) ?? 90;
                         final pausa = int.tryParse(pausaCtrl.text) ?? 120;
                         Navigator.pop(c);
                         setState(() {
-                          final updated = ExerciseConfig(name: name, targetSets: sets, repsList: repsList, recoveryTime: recovery, interExercisePause: pausa, notePT: noteCtrl.text.trim(), noteCliente: original.noteCliente, supersetGroup: supersetGroup, gifFilename: selectedExInfo?.gifFilename ?? original.gifFilename);
+                          final updated = ExerciseConfig(
+                            name: name,
+                            targetSets: sets,
+                            repsList: repsList,
+                            recoveryTime: recovery,
+                            interExercisePause: pausa,
+                            notePT: noteCtrl.text.trim(),
+                            noteCliente: original.noteCliente,
+                            supersetGroup: supersetGroup,
+                            gifFilename:
+                                selectedExInfo?.gifFilename ??
+                                original.gifFilename,
+                          );
                           updated.results = original.results;
                           myRoutine[dayIdx].exercises[exIdx] = updated;
                         });
                         _saveMyRoutine();
                       },
-                      child: Text(AppL.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      child: Text(
+                        AppL.save,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -3788,6 +5343,10 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       'client_routine',
       jsonEncode(_days.map((d) => d.toJson()).toList()),
     );
+    // Reset this week's completed sessions when the routine changes
+    // (but keep the week streak count intact)
+    await prefs.setString('streak_completed_sessions', '[]');
+    await prefs.setInt('streak_required_count', _days.length);
   }
 
   void _aggiungiGiorno() {
@@ -4070,7 +5629,7 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                 setState(() {
                   _days.add(
                     WorkoutDay(
-                      dayName: name,
+                      dayName: _limitToOneEmoji(name),
                       bodyParts: List.from(selectedParts),
                       muscleImage: selectedMuscleImage,
                       exercises: [],
@@ -4122,82 +5681,161 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     _save();
   }
 
-  List<WorkoutDay> _getSampleWorkouts() => [
-    WorkoutDay(
-      dayName: AppL.lang == 'en' ? 'Chest & Triceps' : 'Petto & Tricipiti',
-      bodyParts: ['petto', 'braccia'],
-      muscleImage: 'petto.png',
-      exercises: [
-        ExerciseConfig(name: 'Bench Press', targetSets: 4, repsList: [8, 8, 8, 6], recoveryTime: 90, notePT: ''),
-        ExerciseConfig(name: 'Incline Dumbbell Press', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 75, notePT: ''),
-        ExerciseConfig(name: 'Cable Fly', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 60, notePT: ''),
-        ExerciseConfig(name: 'Tricep Pushdown', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 60, notePT: ''),
-      ],
-    ),
-    WorkoutDay(
-      dayName: AppL.lang == 'en' ? 'Back & Biceps' : 'Schiena & Bicipiti',
-      bodyParts: ['schiena', 'braccia'],
-      muscleImage: 'dorso.png',
-      exercises: [
-        ExerciseConfig(name: 'Pull Up', targetSets: 4, repsList: [8, 8, 6, 6], recoveryTime: 90, notePT: ''),
-        ExerciseConfig(name: 'Barbell Row', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 90, notePT: ''),
-        ExerciseConfig(name: 'Lat Pulldown', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 75, notePT: ''),
-        ExerciseConfig(name: 'Barbell Curl', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 60, notePT: ''),
-      ],
-    ),
-    WorkoutDay(
-      dayName: AppL.lang == 'en' ? 'Legs' : 'Gambe',
-      bodyParts: ['gambe'],
-      muscleImage: 'gambe.png',
-      exercises: [
-        ExerciseConfig(name: 'Squat', targetSets: 4, repsList: [8, 8, 8, 6], recoveryTime: 120, notePT: ''),
-        ExerciseConfig(name: 'Romanian Deadlift', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 90, notePT: ''),
-        ExerciseConfig(name: 'Leg Press', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 90, notePT: ''),
-      ],
-    ),
-    WorkoutDay(
-      dayName: AppL.lang == 'en' ? 'Shoulders' : 'Spalle',
-      bodyParts: ['spalle'],
-      muscleImage: 'spalle.png',
-      exercises: [
-        ExerciseConfig(name: 'Shoulder Press', targetSets: 4, repsList: [10, 10, 8, 8], recoveryTime: 90, notePT: ''),
-        ExerciseConfig(name: 'Lateral Raise', targetSets: 3, repsList: [15, 15, 12], recoveryTime: 60, notePT: ''),
-      ],
-    ),
-    WorkoutDay(
-      dayName: AppL.lang == 'en' ? 'Core & Cardio' : 'Core & Cardio',
-      bodyParts: ['core'],
-      muscleImage: null,
-      exercises: [
-        ExerciseConfig(name: 'Plank', targetSets: 3, repsList: [30, 30, 30], recoveryTime: 60, notePT: ''),
-      ],
-    ),
-  ];
-
-  Future<void> _caricaEsempio() async {
-    final ok = await showDialog<bool>(
+  void _mostraTemplateDialog() {
+    final accent = appAccentNotifier.value;
+    showModalBottomSheet(
       context: context,
-      builder: (_) => AlertDialog(
+      backgroundColor: const Color(0xFF1C1C1E),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (c) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  AppL.lang == 'en'
+                      ? 'Choose a template'
+                      : 'Scegli un template',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: accent,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white38),
+                  onPressed: () => Navigator.pop(c),
+                ),
+              ],
+            ),
+            Text(
+              AppL.lang == 'en'
+                  ? 'Load a pre-built plan as a starting point. You can edit it afterwards.'
+                  : 'Carica una scheda pre-impostata come punto di partenza. Puoi modificarla dopo il caricamento.',
+              style: const TextStyle(color: Colors.white38, fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            ...kWorkoutTemplates.map(
+              (t) => ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: accent.withAlpha(20),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: accent.withAlpha(60)),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    t['icon'] as String,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ),
+                title: Text(
+                  t['name'] as String,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Text(
+                  t['desc'] as String,
+                  style: const TextStyle(color: Colors.white38, fontSize: 12),
+                ),
+                trailing: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: Colors.white24,
+                ),
+                onTap: () {
+                  Navigator.pop(c);
+                  _confermaCaricaTemplate(t);
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confermaCaricaTemplate(Map<String, dynamic> template) {
+    final accent = appAccentNotifier.value;
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: Text(AppL.loadExample, style: const TextStyle(color: Colors.white)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          '"${template['name']}"?',
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+        ),
         content: Text(
           AppL.lang == 'en'
-              ? 'Load a 5-day sample plan? This will replace the current schedule.'
-              : 'Caricare un piano di esempio a 5 giorni? Questo sostituirà la scheda attuale.',
-          style: const TextStyle(color: Colors.white70),
+              ? 'This will add ${(template['days'] as List).length} sessions to your schedule. Existing sessions will be kept.'
+              : 'Verranno aggiunte ${(template['days'] as List).length} sessioni alla scheda. Le sessioni esistenti verranno mantenute.',
+          style: const TextStyle(color: Colors.white54, fontSize: 14),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppL.cancel)),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(AppL.confirm, style: TextStyle(color: appAccentNotifier.value)),
+            onPressed: () => Navigator.pop(c),
+            child: Text(
+              AppL.cancel,
+              style: const TextStyle(color: Colors.white38),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(c);
+              setState(() {
+                for (final dayData in template['days'] as List) {
+                  final day = WorkoutDay.fromJson(
+                    Map<String, dynamic>.from(dayData as Map),
+                  );
+                  _days.add(day);
+                }
+              });
+              await _save();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppL.lang == 'en'
+                          ? 'Template "${template['name']}" loaded! Edit exercises as needed.'
+                          : 'Template "${template['name']}" caricato! Modifica gli esercizi secondo le esigenze.',
+                    ),
+                    backgroundColor: Colors.amber.shade800,
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: accent,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(AppL.lang == 'en' ? 'LOAD' : 'CARICA'),
           ),
         ],
       ),
     );
-    if (ok != true) return;
-    setState(() => _days = _getSampleWorkouts());
-    await _save();
   }
 
   void _aggiungiEsercizio(int dayIdx) {
@@ -4672,7 +6310,6 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     );
   }
 
-
   void _apriArchivioEsercizi(
     BuildContext context,
     StateSetter setS,
@@ -4690,15 +6327,18 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       ),
       builder: (c) => StatefulBuilder(
         builder: (ctx, setA) {
-          final cats = kGifCatalog
-              .map((e) => e.category)
-              .toSet()
-              .where((c) => c.isNotEmpty && c != 'altro')
-              .toList()
-            ..sort();
+          final cats =
+              kGifCatalog
+                  .map((e) => e.category)
+                  .toSet()
+                  .where((c) => c.isNotEmpty && c != 'altro')
+                  .toList()
+                ..sort();
 
           List<ExerciseInfo> filtered = selectedCategory != null
-              ? kGifCatalog.where((e) => e.category == selectedCategory).toList()
+              ? kGifCatalog
+                    .where((e) => e.category == selectedCategory)
+                    .toList()
               : kGifCatalog.where((e) => e.category != 'altro').toList();
 
           if (searchQuery.isNotEmpty) {
@@ -4728,7 +6368,9 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                 TextField(
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: AppL.lang == 'en' ? 'Search exercise...' : 'Cerca esercizio...',
+                    hintText: AppL.lang == 'en'
+                        ? 'Search exercise...'
+                        : 'Cerca esercizio...',
                     hintStyle: const TextStyle(color: Colors.white38),
                     prefixIcon: const Icon(Icons.search, color: Colors.white38),
                     filled: true,
@@ -4737,7 +6379,10 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                   ),
                   onChanged: (v) => setA(() => searchQuery = v),
                 ),
@@ -4752,24 +6397,28 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                         onTap: () => setA(() => selectedCategory = null),
                         accent: appAccentNotifier.value,
                       ),
-                      ...cats.map((cat) => _archiveChip(
-                        label: '${kBodyPartIcons[cat] ?? ''} ${bodyPartName(cat)}',
-                        selected: selectedCategory == cat,
-                        onTap: () => setA(() => selectedCategory = cat),
-                        accent: appAccentNotifier.value,
-                      )),
+                      ...cats.map(
+                        (cat) => _archiveChip(
+                          label:
+                              '${kBodyPartIcons[cat] ?? ''} ${bodyPartName(cat)}',
+                          selected: selectedCategory == cat,
+                          onTap: () => setA(() => selectedCategory = cat),
+                          accent: appAccentNotifier.value,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.85,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.85,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
                     itemCount: filtered.length,
                     itemBuilder: (_, i) {
                       final ex = filtered[i];
@@ -4797,11 +6446,19 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                                           width: double.infinity,
                                           errorBuilder: (_, __, ___) =>
                                               const Center(
-                                                child: Icon(Icons.fitness_center, color: Colors.white30, size: 32),
+                                                child: Icon(
+                                                  Icons.fitness_center,
+                                                  color: Colors.white30,
+                                                  size: 32,
+                                                ),
                                               ),
                                         )
                                       : const Center(
-                                          child: Icon(Icons.fitness_center, color: Colors.white30, size: 32),
+                                          child: Icon(
+                                            Icons.fitness_center,
+                                            color: Colors.white30,
+                                            size: 32,
+                                          ),
                                         ),
                                 ),
                               ),
@@ -4809,7 +6466,11 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                                 padding: const EdgeInsets.all(6),
                                 child: Text(
                                   ex.name,
-                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
@@ -4872,7 +6533,10 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: Text(AppL.renameSession, style: const TextStyle(color: Colors.white)),
+        title: Text(
+          AppL.renameSession,
+          style: const TextStyle(color: Colors.white),
+        ),
         content: TextField(
           controller: ctrl,
           autofocus: true,
@@ -4882,20 +6546,32 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
             labelStyle: const TextStyle(color: Colors.white54),
             filled: true,
             fillColor: Colors.black26,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppL.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppL.cancel),
+          ),
           TextButton(
             onPressed: () {
               final name = ctrl.text.trim();
               if (name.isEmpty) return;
-              setState(() => _days[dayIdx].dayName = name);
+              setState(() => _days[dayIdx].dayName = _limitToOneEmoji(name));
               _save();
               Navigator.pop(context);
             },
-            child: Text(AppL.save, style: TextStyle(color: appAccentNotifier.value, fontWeight: FontWeight.bold)),
+            child: Text(
+              AppL.save,
+              style: TextStyle(
+                color: appAccentNotifier.value,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -4933,7 +6609,11 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
             setS(() {
               currentSets = n;
               while (repsCtrls.length < n) {
-                repsCtrls.add(TextEditingController(text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10'));
+                repsCtrls.add(
+                  TextEditingController(
+                    text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10',
+                  ),
+                );
               }
               while (repsCtrls.length > n) {
                 repsCtrls.last.dispose();
@@ -4941,8 +6621,11 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
               }
             });
           }
+
           return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            ),
             child: DraggableScrollableSheet(
               initialChildSize: 0.9,
               minChildSize: 0.5,
@@ -4952,8 +6635,25 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                 controller: scrollCtrl,
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 children: [
-                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-                  Text(AppL.editExercise, style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    AppL.editExercise,
+                    style: TextStyle(
+                      color: accent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: nameCtrl,
@@ -4963,29 +6663,144 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       labelStyle: const TextStyle(color: Colors.white54),
                       filled: true,
                       fillColor: Colors.black26,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => _apriArchivioEsercizi(ctx, setS, (ex) {
+                      nameCtrl.text = ex.name;
+                      setS(() => selectedExInfo = ex);
+                    }),
+                    icon: const Icon(Icons.library_books_rounded, size: 18),
+                    label: Text(AppL.browseArchive),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: accent,
+                      side: BorderSide(color: accent.withAlpha(80)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: setsCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.sets, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)), onChanged: updateSets)),
+                      Expanded(
+                        child: TextField(
+                          controller: setsCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.sets,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onChanged: updateSets,
+                        ),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: TextField(controller: recoveryCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.recovery, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+                      Expanded(
+                        child: TextField(
+                          controller: recoveryCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.recovery,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: TextField(controller: pausaCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.pauseSec, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+                      Expanded(
+                        child: TextField(
+                          controller: pausaCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.pauseSec,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Text(AppL.repsPerSet, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  Text(
+                    AppL.repsPerSet,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: List.generate(currentSets, (i) => SizedBox(width: 58, child: TextField(controller: repsCtrls[i], keyboardType: TextInputType.number, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 13), decoration: InputDecoration(labelText: 'S${i+1}', labelStyle: const TextStyle(color: Colors.white38, fontSize: 11), filled: true, fillColor: Colors.black26, contentPadding: const EdgeInsets.symmetric(vertical: 8), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none))))),
+                    children: List.generate(
+                      currentSets,
+                      (i) => SizedBox(
+                        width: 58,
+                        child: TextField(
+                          controller: repsCtrls[i],
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: 'S${i + 1}',
+                            labelStyle: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 11,
+                            ),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  TextField(controller: noteCtrl, maxLines: 3, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.notes, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none))),
+                  TextField(
+                    controller: noteCtrl,
+                    maxLines: 3,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: AppL.notes,
+                      labelStyle: const TextStyle(color: Colors.white54),
+                      filled: true,
+                      fillColor: Colors.black26,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
@@ -4993,8 +6808,13 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       onPressed: () {
                         final name = nameCtrl.text.trim();
                         if (name.isEmpty) return;
-                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(1, 20);
-                        final repsList = repsCtrls.map((c) => int.tryParse(c.text) ?? 10).toList();
+                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(
+                          1,
+                          20,
+                        );
+                        final repsList = repsCtrls
+                            .map((c) => int.tryParse(c.text) ?? 10)
+                            .toList();
                         final recovery = int.tryParse(recoveryCtrl.text) ?? 90;
                         final pausa = int.tryParse(pausaCtrl.text) ?? 120;
                         final newEx = ExerciseConfig(
@@ -5006,13 +6826,20 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                           notePT: noteCtrl.text.trim(),
                           noteCliente: orig.noteCliente,
                           supersetGroup: supersetGroup,
-                          gifFilename: selectedExInfo?.gifFilename ?? orig.gifFilename,
+                          gifFilename:
+                              selectedExInfo?.gifFilename ?? orig.gifFilename,
                         );
                         Navigator.pop(c);
                         setState(() => _days[dayIdx].exercises[exIdx] = newEx);
                         _save();
                       },
-                      child: Text(AppL.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      child: Text(
+                        AppL.save,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -5037,13 +6864,6 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: _caricaEsempio,
-            child: Text(
-              AppL.loadExample,
-              style: const TextStyle(color: Colors.white54, fontSize: 12),
-            ),
-          ),
-          TextButton(
             onPressed: () async {
               await _save();
               if (mounted) Navigator.pop(context);
@@ -5055,12 +6875,27 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _aggiungiGiorno,
-        backgroundColor: accent,
-        foregroundColor: Colors.black,
-        icon: const Icon(Icons.add),
-        label: Text(AppL.day),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: 'templates_fab',
+            onPressed: _mostraTemplateDialog,
+            backgroundColor: const Color(0xFF2C2C2E),
+            foregroundColor: Colors.amber,
+            icon: const Icon(Icons.auto_awesome_rounded),
+            label: Text(AppL.lang == 'en' ? 'Templates' : 'Template'),
+          ),
+          const SizedBox(width: 12),
+          FloatingActionButton.extended(
+            heroTag: 'add_day_fab',
+            onPressed: _aggiungiGiorno,
+            backgroundColor: accent,
+            foregroundColor: Colors.black,
+            icon: const Icon(Icons.add),
+            label: Text(AppL.day),
+          ),
+        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -5079,10 +6914,47 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                     AppL.noScheduleYet,
                     style: const TextStyle(color: Colors.white38, fontSize: 16),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppL.addFirstDay,
-                    style: const TextStyle(color: Colors.white24, fontSize: 13),
+                  const SizedBox(height: 24),
+                  // Speech bubble hint
+                  GestureDetector(
+                    onTap: _mostraTemplateDialog,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 32),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: accent.withAlpha(20),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: accent.withAlpha(80)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('💬', style: const TextStyle(fontSize: 22)),
+                          const SizedBox(width: 10),
+                          Flexible(
+                            child: Text(
+                              AppL.lang == 'en'
+                                  ? "Don't know where to start?\nTap to browse pre-built plans!"
+                                  : "Non sai da dove iniziare?\nSfoglia le schede precompilate!",
+                              style: TextStyle(
+                                color: accent,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.auto_awesome_rounded,
+                            color: accent,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -5103,13 +6975,26 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       horizontal: 16,
                       vertical: 4,
                     ),
-                    leading: Text(
-                      day.bodyParts
-                          .map((k) => kBodyPartIcons[k] ?? '')
-                          .where((e) => e.isNotEmpty)
-                          .join(' '),
-                      style: const TextStyle(fontSize: 22),
-                    ),
+                    leading: day.muscleImage != null && day.muscleImage!.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              'assets/muscle/${day.muscleImage}',
+                              width: 42,
+                              height: 42,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : day.bodyParts.isNotEmpty
+                        ? Text(
+                            day.bodyParts
+                                .map((k) => kBodyPartIcons[k] ?? '')
+                                .where((e) => e.isNotEmpty)
+                                .take(2)
+                                .join(' '),
+                            style: const TextStyle(fontSize: 22),
+                          )
+                        : const Icon(Icons.fitness_center, color: Colors.white38),
                     title: Text(
                       day.dayName,
                       style: const TextStyle(
@@ -5128,7 +7013,11 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit_rounded, color: Colors.white38, size: 20),
+                          icon: const Icon(
+                            Icons.edit_rounded,
+                            color: Colors.white38,
+                            size: 20,
+                          ),
                           onPressed: () => _rinominaGiorno(dayIdx),
                         ),
                         IconButton(
@@ -5207,8 +7096,13 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit_rounded, color: Colors.white38, size: 18),
-                                onPressed: () => _modificaEsercizio(dayIdx, e.key),
+                                icon: const Icon(
+                                  Icons.edit_rounded,
+                                  color: Colors.white38,
+                                  size: 18,
+                                ),
+                                onPressed: () =>
+                                    _modificaEsercizio(dayIdx, e.key),
                               ),
                               IconButton(
                                 icon: const Icon(
@@ -5216,7 +7110,8 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                                   color: Colors.redAccent,
                                   size: 20,
                                 ),
-                                onPressed: () => _eliminaEsercizio(dayIdx, e.key),
+                                onPressed: () =>
+                                    _eliminaEsercizio(dayIdx, e.key),
                               ),
                             ],
                           ),
@@ -5291,6 +7186,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
   List<Map<String, dynamic>> _allCompletedExercises = [];
   bool _isNewRecord = false;
   int _currentStreak = 0; // streak aggiornata dopo fine allenamento
+  int _streakDoneCount = 0;
+  int _streakTotalCount = 0;
+  Set<String> _streakDoneNames = {};
   final Map<int, List<Map<String, dynamic>>> _supersetAccumulated = {};
   // Risultati sessione precedente: nome esercizio → lista serie {w, r}
   final Map<String, List<Map<String, dynamic>>> _previousResults = {};
@@ -5509,29 +7407,72 @@ class _WorkoutEngineState extends State<WorkoutEngine>
 
   // --- NUOVA FUNZIONE NOTIFICA ---
   Future<void> _programmaNotificaFine(int secondi) async {
-    final gen = ++_notifGen;
+    ++_notifGen;
+    final gen = _notifGen;
+    if (kIsWeb) return;
+
+    // Cancella notifica finale precedente
+    try { await flutterLocalNotificationsPlugin.cancel(0); } catch (_) {}
+
+    // Notifica fine recupero — Future.delayed affidabile (come cliente.txt)
     try {
       await Future.delayed(Duration(seconds: secondi));
-      if (gen != _notifGen) return;
-      if (!mounted) return;
-
-      const androidDetails = AndroidNotificationDetails(
-        'timer_gym',
-        'Timer Recupero',
-        importance: Importance.max,
-        priority: Priority.high,
-        icon: 'ic_notification', //
-      );
-
+      if (gen != _notifGen) return; // annullato via _skipRest
       await flutterLocalNotificationsPlugin.show(
         0,
-        'Recupero Terminato!',
-        'Torna ad allenarti!',
-        const NotificationDetails(android: androidDetails),
+        AppL.lang == 'en' ? '💪 GET BACK TO TRAINING!' : '💪 TORNA AD ALLENARTI!',
+        null,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'timer_gym_v2',
+            'Timer Recupero',
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: 'ic_notification',
+            playSound: true,
+            enableVibration: true,
+          ),
+        ),
       );
     } catch (e) {
       debugPrint("Errore notifica: $e");
     }
+  }
+
+  // Aggiorna la notifica countdown nel pannello con il tempo rimanente grande
+  void _aggiornaCountdown(int remaining) {
+    if (kIsWeb) return;
+    final mins = remaining ~/ 60;
+    final secs = remaining % 60;
+    final timeStr = '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+    final title = AppL.lang == 'en' ? '⏱ Rest in progress' : '⏱ Recupero in corso';
+    try {
+      flutterLocalNotificationsPlugin.show(
+        1,
+        timeStr,
+        title,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'timer_gym_cd',
+            AppL.lang == 'en' ? 'Timer running' : 'Timer in corso',
+            channelDescription: AppL.lang == 'en'
+                ? 'Rest countdown'
+                : 'Countdown recupero palestra',
+            importance: Importance.low,
+            priority: Priority.low,
+            ongoing: true,
+            autoCancel: false,
+            silent: true,
+            icon: 'ic_notification',
+            styleInformation: BigTextStyleInformation(
+              timeStr,
+              contentTitle: title,
+              summaryText: AppL.lang == 'en' ? 'Gym' : 'Palestra',
+            ),
+          ),
+        ),
+      );
+    } catch (_) {}
   }
 
   @override
@@ -5776,50 +7717,161 @@ class _WorkoutEngineState extends State<WorkoutEngine>
               ),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Divider(color: Colors.white24),
-              const SizedBox(height: 8),
-              _recapRow(
-                Icons.fitness_center,
-                AppL.exercisesLabel,
-                '${_allCompletedExercises.length}',
-              ),
-              _recapRow(Icons.repeat, AppL.totalSeries, '$totalSeries'),
-              const SizedBox(height: 8),
-              const Divider(color: Colors.white24),
-              // Streak display
-              if (_currentStreak > 0) ...[
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Divider(color: Colors.white24),
                 const SizedBox(height: 8),
+                _recapRow(
+                  Icons.fitness_center,
+                  AppL.exercisesLabel,
+                  '${_allCompletedExercises.length}',
+                ),
+                _recapRow(Icons.repeat, AppL.totalSeries, '$totalSeries'),
+                const SizedBox(height: 8),
+                const Divider(color: Colors.white24),
+                const SizedBox(height: 8),
+                // Streak progress section
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [Color(0xFFFF6B00), Color(0xFFFFAA00)]),
+                    color: const Color(0xFF252527),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _currentStreak > 0
+                          ? Colors.orange.withAlpha(80)
+                          : Colors.white12,
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
                     children: [
-                      const Text('🔥', style: TextStyle(fontSize: 22)),
-                      const SizedBox(width: 8),
-                      Text(
-                        AppL.lang == 'en'
-                          ? '$_currentStreak week${_currentStreak == 1 ? '' : 's'} streak!'
-                          : '$_currentStreak ${_currentStreak == 1 ? 'settimana' : 'settimane'} di fila!',
-                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('🔓', style: TextStyle(fontSize: 15)),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              AppL.lang == 'en'
+                                  ? 'Session unlocked! $_streakDoneCount/$_streakTotalCount this week'
+                                  : 'Sessione sbloccata! $_streakDoneCount/$_streakTotalCount questa settimana',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      if (widget.allSessionNames.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        LayoutBuilder(
+                          builder: (ctx, constraints) {
+                            final n = widget.allSessionNames.length;
+                            final iconSize = n > 0
+                                ? (constraints.maxWidth / n - 8).clamp(
+                                    18.0,
+                                    48.0,
+                                  )
+                                : 48.0;
+                            return Row(
+                              children: List.generate(n, (i) {
+                                final name = widget.allSessionNames[i];
+                                final done = _streakDoneNames.contains(name);
+                                return Expanded(
+                                  child: Center(
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 300),
+                                      width: iconSize,
+                                      height: iconSize,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(7),
+                                        gradient: done
+                                            ? const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFFF6B00),
+                                                  Color(0xFFFFAB00),
+                                                ],
+                                              )
+                                            : null,
+                                        color: done
+                                            ? null
+                                            : const Color(0xFF1C1C1E),
+                                        boxShadow: done
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.orange.withAlpha(
+                                                    80,
+                                                  ),
+                                                  blurRadius: 6,
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(7),
+                                        child: Opacity(
+                                          opacity: done ? 1.0 : 0.2,
+                                          child: Image.asset(
+                                            'assets/icon_client.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            );
+                          },
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                      if (_streakDoneCount >= _streakTotalCount &&
+                          _streakTotalCount > 0)
+                        Text(
+                          AppL.lang == 'en'
+                              ? '🔥 Week complete! Streak continues!'
+                              : '🔥 Settimana completata! La streak continua!',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        )
+                      else ...[
+                        Text(
+                          AppL.lang == 'en'
+                              ? 'Complete ${_streakTotalCount - _streakDoneCount} more session${_streakTotalCount - _streakDoneCount == 1 ? '' : 's'} to keep your streak!'
+                              : 'Completa ancora ${_streakTotalCount - _streakDoneCount} session${_streakTotalCount - _streakDoneCount == 1 ? 'e' : 'i'} per non perdere i tuoi progressi!',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                      if (_currentStreak > 0) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          AppL.lang == 'en'
+                              ? '🔥 $_currentStreak week${_currentStreak == 1 ? '' : 's'} streak!'
+                              : '🔥 $_currentStreak ${_currentStreak == 1 ? 'settimana' : 'settimane'} di fila!',
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
               ],
-              const SizedBox(height: 4),
-              Text(
-                widget.day.dayName,
-                style: const TextStyle(color: Colors.white38, fontSize: 12),
-              ),
-            ],
+            ),
           ),
           actions: [
             SizedBox(
@@ -5914,8 +7966,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       timerActive = true;
     });
 
-    // 2. Programmiamo la notifica (una sola, con _notifGen per annullare precedenti)
+    // 2. Programmiamo la notifica finale (Future.delayed) e mostriamo countdown
     _programmaNotificaFine(sec);
+    _aggiornaCountdown(sec); // countdown iniziale nel pannello notifiche
 
     // 3. Timer visivo
     _bgTimer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -5927,6 +7980,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       final remaining = _endTime!.difference(DateTime.now()).inSeconds;
 
       if (remaining <= 0) {
+        if (!kIsWeb) flutterLocalNotificationsPlugin.cancel(1); // solo countdown
         _eseguiFeedbackFineTimer();
         t.cancel();
         if (mounted) {
@@ -5946,6 +8000,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
             _bgCounter = remaining;
           });
         }
+        _aggiornaCountdown(remaining); // aggiorna timer nel pannello ogni secondo
       }
     });
   }
@@ -6144,51 +8199,15 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     final overlay = Overlay.of(context);
     late OverlayEntry entry;
     entry = OverlayEntry(
-      builder: (_) => Positioned(
-        top: MediaQuery.of(context).size.height * 0.25,
-        left: 24,
-        right: 24,
-        child: Material(
-          color: Colors.transparent,
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.elasticOut,
-            builder: (_, v, child) => Transform.scale(scale: v, child: child),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: Colors.amber.withAlpha(120), blurRadius: 20, spreadRadius: 2)],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('🏆', style: TextStyle(fontSize: 44)),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppL.lang == 'en' ? 'NEW PERSONAL RECORD!' : 'NUOVO RECORD PERSONALE!',
-                    style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppL.lang == 'en' ? 'Great job! Keep pushing! 💪' : 'Ottimo lavoro! Continua così! 💪',
-                    style: const TextStyle(color: Colors.black87, fontSize: 13),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+      builder: (_) => _RecordOverlay(
+        lang: AppL.lang,
+        onDone: () {
+          if (entry.mounted) entry.remove();
+        },
       ),
     );
     overlay.insert(entry);
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(milliseconds: 3200), () {
       if (entry.mounted) entry.remove();
     });
   }
@@ -6213,18 +8232,11 @@ class _WorkoutEngineState extends State<WorkoutEngine>
 
     final currentEx = widget.day.exercises[exI];
 
-    // Controlla record personale
-    final exHistory = widget.history
-        .where((h) => h['exercise'] == currentEx.name)
-        .toList();
-    double maxPast = 0;
-    for (final h in exHistory) {
-      for (final s in (h['series'] as List)) {
-        final sw = (s['w'] as num).toDouble();
-        if (sw > maxPast) maxPast = sw;
-      }
-    }
-    setState(() => _isNewRecord = maxPast > 0 && w > maxPast);
+    // Controlla record personale rispetto all'ultima sessione
+    final suggest = _getSuggest(currentEx.name, setN);
+    final lastW = (suggest['w'] as num?)?.toDouble() ?? 0.0;
+    final lastR = (suggest['r'] as num?)?.toInt() ?? 0;
+    setState(() => _isNewRecord = (lastW > 0 || lastR > 0) && (w > lastW || r > lastR));
     if (_isNewRecord && mounted) {
       _showNewRecordOverlay();
     }
@@ -6338,8 +8350,19 @@ class _WorkoutEngineState extends State<WorkoutEngine>
             await prefs.setString('client_routine', jsonEncode(full));
           }
           // Aggiorna streak
-          final streak = await updateStreak(widget.day.dayName, widget.allSessionNames);
-          if (mounted) setState(() => _currentStreak = streak);
+          final streak = await updateStreak(
+            widget.day.dayName,
+            widget.allSessionNames,
+          );
+          final sData = await getStreakData();
+          scheduleStreakReminder(AppL.lang); // reset reminder: prossimo in 48h
+          if (mounted)
+            setState(() {
+              _currentStreak = streak;
+              _streakDoneCount = sData.done.length;
+              _streakTotalCount = widget.allSessionNames.length;
+              _streakDoneNames = sData.done;
+            });
           if (mounted) {
             if (!kIsWeb) {
               AdManager.instance.showInterstitialThenRun(_showRecapDialog);
@@ -6415,8 +8438,19 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           await prefs.setString('client_routine', jsonEncode(full));
         }
         // Aggiorna streak
-        final streak = await updateStreak(widget.day.dayName, widget.allSessionNames);
-        if (mounted) setState(() => _currentStreak = streak);
+        final streak = await updateStreak(
+          widget.day.dayName,
+          widget.allSessionNames,
+        );
+        final sData = await getStreakData();
+        scheduleStreakReminder(AppL.lang); // reset reminder: prossimo in 48h
+        if (mounted)
+          setState(() {
+            _currentStreak = streak;
+            _streakDoneCount = sData.done.length;
+            _streakTotalCount = widget.allSessionNames.length;
+            _streakDoneNames = sData.done;
+          });
         if (mounted) {
           if (!kIsWeb) {
             AdManager.instance.showInterstitialThenRun(_showRecapDialog);
@@ -6454,6 +8488,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
   }
 
   void _skipRest() {
+    ++_notifGen; // previene notifica Future.delayed pendente
     _bgTimer?.cancel();
     try {
       if (!kIsWeb) flutterLocalNotificationsPlugin.cancelAll();
@@ -6673,35 +8708,35 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                   child: Wrap(
                     spacing: 8,
                     children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.link,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'SUPERSERIE ${ex.supersetGroup}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 5,
                         ),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.link,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'SUPERSERIE ${ex.supersetGroup}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -7294,57 +9329,71 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                               ],
                             ),
                             const SizedBox(height: 6),
-                            // GIF del prossimo esercizio (piccola, inline)
-                            if (prossimoGifPath != null)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    prossimoGifPath,
-                                    height: 90,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) =>
-                                        const SizedBox.shrink(),
-                                  ),
-                                ),
-                              ),
-                            Text(
-                              _infoProssimo,
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 3,
-                              style: TextStyle(
-                                color: accent.withAlpha(210),
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            if (lastW > 0) ...[
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.history_rounded,
-                                    color: Colors.white.withAlpha(70),
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${AppL.lastTime}\n${lastW}kg × ${lastR} reps',
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 3,
-                                    style: TextStyle(
-                                      color: Colors.white.withAlpha(160),
-                                      fontSize: 17,
-                                      height: 1.4,
+                            // GIF + info side by side
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (prossimoGifPath != null) ...[
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.asset(
+                                      prossimoGifPath,
+                                      height: 72,
+                                      width: 72,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox.shrink(),
                                     ),
                                   ),
+                                  const SizedBox(width: 10),
                                 ],
-                              ),
-                            ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _infoProssimo,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: TextStyle(
+                                          color: accent.withAlpha(210),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      if (lastW > 0) ...[
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.history_rounded,
+                                              color: Colors.white.withAlpha(70),
+                                              size: 15,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                '${AppL.lastTime} ${lastW}kg × ${lastR} reps',
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                  color: Colors.white.withAlpha(
+                                                    160,
+                                                  ),
+                                                  fontSize: 14,
+                                                  height: 1.4,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -7509,6 +9558,160 @@ class _AumentaPesoWidgetState extends State<_AumentaPesoWidget>
           ),
         ),
       ),
+    );
+  }
+}
+
+class _RecordOverlay extends StatefulWidget {
+  final String lang;
+  final VoidCallback onDone;
+  const _RecordOverlay({required this.lang, required this.onDone});
+  @override
+  State<_RecordOverlay> createState() => _RecordOverlayState();
+}
+
+class _RecordOverlayState extends State<_RecordOverlay>
+    with TickerProviderStateMixin {
+  late final AnimationController _cardCtrl;
+  late final AnimationController _sparkCtrl;
+  late final Animation<double> _cardScale;
+  late final Animation<double> _sparkAnim;
+
+  static const List<String> _sparks = [
+    '🎆',
+    '✨',
+    '🔥',
+    '⭐',
+    '💥',
+    '🎇',
+    '🏆',
+    '💫',
+  ];
+  static const List<Offset> _dirs = [
+    Offset(-1.0, -1.2),
+    Offset(0.0, -1.5),
+    Offset(1.0, -1.2),
+    Offset(-1.3, 0.0),
+    Offset(1.3, 0.0),
+    Offset(-0.8, 1.2),
+    Offset(0.0, 1.5),
+    Offset(0.8, 1.2),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _cardCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _sparkCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _cardScale = CurvedAnimation(parent: _cardCtrl, curve: Curves.elasticOut);
+    _sparkAnim = CurvedAnimation(parent: _sparkCtrl, curve: Curves.easeOut);
+    _cardCtrl.forward();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) _sparkCtrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _cardCtrl.dispose();
+    _sparkCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final cx = size.width / 2;
+    final cy = size.height * 0.4;
+    return Stack(
+      children: [
+        ...List.generate(_sparks.length, (i) {
+          final dir = _dirs[i % _dirs.length];
+          return AnimatedBuilder(
+            animation: _sparkAnim,
+            builder: (_, __) {
+              final t = _sparkAnim.value;
+              final dx = dir.dx * 120 * t;
+              final dy = dir.dy * 120 * t;
+              final opacity = (1.0 - t).clamp(0.0, 1.0);
+              return Positioned(
+                left: cx + dx - 16,
+                top: cy + dy - 16,
+                child: Opacity(
+                  opacity: opacity,
+                  child: Text(_sparks[i], style: const TextStyle(fontSize: 24)),
+                ),
+              );
+            },
+          );
+        }),
+        Positioned(
+          top: cy - 90,
+          left: 24,
+          right: 24,
+          child: Material(
+            color: Colors.transparent,
+            child: ScaleTransition(
+              scale: _cardScale,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.amber.withAlpha(120),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🏆', style: TextStyle(fontSize: 52)),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.lang == 'en'
+                          ? 'NEW PERSONAL RECORD!'
+                          : 'NUOVO RECORD PERSONALE!',
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.lang == 'en'
+                          ? '🚀 Keep pushing! 💪'
+                          : '🚀 Continua così! 💪',
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -8947,7 +11150,9 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
                                 color: Colors.redAccent,
                                 size: 20,
                               ),
-                              tooltip: AppL.lang == 'en' ? 'Delete session' : 'Elimina sessione',
+                              tooltip: AppL.lang == 'en'
+                                  ? 'Delete session'
+                                  : 'Elimina sessione',
                               onPressed: () => _eliminaSessione(sIdx),
                             ),
                           ],

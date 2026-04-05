@@ -2,7 +2,7 @@ name: gym_app
 description: "GymApp - Track your workouts, build your own schedule"
 publish_to: 'none'
 
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: ^3.10.4
@@ -17,6 +17,7 @@ dependencies:
   url_launcher: ^6.3.1
   webview_flutter: ^4.10.0
   flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
   path_provider: ^2.1.5
   file_picker: ^10.3.10
   google_fonts: ^6.2.1
