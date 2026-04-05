@@ -111,6 +111,38 @@ bool _notificationsReady = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  tz_data.initializeTimeZones();
+
+  // Inizializza notifiche prima di runApp — stesso pattern di app_cliente (funziona!)
+  const AndroidInitializationSettings initAndroid =
+      AndroidInitializationSettings('ic_notification');
+  const InitializationSettings initSettings =
+      InitializationSettings(android: initAndroid);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+  _notificationsReady = true;
+
+  if (!kIsWeb && Platform.isAndroid) {
+    final androidPlugin = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    await androidPlugin?.requestNotificationsPermission();
+    // Canali con importanza corretta — v3 per garantire fresh channel sul device
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+          'timer_gym_v3', 'Timer Recupero',
+          importance: Importance.max),
+    );
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+          'timer_gym_cd', 'Timer in corso',
+          importance: Importance.defaultImportance),
+    );
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+          'streak_reminder', 'Streak Reminder',
+          importance: Importance.high),
+    );
+  }
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -119,53 +151,8 @@ void main() async {
     ),
   );
 
-  // Inizializza notifiche prima del runApp — garantisce canali con importanza corretta
-  await _initNotifications();
-
-  // Avvia l'app
   runApp(const ClientGymApp());
-
-  // Inizializza altri plugin in background
   _initPluginsBackground();
-}
-
-Future<void> _initNotifications() async {
-  try {
-    tz_data.initializeTimeZones();
-    const AndroidInitializationSettings initAndroid =
-        AndroidInitializationSettings('ic_notification');
-    const InitializationSettings initSettings = InitializationSettings(
-      android: initAndroid,
-    );
-    await flutterLocalNotificationsPlugin.initialize(initSettings);
-    _notificationsReady = true;
-
-    // Crea i canali esplicitamente con la giusta importanza
-    if (!kIsWeb && Platform.isAndroid) {
-      final androidPlugin = flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
-      await androidPlugin?.createNotificationChannel(
-        const AndroidNotificationChannel(
-            'timer_gym_v2', 'Timer Recupero',
-            importance: Importance.max),
-      );
-      await androidPlugin?.createNotificationChannel(
-        const AndroidNotificationChannel(
-            'timer_gym_cd', 'Timer in corso',
-            importance: Importance.defaultImportance),
-      );
-      await androidPlugin?.createNotificationChannel(
-        const AndroidNotificationChannel(
-            'streak_reminder', 'Streak Reminder',
-            importance: Importance.high),
-      );
-      await androidPlugin?.requestNotificationsPermission();
-      await androidPlugin?.requestExactAlarmsPermission();
-    }
-  } catch (e) {
-    debugPrint('Notification init: $e');
-  }
 }
 
 Future<void> _initPluginsBackground() async {
@@ -7209,6 +7196,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // per didChangeAppLifecycleState
     _sessionId = DateTime.now().millisecondsSinceEpoch.toString();
     exI = 0;
     currentExSeries = [];
@@ -7424,7 +7412,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         null,
         const NotificationDetails(
           android: AndroidNotificationDetails(
-            'timer_gym_v2',
+            'timer_gym_v3',
             'Timer Recupero',
             importance: Importance.max,
             priority: Priority.high,
