@@ -7427,39 +7427,19 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     }
   }
 
-  // Aggiorna la notifica countdown nel pannello con il tempo rimanente grande
+  // Aggiorna la notifica countdown nel pannello con il tempo rimanente grande (nativo)
   void _aggiornaCountdown(int remaining) {
     if (kIsWeb) return;
     final mins = remaining ~/ 60;
     final secs = remaining % 60;
     final timeStr = '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-    final title = AppL.lang == 'en' ? '⏱ Rest in progress' : '⏱ Recupero in corso';
+    final subtitle = AppL.lang == 'en' ? '⏱ Rest in progress' : '⏱ Recupero in corso';
     try {
-      flutterLocalNotificationsPlugin.show(
-        1,
-        timeStr,
-        title,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'timer_gym_cd',
-            AppL.lang == 'en' ? 'Timer running' : 'Timer in corso',
-            channelDescription: AppL.lang == 'en'
-                ? 'Rest countdown'
-                : 'Countdown recupero palestra',
-            importance: Importance.low,
-            priority: Priority.low,
-            ongoing: true,
-            autoCancel: false,
-            silent: true,
-            icon: 'ic_notification',
-            styleInformation: BigTextStyleInformation(
-              timeStr,
-              contentTitle: title,
-              summaryText: AppL.lang == 'en' ? 'Gym' : 'Palestra',
-            ),
-          ),
-        ),
-      );
+      _gymFileChannel.invokeMethod('showTimerNotification', {
+        'time': timeStr,
+        'subtitle': subtitle,
+        'channel': 'timer_gym_cd',
+      });
     } catch (_) {}
   }
 
@@ -7968,7 +7948,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       final remaining = _endTime!.difference(DateTime.now()).inSeconds;
 
       if (remaining <= 0) {
-        if (!kIsWeb) flutterLocalNotificationsPlugin.cancel(1); // solo countdown
+        if (!kIsWeb) _gymFileChannel.invokeMethod('cancelTimerNotification').catchError((_) {}); // cancella countdown nativo
         _eseguiFeedbackFineTimer();
         t.cancel();
         if (mounted) {
