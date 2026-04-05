@@ -218,13 +218,17 @@ class AppL {
   static void setLang(String lang) => _lang = lang;
   static String get lang => _lang;
 
-  static String get mySchedule => _lang == 'en' ? 'My Schedule' : 'La mia scheda';
-  static String get noSchedule => _lang == 'en' ? 'No schedule yet' : 'Nessuna scheda';
-  static String get createSchedule => _lang == 'en' ? 'Create your schedule' : 'Crea la tua scheda';
+  static String get mySchedule =>
+      _lang == 'en' ? 'My Schedule' : 'La mia scheda';
+  static String get noSchedule =>
+      _lang == 'en' ? 'No schedule yet' : 'Nessuna scheda';
+  static String get createSchedule =>
+      _lang == 'en' ? 'Create your schedule' : 'Crea la tua scheda';
   static String get train => _lang == 'en' ? 'Train' : 'Allenati';
   static String get progress => _lang == 'en' ? 'Progress' : 'Progressi';
   static String get settings => _lang == 'en' ? 'Settings' : 'Impostazioni';
-  static String get deleteData => _lang == 'en' ? 'Delete data' : 'Cancella dati';
+  static String get deleteData =>
+      _lang == 'en' ? 'Delete data' : 'Cancella dati';
   static String get day => _lang == 'en' ? 'Day' : 'Giorno';
   static String get exercises => _lang == 'en' ? 'Exercises' : 'Esercizi';
   static String get sets => _lang == 'en' ? 'Sets' : 'Serie';
@@ -235,144 +239,276 @@ class AppL {
   static String get cancel => _lang == 'en' ? 'Cancel' : 'Annulla';
   static String get add => _lang == 'en' ? 'Add' : 'Aggiungi';
   static String get weight => _lang == 'en' ? 'Weight (kg)' : 'Peso (kg)';
-  static String get startWorkout => _lang == 'en' ? 'Start Workout' : 'Inizia Allenamento';
-  static String get proTrainer => _lang == 'en' ? 'Are you a Personal Trainer?' : 'Sei un Personal Trainer?';
-  static String get pause => _lang == 'en' ? 'Pause between exercises (s)' : 'Pausa tra esercizi (s)';
-  static String get browseArchive => _lang == 'en' ? 'Browse archive' : 'Sfoglia archivio';
-  static String get repsPerSet => _lang == 'en' ? 'Reps per set' : 'Reps per serie';
-  static String get muscleGroup => _lang == 'en' ? 'Muscle group' : 'Gruppo muscolare';
-  static String get chooseExercise => _lang == 'en' ? 'Choose exercise' : 'Scegli esercizio';
-  static String get noScheduleYet => _lang == 'en' ? 'No days yet' : 'Nessun giorno ancora';
-  static String get addFirstDay => _lang == 'en' ? 'Press + to add the first day' : 'Premi + per aggiungere il primo giorno';
-  static String get deleteDay => _lang == 'en' ? 'Delete day?' : 'Elimina giorno?';
+  static String get startWorkout =>
+      _lang == 'en' ? 'Start Workout' : 'Inizia Allenamento';
+  static String get proTrainer => _lang == 'en'
+      ? 'Are you a Personal Trainer?'
+      : 'Sei un Personal Trainer?';
+  static String get pause =>
+      _lang == 'en' ? 'Pause between exercises (s)' : 'Pausa tra esercizi (s)';
+  static String get browseArchive =>
+      _lang == 'en' ? 'Browse archive' : 'Sfoglia archivio';
+  static String get repsPerSet =>
+      _lang == 'en' ? 'Reps per set' : 'Reps per serie';
+  static String get muscleGroup =>
+      _lang == 'en' ? 'Muscle group' : 'Gruppo muscolare';
+  static String get chooseExercise =>
+      _lang == 'en' ? 'Choose exercise' : 'Scegli esercizio';
+  static String get noScheduleYet =>
+      _lang == 'en' ? 'No days yet' : 'Nessun giorno ancora';
+  static String get addFirstDay => _lang == 'en'
+      ? 'Press + to add the first day'
+      : 'Premi + per aggiungere il primo giorno';
+  static String get deleteDay =>
+      _lang == 'en' ? 'Delete day?' : 'Elimina giorno?';
   static String get delete => _lang == 'en' ? 'DELETE' : 'ELIMINA';
-  static String get circuit => _lang == 'en' ? 'Superset / Circuit' : 'Superserie / Circuito';
-  static String get circuitHint => _lang == 'en' ? 'Assign the same number to exercises done back-to-back without rest. 0 = normal, 1/2/3 = superset/circuit group.' : 'Assegna lo stesso numero agli esercizi da fare in sequenza senza recupero. 0 = normale, 1/2/3 = gruppo superserie/circuito.';
-  static String get exerciseName => _lang == 'en' ? 'Exercise name' : 'Nome esercizio';
+  static String get circuit =>
+      _lang == 'en' ? 'Superset / Circuit' : 'Superserie / Circuito';
+  static String get circuitHint => _lang == 'en'
+      ? 'Assign the same number to exercises done back-to-back without rest. 0 = normal, 1/2/3 = superset/circuit group.'
+      : 'Assegna lo stesso numero agli esercizi da fare in sequenza senza recupero. 0 = normale, 1/2/3 = gruppo superserie/circuito.';
+  static String get exerciseName =>
+      _lang == 'en' ? 'Exercise name' : 'Nome esercizio';
   static String get pauseSec => _lang == 'en' ? 'Pause (s)' : 'Pausa (s)';
-  static String get tapToChooseMuscle => _lang == 'en' ? 'Tap to choose muscle image' : 'Tocca per scegliere immagine muscolo';
-  static String get noScheduleMsg => _lang == 'en' ? 'No schedule yet.\nCreate your first workout!' : 'Nessuna scheda.\nCrea il tuo primo allenamento!';
+  static String get tapToChooseMuscle => _lang == 'en'
+      ? 'Tap to choose muscle image'
+      : 'Tocca per scegliere immagine muscolo';
+  static String get noScheduleMsg => _lang == 'en'
+      ? 'No schedule yet.\nCreate your first workout!'
+      : 'Nessuna scheda.\nCrea il tuo primo allenamento!';
   static String get history => _lang == 'en' ? 'History' : 'Storico';
-  static String get workoutOf => _lang == 'en' ? 'Workout of' : 'Allenamento del';
-  static String get restTimer => _lang == 'en' ? 'Rest timer' : 'Timer recupero';
+  static String get workoutOf =>
+      _lang == 'en' ? 'Workout of' : 'Allenamento del';
+  static String get restTimer =>
+      _lang == 'en' ? 'Rest timer' : 'Timer recupero';
   static String get nextSet => _lang == 'en' ? 'Next set' : 'Prossima serie';
   static String get done => _lang == 'en' ? 'Done' : 'Fatto';
   static String get skip => _lang == 'en' ? 'Skip' : 'Salta';
   static String get confirm => _lang == 'en' ? 'Confirm' : 'Conferma';
   static String get workout => _lang == 'en' ? 'Workout' : 'Allenamento';
-  static String get totalVolume => _lang == 'en' ? 'Total volume' : 'Volume totale';
-  static String get personalBest => _lang == 'en' ? 'Personal best' : 'Record personale';
+  static String get totalVolume =>
+      _lang == 'en' ? 'Total volume' : 'Volume totale';
+  static String get personalBest =>
+      _lang == 'en' ? 'Personal best' : 'Record personale';
   static String get language => _lang == 'en' ? 'Language' : 'Lingua';
   static String get italian => _lang == 'en' ? 'Italian' : 'Italiano';
   static String get english => _lang == 'en' ? 'English' : 'Inglese';
-  static String get accentColor => _lang == 'en' ? 'Accent color' : 'Colore accento';
-  static String get chooseLanguage => _lang == 'en' ? 'Choose your language' : 'Scegli la tua lingua';
+  static String get accentColor =>
+      _lang == 'en' ? 'Accent color' : 'Colore accento';
+  static String get chooseLanguage =>
+      _lang == 'en' ? 'Choose your language' : 'Scegli la tua lingua';
   static String get continueBtn => _lang == 'en' ? 'Continue' : 'Continua';
-  static String get welcomeTitle => _lang == 'en' ? 'Welcome to GymApp' : 'Benvenuto in GymApp';
+  static String get welcomeTitle =>
+      _lang == 'en' ? 'Welcome to GymApp' : 'Benvenuto in GymApp';
   static String get setGroup => _lang == 'en' ? 'Group' : 'Gruppo';
 
   // Onboarding pages
-  static String get onboardingWelcomeText => _lang == 'en' ? 'Your smart workout app, wherever you are.' : 'La tua app per allenarsi in modo intelligente, ovunque tu sia.';
-  static String get onboardingScheduleTitle => _lang == 'en' ? 'Build your schedule' : 'Crea la tua scheda';
-  static String get onboardingScheduleText => _lang == 'en' ? 'Build your personalized routine with exercises from our database of 1200+ movements with animated GIFs.' : 'Costruisci la tua routine personalizzata con esercizi dal nostro database di 1200+ movimenti con GIF animate.';
-  static String get onboardingTrainTitle => _lang == 'en' ? 'Train & track' : 'Allena e registra';
-  static String get onboardingTrainText => _lang == 'en' ? 'Follow each set with automatic timer, record weights and reps, view your progress over time.' : 'Segui ogni serie con timer automatico, registra pesi e ripetizioni, visualizza i tuoi progressi nel tempo.';
-  static String get onboardingProgressTitle => _lang == 'en' ? 'Monitor progress' : 'Monitora i progressi';
-  static String get onboardingProgressText => _lang == 'en' ? 'Charts for each exercise, session history and automatic suggestions to increase loads.' : 'Grafici per ogni esercizio, storico delle sessioni e suggerimenti automatici per aumentare i carichi.';
-  static String get onboardingProText => _lang == 'en' ? 'Take your clients to the next level with the complete ecosystem: PT app to create schedules and monitor all your athletes from a single dashboard.' : 'Porta i tuoi clienti al livello successivo con l\'ecosistema completo: app PT per creare schede e monitorare tutti i tuoi atleti da un\'unica dashboard.';
-  static String get contactGianmarco => _lang == 'en' ? 'Contact Gianmarco' : 'Contatta Gianmarco';
-  static String get proInfoText => _lang == 'en' ? 'Write for info on the GymApp Pro ecosystem' : 'Scrivi per info sull\'ecosistema GymApp Pro';
+  static String get onboardingWelcomeText => _lang == 'en'
+      ? 'Your smart workout app, wherever you are.'
+      : 'La tua app per allenarsi in modo intelligente, ovunque tu sia.';
+  static String get onboardingScheduleTitle =>
+      _lang == 'en' ? 'Build your schedule' : 'Crea la tua scheda';
+  static String get onboardingScheduleText => _lang == 'en'
+      ? 'Build your personalized routine with exercises from our database of 1200+ movements with animated GIFs.'
+      : 'Costruisci la tua routine personalizzata con esercizi dal nostro database di 1200+ movimenti con GIF animate.';
+  static String get onboardingTrainTitle =>
+      _lang == 'en' ? 'Train & track' : 'Allena e registra';
+  static String get onboardingTrainText => _lang == 'en'
+      ? 'Follow each set with automatic timer, record weights and reps, view your progress over time.'
+      : 'Segui ogni serie con timer automatico, registra pesi e ripetizioni, visualizza i tuoi progressi nel tempo.';
+  static String get onboardingProgressTitle =>
+      _lang == 'en' ? 'Monitor progress' : 'Monitora i progressi';
+  static String get onboardingProgressText => _lang == 'en'
+      ? 'Charts for each exercise, session history and automatic suggestions to increase loads.'
+      : 'Grafici per ogni esercizio, storico delle sessioni e suggerimenti automatici per aumentare i carichi.';
+  static String get onboardingProText => _lang == 'en'
+      ? 'Take your clients to the next level with the complete ecosystem: PT app to create schedules and monitor all your athletes from a single dashboard.'
+      : 'Porta i tuoi clienti al livello successivo con l\'ecosistema completo: app PT per creare schede e monitorare tutti i tuoi atleti da un\'unica dashboard.';
+  static String get contactGianmarco =>
+      _lang == 'en' ? 'Contact Gianmarco' : 'Contatta Gianmarco';
+  static String get proInfoText => _lang == 'en'
+      ? 'Write for info on the GymApp Pro ecosystem'
+      : 'Scrivi per info sull\'ecosistema GymApp Pro';
   static String get startBtn => _lang == 'en' ? 'START' : 'INIZIA';
   static String get nextBtn => _lang == 'en' ? 'NEXT' : 'AVANTI';
-  static String get chooseMuscleImage => _lang == 'en' ? 'Workout image' : 'Immagine allenamento';
+  static String get chooseMuscleImage =>
+      _lang == 'en' ? 'Workout image' : 'Immagine allenamento';
   static String get noImage => _lang == 'en' ? 'None' : 'Nessuna';
-  static String get promoText => _lang == 'en' ? 'Take your clients to the next level with the GymApp Pro ecosystem.' : 'Porta i tuoi clienti al livello successivo con l\'ecosistema GymApp Pro.';
-  static String get noScheduleLoaded => _lang == 'en' ? 'No schedule loaded' : 'Nessuna scheda caricata';
-  static String get editOrCreate => _lang == 'en' ? 'Edit / Create new schedule' : 'Modifica / Crea nuova scheda';
+  static String get promoText => _lang == 'en'
+      ? 'Take your clients to the next level with the GymApp Pro ecosystem.'
+      : 'Porta i tuoi clienti al livello successivo con l\'ecosistema GymApp Pro.';
+  static String get noScheduleLoaded =>
+      _lang == 'en' ? 'No schedule loaded' : 'Nessuna scheda caricata';
+  static String get editOrCreate => _lang == 'en'
+      ? 'Edit / Create new schedule'
+      : 'Modifica / Crea nuova scheda';
   static String get trainNow => _lang == 'en' ? 'TRAIN NOW' : 'ALLENATI ORA';
   static String get train2 => _lang == 'en' ? 'TRAIN' : 'ALLENATI';
-  static String get chooseAndStart => _lang == 'en' ? 'Choose and start your workout' : 'Scegli e inizia il tuo allenamento';
-  static String get createFirstSchedule => _lang == 'en' ? 'Create your schedule before training' : 'Crea la tua scheda prima di allenarti';
-  static String get workoutProgress => _lang == 'en' ? 'WORKOUT PROGRESS' : 'ANDAMENTO ALLENAMENTO';
-  static String get neverTrained => _lang == 'en' ? 'Never trained' : 'Mai allenato';
+  static String get chooseAndStart => _lang == 'en'
+      ? 'Choose and start your workout'
+      : 'Scegli e inizia il tuo allenamento';
+  static String get createFirstSchedule => _lang == 'en'
+      ? 'Create your schedule before training'
+      : 'Crea la tua scheda prima di allenarti';
+  static String get workoutProgress =>
+      _lang == 'en' ? 'WORKOUT PROGRESS' : 'ANDAMENTO ALLENAMENTO';
+  static String get neverTrained =>
+      _lang == 'en' ? 'Never trained' : 'Mai allenato';
   static String get today => _lang == 'en' ? 'Today' : 'Oggi';
   static String get yesterday => _lang == 'en' ? 'Yesterday' : 'Ieri';
   static String get daysAgo => _lang == 'en' ? 'days ago' : 'giorni fa';
   static String get others => _lang == 'en' ? 'others' : 'altri';
-  static String get timerSound => _lang == 'en' ? 'Timer sound' : 'Suono fine timer';
-  static String get timerVibration => _lang == 'en' ? 'Timer vibration' : 'Vibrazione fine timer';
-  static String get autoStartTimer => _lang == 'en' ? 'Auto-start timer' : 'Avvia timer automaticamente';
-  static String get screenAlwaysOn => _lang == 'en' ? 'Screen always on' : 'Schermo sempre acceso';
-  static String get confirmSeriesWindow => _lang == 'en' ? 'Set confirmation window' : 'Finestra di conferma serie';
-  static String get weightSuggestion => _lang == 'en' ? 'Weight increase suggestion' : 'Suggerimento aumento peso';
-  static String get dataManagement => _lang == 'en' ? 'Data Management' : 'Gestione Dati';
+  static String get timerSound =>
+      _lang == 'en' ? 'Timer sound' : 'Suono fine timer';
+  static String get timerVibration =>
+      _lang == 'en' ? 'Timer vibration' : 'Vibrazione fine timer';
+  static String get autoStartTimer =>
+      _lang == 'en' ? 'Auto-start timer' : 'Avvia timer automaticamente';
+  static String get screenAlwaysOn =>
+      _lang == 'en' ? 'Screen always on' : 'Schermo sempre acceso';
+  static String get confirmSeriesWindow =>
+      _lang == 'en' ? 'Set confirmation window' : 'Finestra di conferma serie';
+  static String get weightSuggestion => _lang == 'en'
+      ? 'Weight increase suggestion'
+      : 'Suggerimento aumento peso';
+  static String get dataManagement =>
+      _lang == 'en' ? 'Data Management' : 'Gestione Dati';
   static String get insertKg => _lang == 'en' ? 'Enter KG' : 'Inserisci KG';
-  static String get insertReps => _lang == 'en' ? 'Enter REPS' : 'Inserisci REPS';
-  static String get enterKgReps => _lang == 'en' ? 'Enter kg and reps before confirming' : 'Inserisci kg e reps prima di confermare';
+  static String get insertReps =>
+      _lang == 'en' ? 'Enter REPS' : 'Inserisci REPS';
+  static String get enterKgReps => _lang == 'en'
+      ? 'Enter kg and reps before confirming'
+      : 'Inserisci kg e reps prima di confermare';
   static String get saveSeries => _lang == 'en' ? 'SAVE SET' : 'SALVA SERIE';
-  static String get confirmSeries => _lang == 'en' ? 'CONFIRM SET' : 'CONFERMA SERIE';
+  static String get confirmSeries =>
+      _lang == 'en' ? 'CONFIRM SET' : 'CONFERMA SERIE';
   static String get quitWorkout => _lang == 'en' ? 'Quit?' : 'Interrompere?';
-  static String get quitWorkoutMsg => _lang == 'en' ? 'Do you really want to exit? Progress made so far is saved.' : 'Vuoi davvero uscire dall\'allenamento? I progressi fin qui fatti sono comunque salvati.';
-  static String get exitAndSave => _lang == 'en' ? 'EXIT & SAVE' : 'ESCI E SALVA';
-  static String get exerciseComplete => _lang == 'en' ? 'EXERCISE COMPLETED' : 'ESERCIZIO COMPLETATO';
-  static String get exerciseCompleteMsg => _lang == 'en' ? 'Data has been saved and cannot be modified.' : 'I dati sono stati salvati e non sono più modificabili.';
+  static String get quitWorkoutMsg => _lang == 'en'
+      ? 'Do you really want to exit? Progress made so far is saved.'
+      : 'Vuoi davvero uscire dall\'allenamento? I progressi fin qui fatti sono comunque salvati.';
+  static String get exitAndSave =>
+      _lang == 'en' ? 'EXIT & SAVE' : 'ESCI E SALVA';
+  static String get exerciseComplete =>
+      _lang == 'en' ? 'EXERCISE COMPLETED' : 'ESERCIZIO COMPLETATO';
+  static String get exerciseCompleteMsg => _lang == 'en'
+      ? 'Data has been saved and cannot be modified.'
+      : 'I dati sono stati salvati e non sono più modificabili.';
   static String get nextInfo => _lang == 'en' ? 'NEXT' : 'PROSSIMA';
   static String get lastTime => _lang == 'en' ? 'LAST TIME' : 'ULTIMA VOLTA';
-  static String get increaseWeight => _lang == 'en' ? 'INCREASE WEIGHT' : 'AUMENTA IL PESO';
+  static String get increaseWeight =>
+      _lang == 'en' ? 'INCREASE WEIGHT' : 'AUMENTA IL PESO';
   static String get increase => _lang == 'en' ? 'INCREASE' : 'AUMENTA';
-  static String get workoutComplete => _lang == 'en' ? 'WORKOUT COMPLETE!' : 'ALLENAMENTO COMPLETATO!';
-  static String get firstSession => _lang == 'en' ? 'First session!' : 'Prima sessione!';
-  static String get improving => _lang == 'en' ? 'Improving!' : 'In miglioramento!';
+  static String get workoutComplete =>
+      _lang == 'en' ? 'WORKOUT COMPLETE!' : 'ALLENAMENTO COMPLETATO!';
+  static String get firstSession =>
+      _lang == 'en' ? 'First session!' : 'Prima sessione!';
+  static String get improving =>
+      _lang == 'en' ? 'Improving!' : 'In miglioramento!';
   static String get declining => _lang == 'en' ? 'Declining' : 'In calo';
   static String get plateau => _lang == 'en' ? 'Plateau' : 'Stallo';
   static String get details => _lang == 'en' ? 'DETAILS' : 'DETTAGLI';
-  static String get greatWork => _lang == 'en' ? 'GREAT JOB!' : 'OTTIMO LAVORO!';
-  static String get workoutSummary => _lang == 'en' ? 'Workout summary' : 'Riepilogo allenamento';
+  static String get greatWork =>
+      _lang == 'en' ? 'GREAT JOB!' : 'OTTIMO LAVORO!';
+  static String get workoutSummary =>
+      _lang == 'en' ? 'Workout summary' : 'Riepilogo allenamento';
   static String get close => _lang == 'en' ? 'CLOSE' : 'CHIUDI';
-  static String get totalSeries => _lang == 'en' ? 'Total sets' : 'Serie totali';
+  static String get totalSeries =>
+      _lang == 'en' ? 'Total sets' : 'Serie totali';
   static String get exercisesLabel => _lang == 'en' ? 'Exercises' : 'Esercizi';
-  static String get primaryMuscle => _lang == 'en' ? 'PRIMARY MUSCLE' : 'MUSCOLO PRINCIPALE';
-  static String get secondaryMuscles => _lang == 'en' ? 'SECONDARY MUSCLES' : 'MUSCOLI SECONDARI';
-  static String get execution => _lang == 'en' ? '📋 EXECUTION' : '📋 ESECUZIONE';
+  static String get primaryMuscle =>
+      _lang == 'en' ? 'PRIMARY MUSCLE' : 'MUSCOLO PRINCIPALE';
+  static String get secondaryMuscles =>
+      _lang == 'en' ? 'SECONDARY MUSCLES' : 'MUSCOLI SECONDARI';
+  static String get execution =>
+      _lang == 'en' ? '📋 EXECUTION' : '📋 ESECUZIONE';
   static String get tips => _lang == 'en' ? '💡 TIPS' : '💡 CONSIGLI';
-  static String get notInCatalog => _lang == 'en' ? 'Exercise not in catalog.\nUse YouTube to watch the technique.' : 'Esercizio non in catalogo.\nUsa YouTube per vedere la tecnica.';
-  static String get notInCatalogShort => _lang == 'en' ? 'Exercise not in catalog.' : 'Esercizio non in catalogo.';
-  static String get watchOnYoutube => _lang == 'en' ? 'Watch on YouTube' : 'Guarda su YouTube';
-  static String get progressOverTime => _lang == 'en' ? 'Progress over time — one line per set' : 'Progressi nel tempo — una linea per serie';
+  static String get notInCatalog => _lang == 'en'
+      ? 'Exercise not in catalog.\nUse YouTube to watch the technique.'
+      : 'Esercizio non in catalogo.\nUsa YouTube per vedere la tecnica.';
+  static String get notInCatalogShort =>
+      _lang == 'en' ? 'Exercise not in catalog.' : 'Esercizio non in catalogo.';
+  static String get watchOnYoutube =>
+      _lang == 'en' ? 'Watch on YouTube' : 'Guarda su YouTube';
+  static String get progressOverTime => _lang == 'en'
+      ? 'Progress over time — one line per set'
+      : 'Progressi nel tempo — una linea per serie';
   static String get noData => _lang == 'en' ? 'No data' : 'Nessun dato';
-  static String get noDataRegistered => _lang == 'en' ? 'No recorded data' : 'Nessun dato registrato';
+  static String get noDataRegistered =>
+      _lang == 'en' ? 'No recorded data' : 'Nessun dato registrato';
   static String get myNotes => _lang == 'en' ? 'My notes...' : 'Le mie note...';
   static String get coachNotes => _lang == 'en' ? 'COACH' : 'COACH';
   static String get setsDone => _lang == 'en' ? 'SETS DONE' : 'SERIE FATTE';
   static String get of => _lang == 'en' ? 'OF' : 'DI';
-  static String get changeExercise => _lang == 'en' ? 'CHANGE EXERCISE' : 'CAMBIO ESERCIZIO';
-  static String get noHistory => _lang == 'en' ? 'No history' : 'Nessuno storico presente';
-  static String get deleteSelected => _lang == 'en' ? 'Delete selected' : 'Elimina selezionati';
-  static String get totalReset => _lang == 'en' ? 'TOTAL RESET' : 'RESET TOTALE';
-  static String get fullReset => _lang == 'en' ? 'Full data reset' : 'Reset completo dati';
-  static String get fullResetTitle => _lang == 'en' ? 'Full reset' : 'Reset completo';
-  static String get fullResetMsg => _lang == 'en' ? 'Will delete ALL data: schedule, history and settings.' : 'Eliminerà TUTTI i dati: scheda, storico e impostazioni.';
+  static String get changeExercise =>
+      _lang == 'en' ? 'CHANGE EXERCISE' : 'CAMBIO ESERCIZIO';
+  static String get noHistory =>
+      _lang == 'en' ? 'No history' : 'Nessuno storico presente';
+  static String get deleteSelected =>
+      _lang == 'en' ? 'Delete selected' : 'Elimina selezionati';
+  static String get totalReset =>
+      _lang == 'en' ? 'TOTAL RESET' : 'RESET TOTALE';
+  static String get fullReset =>
+      _lang == 'en' ? 'Full data reset' : 'Reset completo dati';
+  static String get fullResetTitle =>
+      _lang == 'en' ? 'Full reset' : 'Reset completo';
+  static String get fullResetMsg => _lang == 'en'
+      ? 'Will delete ALL data: schedule, history and settings.'
+      : 'Eliminerà TUTTI i dati: scheda, storico e impostazioni.';
   static String get continueLabel => _lang == 'en' ? 'CONTINUE' : 'CONTINUA';
-  static String get areYouSure => _lang == 'en' ? 'Are you sure?' : 'Sei sicuro?';
-  static String get irreversible => _lang == 'en' ? 'This operation is irreversible.' : 'Operazione irreversibile.';
-  static String get deleteAll => _lang == 'en' ? 'DELETE ALL' : 'CANCELLA TUTTO';
-  static String get noSession => _lang == 'en' ? 'No sessions' : 'Nessuna sessione';
-  static String get deleteSession => _lang == 'en' ? 'Delete session?' : 'Elimina sessione?';
-  static String get deleteSessionMsg => _lang == 'en' ? 'All data from this session will be deleted.' : 'Tutti i dati di questa sessione verranno eliminati.';
-  static String get sessionDeleted => _lang == 'en' ? 'Session deleted' : 'Sessione eliminata';
-  static String get deleteSeries => _lang == 'en' ? 'Delete set?' : 'Elimina serie?';
-  static String get dataDeleted => _lang == 'en' ? 'Data deleted' : 'Dati eliminati';
-  static String get skipUseButton => _lang == 'en' ? 'Use the SKIP button to return to the exercise' : 'Usa il tasto \'SKIP\' per tornare all\'esercizio';
-  static String get restoreWorkout => _lang == 'en' ? '♻️ Previous workout restored' : '♻️ Allenamento precedente ripristinato';
-  static String get workoutNotDone => _lang == 'en' ? 'You completed this exercise, but there are more! Use the arrows.' : 'Hai completato questo esercizio, ma ne mancano altri! Usa le frecce.';
-  static String get proFeature1 => _lang == 'en' ? '✅ Personalized schedules for each athlete' : '✅ Schede personalizzate per ogni atleta';
-  static String get proFeature2 => _lang == 'en' ? '✅ Real-time progress monitoring' : '✅ Monitoraggio progressi in tempo reale';
-  static String get proFeature3 => _lang == 'en' ? '✅ Shared exercise database' : '✅ Database esercizi condiviso';
-  static String get proFeature4 => _lang == 'en' ? '✅ No monthly subscriptions' : '✅ Senza abbonamenti mensili';
-  static String get gymAppPro => _lang == 'en' ? 'GymApp Pro - For PT' : 'GymApp Pro - Per PT';
+  static String get areYouSure =>
+      _lang == 'en' ? 'Are you sure?' : 'Sei sicuro?';
+  static String get irreversible => _lang == 'en'
+      ? 'This operation is irreversible.'
+      : 'Operazione irreversibile.';
+  static String get deleteAll =>
+      _lang == 'en' ? 'DELETE ALL' : 'CANCELLA TUTTO';
+  static String get noSession =>
+      _lang == 'en' ? 'No sessions' : 'Nessuna sessione';
+  static String get deleteSession =>
+      _lang == 'en' ? 'Delete session?' : 'Elimina sessione?';
+  static String get deleteSessionMsg => _lang == 'en'
+      ? 'All data from this session will be deleted.'
+      : 'Tutti i dati di questa sessione verranno eliminati.';
+  static String get sessionDeleted =>
+      _lang == 'en' ? 'Session deleted' : 'Sessione eliminata';
+  static String get deleteSeries =>
+      _lang == 'en' ? 'Delete set?' : 'Elimina serie?';
+  static String get dataDeleted =>
+      _lang == 'en' ? 'Data deleted' : 'Dati eliminati';
+  static String get skipUseButton => _lang == 'en'
+      ? 'Use the SKIP button to return to the exercise'
+      : 'Usa il tasto \'SKIP\' per tornare all\'esercizio';
+  static String get restoreWorkout => _lang == 'en'
+      ? '♻️ Previous workout restored'
+      : '♻️ Allenamento precedente ripristinato';
+  static String get workoutNotDone => _lang == 'en'
+      ? 'You completed this exercise, but there are more! Use the arrows.'
+      : 'Hai completato questo esercizio, ma ne mancano altri! Usa le frecce.';
+  static String get proFeature1 => _lang == 'en'
+      ? '✅ Personalized schedules for each athlete'
+      : '✅ Schede personalizzate per ogni atleta';
+  static String get proFeature2 => _lang == 'en'
+      ? '✅ Real-time progress monitoring'
+      : '✅ Monitoraggio progressi in tempo reale';
+  static String get proFeature3 => _lang == 'en'
+      ? '✅ Shared exercise database'
+      : '✅ Database esercizi condiviso';
+  static String get proFeature4 => _lang == 'en'
+      ? '✅ No monthly subscriptions'
+      : '✅ Senza abbonamenti mensili';
+  static String get gymAppPro =>
+      _lang == 'en' ? 'GymApp Pro - For PT' : 'GymApp Pro - Per PT';
   static String get recoverySuffix => _lang == 'en' ? 's rest' : 's riposo';
   static String get sessionCount => _lang == 'en' ? 'session' : 'session';
-  static String get sessionCountPlural => _lang == 'en' ? 'sessions' : 'sessioni';
+  static String get sessionCountPlural =>
+      _lang == 'en' ? 'sessions' : 'sessioni';
+  static String get loadExample => _lang == 'en' ? 'Load example' : 'Carica esempio';
+  static String get renameSession => _lang == 'en' ? 'Rename session' : 'Rinomina sessione';
+  static String get sessionName => _lang == 'en' ? 'Session name' : 'Nome sessione';
+  static String get editExercise => _lang == 'en' ? 'Edit exercise' : 'Modifica esercizio';
+  static String get streakWeeks => _lang == 'en' ? 'Week streak' : 'Settimane di fila';
+  static String get streakMsg => _lang == 'en' ? '🔥 Keep your streak alive!' : '🔥 Mantieni la tua streak!';
+  static String get newRecord => _lang == 'en' ? 'NEW RECORD!' : 'NUOVO RECORD!';
 }
 
 class AdManager {
@@ -382,7 +518,8 @@ class AdManager {
   InterstitialAd? _interstitialAd;
   bool _isAdLoaded = false;
 
-  static const String _interstitialAdUnitId = 'ca-app-pub-2556899149200560/4751310597';
+  static const String _interstitialAdUnitId =
+      'ca-app-pub-2556899149200560/4751310597';
   static const String bannerAdUnitId = 'ca-app-pub-2556899149200560/2699862325';
 
   // Callback in attesa che l'ad venga caricata (per il primo allenamento)
@@ -487,7 +624,12 @@ class _GymAppHomeState extends State<GymAppHome> {
     final done = prefs.getBool('onboarding_done') ?? false;
     final lang = prefs.getString('app_lang') ?? 'it';
     AppL.setLang(lang);
-    if (mounted) setState(() { _langChosen = langChosen; _onboardingDone = done; _loading = false; });
+    if (mounted)
+      setState(() {
+        _langChosen = langChosen;
+        _onboardingDone = done;
+        _loading = false;
+      });
   }
 
   @override
@@ -538,7 +680,12 @@ class LanguagePickerScreen extends StatelessWidget {
                 const Text(
                   'Scegli la lingua\nChoose your language',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.4),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    height: 1.4,
+                  ),
                 ),
                 const SizedBox(height: 48),
                 SizedBox(
@@ -549,9 +696,17 @@ class LanguagePickerScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00F2FF),
                       foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
-                    child: const Text('🇮🇹  Italiano', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+                    child: const Text(
+                      '🇮🇹  Italiano',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -564,9 +719,18 @@ class LanguagePickerScreen extends StatelessWidget {
                       backgroundColor: Colors.white12,
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: Colors.white24)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(color: Colors.white24),
+                      ),
                     ),
-                    child: const Text('🇬🇧  English', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+                    child: const Text(
+                      '🇬🇧  English',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -644,16 +808,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length, (i) => AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
-                width: _currentPage == i ? 24 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: _currentPage == i ? accent : Colors.white24,
-                  borderRadius: BorderRadius.circular(4),
+              children: List.generate(
+                _pages.length,
+                (i) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 16,
+                  ),
+                  width: _currentPage == i ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentPage == i ? accent : Colors.white24,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
-              )),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
@@ -666,22 +836,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: accent,
                           foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                        child: Text(AppL.startBtn, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 2)),
+                        child: Text(
+                          AppL.startBtn,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                            letterSpacing: 2,
+                          ),
+                        ),
                       ),
                     )
                   : SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () => _pageCtrl.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut),
+                        onPressed: () => _pageCtrl.nextPage(
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOut,
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: accent,
                           foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                        child: Text(AppL.nextBtn, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                        child: Text(
+                          AppL.nextBtn,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ),
             ),
@@ -702,13 +892,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             page.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.5,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
             page.text,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white60, fontSize: 16, height: 1.6),
+            style: const TextStyle(
+              color: Colors.white60,
+              fontSize: 16,
+              height: 1.6,
+            ),
           ),
           if (page.isPromo) ...[
             const SizedBox(height: 32),
@@ -722,8 +921,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: accent,
                 side: BorderSide(color: accent.withAlpha(120)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -744,7 +948,12 @@ class _OnboardingPage {
   final String title;
   final String text;
   final bool isPromo;
-  const _OnboardingPage({required this.icon, required this.title, required this.text, this.isPromo = false});
+  const _OnboardingPage({
+    required this.icon,
+    required this.title,
+    required this.text,
+    this.isPromo = false,
+  });
 }
 
 /// Mappa parole chiave italiane → termini inglesi per la ricerca esercizi
@@ -795,6 +1004,24 @@ List<ExerciseInfo> searchExercisesWithItalian(String query, {int limit = 6}) {
     if (seen.add(ex.name) && results.length < limit) results.add(ex);
   }
 
+  if (AppL.lang == 'en') {
+    // EN mode: search kGifCatalog (English names) first, then kExerciseCatalog by nameEn
+    for (final ex in kGifCatalog) {
+      if (ex.name.toLowerCase().contains(q) ||
+          ex.nameEn.toLowerCase().contains(q)) {
+        tryAdd(ex);
+      }
+    }
+    for (final ex in kExerciseCatalog) {
+      if (ex.nameEn.toLowerCase().contains(q) ||
+          ex.aliases.any((a) => a.toLowerCase().contains(q))) {
+        tryAdd(ex);
+      }
+    }
+    return results;
+  }
+
+  // IT mode: cerca prima nel catalogo italiano, poi GIF, poi keywords
   // 1. Match diretto nel catalogo italiano (kExerciseCatalog) — nomi IT come "Trazioni"
   for (final ex in kExerciseCatalog) {
     if (ex.name.toLowerCase().contains(q) ||
@@ -806,7 +1033,8 @@ List<ExerciseInfo> searchExercisesWithItalian(String query, {int limit = 6}) {
 
   // 2. Match diretto nel catalogo GIF (nomi EN) — es. "Pull-Up", "Bench Press"
   for (final ex in kGifCatalog) {
-    if (ex.name.toLowerCase().contains(q) || ex.nameEn.toLowerCase().contains(q)) {
+    if (ex.name.toLowerCase().contains(q) ||
+        ex.nameEn.toLowerCase().contains(q)) {
       tryAdd(ex);
     }
   }
@@ -817,7 +1045,8 @@ List<ExerciseInfo> searchExercisesWithItalian(String query, {int limit = 6}) {
       if (entry.key.contains(q) || q.contains(entry.key)) {
         for (final eng in entry.value) {
           for (final ex in kGifCatalog) {
-            if (ex.name.toLowerCase().contains(eng) || ex.nameEn.toLowerCase().contains(eng)) {
+            if (ex.name.toLowerCase().contains(eng) ||
+                ex.nameEn.toLowerCase().contains(eng)) {
               tryAdd(ex);
               if (results.length >= limit) return results;
             }
@@ -828,6 +1057,284 @@ List<ExerciseInfo> searchExercisesWithItalian(String query, {int limit = 6}) {
   }
 
   return results;
+}
+
+// --- STREAK SYSTEM ---
+
+/// Restituisce la stringa ISO-week "YYYY-Www" per la data fornita.
+String _isoWeek(DateTime d) {
+  final thursday = d.add(Duration(days: 4 - (d.weekday == 7 ? 0 : d.weekday)));
+  final year = thursday.year;
+  final startOfYear = DateTime(year, 1, 1);
+  final weekNum = ((thursday.difference(startOfYear).inDays) / 7).ceil() + 1;
+  return '$year-W${weekNum.toString().padLeft(2, '0')}';
+}
+
+/// Aggiorna la streak dopo aver completato una sessione.
+/// [dayName] = nome del giorno completato
+/// [totalSessionNames] = nomi di tutti i giorni nella scheda
+Future<int> updateStreak(String dayName, List<String> totalSessionNames) async {
+  final prefs = await SharedPreferences.getInstance();
+  final now = DateTime.now();
+  final thisWeek = _isoWeek(now);
+  final lastWeek = prefs.getString('streak_last_week') ?? '';
+  int streak = prefs.getInt('streak_count') ?? 0;
+
+  // Sessioni completate questa settimana
+  final completedJson = prefs.getString('streak_completed_sessions') ?? '[]';
+  Set<String> completed = Set<String>.from(jsonDecode(completedJson));
+
+  // Se è una nuova settimana, valuta la precedente e resetta
+  if (lastWeek.isNotEmpty && lastWeek != thisWeek) {
+    // Recupera le sessioni della settimana precedente
+    final prevCompletedJson = prefs.getString('streak_prev_completed') ?? '[]';
+    Set<String> prevCompleted = Set<String>.from(jsonDecode(prevCompletedJson));
+    final allDone = totalSessionNames.every((n) => prevCompleted.contains(n));
+    if (allDone) {
+      streak++;
+    } else {
+      streak = 0;
+    }
+    await prefs.setInt('streak_count', streak);
+    // Sposta completed come prev, resetta
+    await prefs.setString('streak_prev_completed', jsonEncode(completed.toList()));
+    completed = {};
+  }
+
+  completed.add(dayName);
+  await prefs.setString('streak_last_week', thisWeek);
+  await prefs.setString('streak_completed_sessions', jsonEncode(completed.toList()));
+  // Aggiorna data ultimo allenamento per notifiche
+  await prefs.setString('last_workout_date', now.toIso8601String());
+
+  return streak;
+}
+
+/// Legge il valore attuale della streak.
+Future<int> getStreak() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('streak_count') ?? 0;
+}
+
+/// Controlla se l'utente non si allena da più di 2 giorni e mostra notifica giornaliera.
+Future<void> checkAndScheduleStreakNotification(String lang) async {
+  if (kIsWeb) return;
+  final prefs = await SharedPreferences.getInstance();
+  final lastStr = prefs.getString('last_workout_date');
+  if (lastStr == null) return;
+  final last = DateTime.tryParse(lastStr);
+  if (last == null) return;
+  final daysSince = DateTime.now().difference(last).inDays;
+  if (daysSince >= 2) {
+    const channelId = 'streak_reminder';
+    const androidDetails = AndroidNotificationDetails(
+      channelId, 'Streak Reminder',
+      channelDescription: 'Remind user to train to keep their streak',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@drawable/ic_notification',
+    );
+    final title = lang == 'en' ? '🔥 Keep your streak alive!' : '🔥 Non perdere la tua streak!';
+    final body = lang == 'en'
+        ? "You haven't trained in $daysSince days. Train today to keep your progress!"
+        : "Non ti alleni da $daysSince giorni. Allenati oggi per non perdere i tuoi progressi!";
+    await flutterLocalNotificationsPlugin.show(
+      9901,
+      title,
+      body,
+      const NotificationDetails(android: androidDetails),
+    );
+  }
+}
+
+// --- TRADUZIONE MUSCOLI E TESTO ESERCIZI IT → EN ---
+
+/// Traduce i nomi dei muscoli dall'italiano all'inglese quando la lingua è EN.
+String translateMuscle(String italian) {
+  if (AppL.lang != 'en' || italian.isEmpty) return italian;
+  const m = {
+    'Gran dorsale': 'Latissimus Dorsi',
+    'Romboidi': 'Rhomboids',
+    'Grande pettorale': 'Pectoralis Major',
+    'Gran pettorale': 'Pectoralis Major',
+    'Pettorale minore': 'Pectoralis Minor',
+    'Bicipiti': 'Biceps',
+    'Tricipiti': 'Triceps',
+    'Brachioradiale': 'Brachioradialis',
+    'Deltoide anteriore': 'Front Deltoid',
+    'Deltoide laterale': 'Lateral Deltoid',
+    'Deltoide posteriore': 'Rear Deltoid',
+    'Deltoide (fascio anteriore e laterale)': 'Deltoid (front & lateral)',
+    'Deltoide (tutte le fasce)': 'Deltoid (all heads)',
+    'Deltoide': 'Deltoid',
+    'Trapezio superiore': 'Upper Trapezius',
+    'Trapezio medio': 'Mid Trapezius',
+    'Trapezio': 'Trapezius',
+    'Serratura anteriore': 'Serratus Anterior',
+    'Quadricipiti': 'Quadriceps',
+    'Ischiocrurali': 'Hamstrings',
+    'Gluteo grande': 'Gluteus Maximus',
+    'Gluteo medio': 'Gluteus Medius',
+    'Gluteo minore': 'Gluteus Minimus',
+    'Glutei': 'Glutes',
+    'Polpacci': 'Calves',
+    'Gastrocnemio': 'Gastrocnemius',
+    'Soleo': 'Soleus',
+    'Adduttori dell\'anca': 'Hip Adductors',
+    'Adduttori': 'Adductors',
+    'Abduttori': 'Abductors',
+    'Flessori anca': 'Hip Flexors',
+    'Flessori avambraccio': 'Forearm Flexors',
+    'Avambracci': 'Forearms',
+    'Lombari': 'Lower Back',
+    'Rettosaddominale (fascio inferiore)': 'Lower Rectus Abdominis',
+    'Rettosaddominale': 'Rectus Abdominis',
+    'Obliqui': 'Obliques',
+    'Trasverso addome': 'Transverse Abdominis',
+    'Sovraspinato': 'Supraspinatus',
+    'Grande rotondo': 'Teres Major',
+    'Piccolo rotondo': 'Teres Minor',
+    'Piriforme': 'Piriformis',
+    'Gracile': 'Gracilis',
+    'Pettineo': 'Pectineus',
+    'Bicipiti (picco)': 'Biceps (peak)',
+    'Bicipiti, Brachioradiale': 'Biceps, Brachioradialis',
+    'Tricipiti (capo laterale)': 'Triceps (lateral head)',
+    'Tricipiti (capo lungo)': 'Triceps (long head)',
+    'Muscolatura principale coinvolta': 'Main muscles',
+    'Muscolatura di supporto': 'Supporting muscles',
+    'Mobilità articolare generale': 'General joint mobility',
+    'Sistema cardiovascolare': 'Cardiovascular system',
+    'Polpacci, Sistema cardiovascolare': 'Calves, Cardiovascular system',
+    'Core': 'Core',
+    'Spalle': 'Shoulders',
+    'Schiena': 'Back',
+    'Gambe': 'Legs',
+    'Braccia': 'Arms',
+  };
+  // Sort by length descending to match longer phrases first
+  final sorted = m.entries.toList()
+    ..sort((a, b) => b.key.length.compareTo(a.key.length));
+  String result = italian;
+  for (final e in sorted) {
+    result = result.replaceAll(e.key, e.value);
+  }
+  return result;
+}
+
+/// Traduce testi di esecuzione/consigli dall'italiano all'inglese quando la lingua è EN.
+String translateExerciseText(String italian) {
+  if (AppL.lang != 'en' || italian.isEmpty) return italian;
+  const phrases = {
+    'Esegui il movimento lentamente e con controllo. Mantieni una postura corretta.':
+        'Perform the movement slowly and under control. Maintain correct posture.',
+    'Inizia con peso moderato per padroneggiare la tecnica.':
+        'Start with moderate weight to master the technique.',
+    'Porta le braccia in posizione di allungamento. Mantieni 20-30 secondi.':
+        'Bring arms into the stretch position. Hold for 20–30 seconds.',
+    'Porta le gambe in posizione di allungamento. Mantieni 20-30 secondi.':
+        'Bring legs into the stretch position. Hold for 20–30 seconds.',
+    'Porta il corpo in posizione di allungamento. Mantieni 20-30 secondi.':
+        'Bring body into stretch position. Hold for 20–30 seconds.',
+    'Non forzare oltre il limite di comfort. Respira profondamente.':
+        'Do not push beyond the comfort limit. Breathe deeply.',
+    'Respira profondamente. Non forzare mai oltre il limite naturale.':
+        'Breathe deeply. Never force beyond the natural limit.',
+    'Respira profondamente. Non forzare oltre il limite.':
+        'Breathe deeply. Do not force beyond the limit.',
+    'Non tirare il collo. Respira normalmente.':
+        'Do not pull on your neck. Breathe normally.',
+    'Non tirare il collo. Concentrati sulla contrazione dell\'addome.':
+        'Do not pull on your neck. Focus on contracting your abs.',
+    'Contrai l\'addome durante tutto l\'esercizio. Controlla la fase eccentrica.':
+        'Engage your core throughout the exercise. Control the eccentric phase.',
+    'Concentrati sulla contrazione dei glutei. Mantieni il core stabile.':
+        'Focus on glute contraction. Keep core stable.',
+    'Esegui il movimento controllando fase eccentrica e concentrica.':
+        'Perform the movement controlling both eccentric and concentric phases.',
+    'Non usare lo slancio. Concentrati sull\'isolamento dei muscoli target.':
+        'No momentum. Focus on isolating the target muscles.',
+    'Mantieni il core stabile durante l\'esercizio.':
+        'Keep the core stable throughout the exercise.',
+    'Evita di dondolare. Controlla sia la fase ascendente che discendente.':
+        'Avoid swinging. Control both the ascending and descending phases.',
+    'Porta la gamba in posizione di allungamento. Mantieni 20-30 secondi.':
+        'Bring leg into stretch position. Hold for 20–30 seconds.',
+    'Esegui il movimento esplosivo verso l\'alto. Controlla la discesa.':
+        'Perform the movement explosively upward. Control the descent.',
+    'Non arrotondare la schiena. Mantieni il core contratto.':
+        'Do not round your back. Keep core engaged.',
+    'Esegui il movimento con controllo. Mantieni il core stabile.':
+        'Perform the movement under control. Keep core stable.',
+  };
+  // Word-level substitutions for partial matches
+  const wordMap = {
+    'Esegui': 'Perform',
+    'lentamente': 'slowly',
+    'con controllo': 'under control',
+    'Mantieni': 'Keep',
+    'postura corretta': 'correct posture',
+    'Contrai': 'Contract',
+    'addome': 'abs',
+    'Abbassa lentamente': 'Lower slowly',
+    'fase eccentrica': 'eccentric phase',
+    'concentrica': 'concentric',
+    'Respira profondamente': 'Breathe deeply',
+    'Non forzare': 'Do not force',
+    'il limite': 'the limit',
+    'Inizia con': 'Start with',
+    'peso moderato': 'moderate weight',
+  };
+  if (phrases.containsKey(italian)) return phrases[italian]!;
+  // Partial substitution for unrecognized texts
+  String result = italian;
+  for (final e in wordMap.entries) {
+    result = result.replaceAll(e.key, e.value);
+  }
+  return result;
+}
+
+/// Restituisce il nome del gruppo muscolare localizzato.
+String bodyPartName(String key) {
+  if (AppL.lang == 'en') {
+    const en = {
+      'nessuno': 'None',
+      'petto': 'Chest',
+      'schiena': 'Back',
+      'gambe': 'Legs',
+      'spalle': 'Shoulders',
+      'braccia': 'Arms',
+      'core': 'Core',
+      'full_body': 'Full Body',
+      'cardio': 'Cardio',
+      'glutei': 'Glutes',
+      'altro': 'Other',
+    };
+    return en[key] ?? key;
+  }
+  return kBodyPartNames[key] ?? key;
+}
+
+/// Restituisce il label dell'immagine muscolo localizzato.
+String muscleImageLabel(Map<String, String> m) {
+  if (AppL.lang == 'en') {
+    const en = {
+      'petto.png': 'Chest',
+      'dorso.png': 'Back',
+      'spalle.png': 'Shoulders',
+      'braccia.png': 'Arms',
+      'bicipiti.png': 'Biceps',
+      'tricipiti.png': 'Triceps',
+      'gambe.png': 'Legs',
+      'quadricipiti.png': 'Quads',
+      'femorali.png': 'Hamstrings',
+      'glutei.png': 'Glutes',
+      'push.png': 'Push',
+      'pull.png': 'Pull',
+    };
+    return en[m['file']] ?? m['label'] ?? '';
+  }
+  return m['label'] ?? '';
 }
 
 // --- MODELLI DATI (SINCRONIZZATI AL 100% CON APP PT) ---
@@ -842,6 +1349,7 @@ class ExerciseConfig {
   // 0 = normale, 1+ = gruppo superserie (stessi numeri = stesso gruppo)
   int supersetGroup;
   List<Map<String, dynamic>> results = [];
+
   /// GIF slug personalizzato (es. 'barbell-curl') per esercizi non in catalogo.
   /// Se null, viene cercato il GIF tramite il catalogo.
   String? gifFilename;
@@ -882,7 +1390,7 @@ class ExerciseConfig {
               .toList() ??
           [],
       recoveryTime:
-          (json['recoveryTime'] as num? ?? json['rest'] as num?)?.toInt() ?? 60,
+          (json['recoveryTime'] as num? ?? json['rest'] as num?)?.toInt() ?? 90,
       interExercisePause:
           (json['interExercisePause'] as num? ?? json['pause'] as num?)
               ?.toInt() ??
@@ -992,6 +1500,7 @@ class _ClientMainPageState extends State<ClientMainPage>
   List<dynamic> history = [];
   Map<String, Map<String, dynamic>> _carryoverWeights = {};
   int _currentIndex = 0;
+  int _streak = 0; // streak corrente
 
   // Impostazioni
   bool _stTimerSound = true;
@@ -1013,7 +1522,11 @@ class _ClientMainPageState extends State<ClientMainPage>
     _loadMainSettings();
     _loadLanguage();
     _loadBannerAd();
-    try { AdManager.instance.loadInterstitial(); } catch (_) {}
+    getStreak().then((v) => setState(() => _streak = v));
+    checkAndScheduleStreakNotification(_appLang);
+    try {
+      AdManager.instance.loadInterstitial();
+    } catch (_) {}
   }
 
   @override
@@ -1086,22 +1599,45 @@ class _ClientMainPageState extends State<ClientMainPage>
             const SizedBox(height: 16),
             Text(
               AppL.proTrainer,
-              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
               AppL.promoText,
-              style: const TextStyle(color: Colors.white60, fontSize: 15, height: 1.5),
+              style: const TextStyle(
+                color: Colors.white60,
+                fontSize: 15,
+                height: 1.5,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            ...[AppL.proFeature1, AppL.proFeature2, AppL.proFeature3, AppL.proFeature4].map((v) =>
-              Padding(
+            ...[
+              AppL.proFeature1,
+              AppL.proFeature2,
+              AppL.proFeature3,
+              AppL.proFeature4,
+            ].map(
+              (v) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(children: [
-                  Expanded(child: Text(v, style: const TextStyle(color: Colors.white70, fontSize: 14))),
-                ]),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        v,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -1118,7 +1654,9 @@ class _ClientMainPageState extends State<ClientMainPage>
                   backgroundColor: accent,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
@@ -1133,7 +1671,6 @@ class _ClientMainPageState extends State<ClientMainPage>
   }
 
   Widget _buildMainSettingsDrawer() {
-
     final Color accent = appAccentNotifier.value;
     final List<Color> presets = [
       const Color(0xFF00F2FF), // ciano originale
@@ -1174,7 +1711,10 @@ class _ClientMainPageState extends State<ClientMainPage>
                       const SizedBox(height: 2),
                       Text(
                         AppL.settings,
-                        style: const TextStyle(color: Colors.white38, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white38,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   );
@@ -1334,24 +1874,42 @@ class _ClientMainPageState extends State<ClientMainPage>
               const Divider(color: Colors.white12),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: Text('LINGUA / LANGUAGE', style: TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 1.5)),
+                child: Text(
+                  'LINGUA / LANGUAGE',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    letterSpacing: 1.5,
+                  ),
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(children: [
-                    Icon(Icons.language, color: Colors.white54, size: 20),
-                    SizedBox(width: 12),
-                    Text('Lingua / Language', style: TextStyle(color: Colors.white, fontSize: 14)),
-                  ]),
+                  const Row(
+                    children: [
+                      Icon(Icons.language, color: Colors.white54, size: 20),
+                      SizedBox(width: 12),
+                      Text(
+                        'Lingua / Language',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ],
+                  ),
                   DropdownButton<String>(
                     value: _appLang,
                     dropdownColor: const Color(0xFF2C2C2E),
                     style: const TextStyle(color: Colors.white),
                     underline: const SizedBox(),
                     items: const [
-                      DropdownMenuItem(value: 'it', child: Text('🇮🇹 Italiano')),
-                      DropdownMenuItem(value: 'en', child: Text('🇬🇧 English')),
+                      DropdownMenuItem(
+                        value: 'it',
+                        child: Text('🇮🇹 Italiano'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'en',
+                        child: Text('🇬🇧 English'),
+                      ),
                     ],
                     onChanged: (v) async {
                       if (v == null) return;
@@ -1366,16 +1924,28 @@ class _ClientMainPageState extends State<ClientMainPage>
               const Divider(color: Colors.white12),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: Text('GYMAPP PRO', style: TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 1.5)),
+                child: Text(
+                  'GYMAPP PRO',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    letterSpacing: 1.5,
+                  ),
+                ),
               ),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   icon: const Text('👨‍💼', style: TextStyle(fontSize: 16)),
-                  label: Text(AppL.gymAppPro, style: const TextStyle(color: Colors.white70)),
+                  label: Text(
+                    AppL.gymAppPro,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.white24),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
@@ -1569,7 +2139,9 @@ class _ClientMainPageState extends State<ClientMainPage>
       ),
       body: Column(
         children: [
-          Expanded(child: _currentIndex == 0 ? _buildRoutinePage() : _buildTrainPage()),
+          Expanded(
+            child: _currentIndex == 0 ? _buildRoutinePage() : _buildTrainPage(),
+          ),
           if (_bannerAdLoaded && _bannerAd != null && !kIsWeb)
             SizedBox(
               width: _bannerAd!.size.width.toDouble(),
@@ -1762,6 +2334,15 @@ class _ClientMainPageState extends State<ClientMainPage>
                             color: Colors.white38,
                             size: 22,
                           ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      // Edit session name
+                      GestureDetector(
+                        onTap: () => _renameSession(index),
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(Icons.edit_rounded, color: Colors.white38, size: 20),
                         ),
                       ),
                     ],
@@ -1980,7 +2561,8 @@ class _ClientMainPageState extends State<ClientMainPage>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (c) => Container(
+      builder: (c) => StatefulBuilder(
+        builder: (ctx2, setSheet) => Container(
         height: MediaQuery.of(context).size.height * 0.75,
         child: Column(
           children: [
@@ -2146,6 +2728,26 @@ class _ClientMainPageState extends State<ClientMainPage>
                             ],
                           ),
                         ),
+                        // Edit exercise button
+                        InkWell(
+                          borderRadius: BorderRadius.circular(22),
+                          onTap: () async {
+                            Navigator.pop(c);
+                            final dayIdx = myRoutine.indexOf(day);
+                            if (dayIdx >= 0) await _editExercise(dayIdx, idx);
+                            if (mounted) _showDayDetail(day);
+                          },
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: Colors.white10,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit_rounded, color: Colors.white38, size: 16),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
                         // Chart button
                         InkWell(
                           borderRadius: BorderRadius.circular(22),
@@ -2176,17 +2778,21 @@ class _ClientMainPageState extends State<ClientMainPage>
           ],
         ),
       ),
+      ),
     );
   }
 
   void _showExerciseDetail(BuildContext ctx, ExerciseConfig ex) {
     final accent = Theme.of(ctx).colorScheme.primary;
     // Le info seguono la GIF (se presente), altrimenti il nome
-    final info = (ex.gifFilename != null ? findByGifSlug(ex.gifFilename!) : null) ??
+    final info =
+        (ex.gifFilename != null ? findByGifSlug(ex.gifFilename!) : null) ??
         findAnyExercise(ex.name);
     final gifPath = ex.gifFilename != null
         ? 'assets/gif/${ex.gifFilename}.gif'
-        : info != null ? 'assets/gif/${info.gifSlug}.gif' : null;
+        : info != null
+        ? 'assets/gif/${info.gifSlug}.gif'
+        : null;
 
     showModalBottomSheet(
       context: ctx,
@@ -2291,26 +2897,26 @@ class _ClientMainPageState extends State<ClientMainPage>
               _infoTile(
                 Icons.fitness_center_rounded,
                 AppL.primaryMuscle,
-                info.primaryMuscle,
-                accent,
+                translateMuscle(info.primaryMuscle),
+                Colors.white70,
               ),
               if (info.secondaryMuscles.isNotEmpty)
                 _infoTile(
                   Icons.grain_rounded,
                   AppL.secondaryMuscles,
-                  info.secondaryMuscles,
+                  translateMuscle(info.secondaryMuscles),
                   Colors.white54,
                 ),
               const SizedBox(height: 12),
               _sectionCard(
                 AppL.execution,
-                info.execution,
+                translateExerciseText(info.execution),
                 const Color(0xFF1C1C1E),
               ),
               const SizedBox(height: 8),
               _sectionCard(
                 AppL.tips,
-                info.tips,
+                translateExerciseText(info.tips),
                 Colors.amber.withAlpha(15),
               ),
             ] else
@@ -2644,11 +3250,14 @@ class _ClientMainPageState extends State<ClientMainPage>
           day: d,
           history: history,
           carryoverWeights: _carryoverWeights,
+          allSessionNames: myRoutine.map((r) => r.dayName).toList(),
           onDone: (session) async {
             history.add(session);
             final prefs2 = await SharedPreferences.getInstance();
             await prefs2.setString('client_history', jsonEncode(history));
             _loadData();
+            // Aggiorna streak UI
+            getStreak().then((v) { if (mounted) setState(() => _streak = v); });
           },
         ),
         transitionsBuilder: (c, anim, _, child) => SlideTransition(
@@ -2719,6 +3328,29 @@ class _ClientMainPageState extends State<ClientMainPage>
                   AppL.chooseAndStart,
                   style: const TextStyle(color: Colors.white38, fontSize: 13),
                 ),
+                if (_streak > 0) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Color(0xFFFF6B00), Color(0xFFFFAA00)]),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🔥', style: TextStyle(fontSize: 18)),
+                        const SizedBox(width: 6),
+                        Text(
+                          AppL.lang == 'en'
+                              ? '$_streak week${_streak == 1 ? '' : 's'} streak — keep it up!'
+                              : '$_streak ${_streak == 1 ? 'settimana' : 'settimane'} di fila — continua così!',
+                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -2933,8 +3565,191 @@ class _ClientMainPageState extends State<ClientMainPage>
       ],
     );
   }
-}
 
+  Future<void> _saveMyRoutine() async {
+    final prefs = await SharedPreferences.getInstance();
+    final fullRoutine = myRoutine.map((d) => d.toJson()).toList();
+    await prefs.setString('client_routine', jsonEncode(fullRoutine));
+  }
+
+  void _renameSession(int idx) async {
+    final ctrl = TextEditingController(text: myRoutine[idx].dayName);
+    final accent = appAccentNotifier.value;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        title: Text(
+          AppL.lang == 'en' ? 'Rename Session' : 'Rinomina Sessione',
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: accent.withAlpha(100))),
+            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: accent)),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppL.cancel)),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+            style: ElevatedButton.styleFrom(backgroundColor: accent),
+            child: Text(AppL.save, style: const TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+    if (result != null && result.isNotEmpty) {
+      setState(() => myRoutine[idx].dayName = result);
+      _saveMyRoutine();
+    }
+  }
+
+  Future<void> _editExercise(int dayIdx, int exIdx) async {
+    final accent = appAccentNotifier.value;
+    final original = myRoutine[dayIdx].exercises[exIdx];
+    final nameCtrl = TextEditingController(text: original.name);
+    final setsCtrl = TextEditingController(text: '${original.targetSets}');
+    final recoveryCtrl = TextEditingController(text: '${original.recoveryTime}');
+    final pausaCtrl = TextEditingController(text: '${original.interExercisePause}');
+    final noteCtrl = TextEditingController(text: original.notePT);
+    int supersetGroup = original.supersetGroup;
+    int currentSets = original.targetSets;
+    List<TextEditingController> repsCtrls = List.generate(
+      original.repsList.length,
+      (i) => TextEditingController(text: '${original.repsList[i]}'),
+    );
+    ExerciseInfo? selectedExInfo;
+    if (original.gifFilename != null) {
+      selectedExInfo = findByGifSlug(original.gifFilename!);
+    }
+    List<ExerciseInfo> suggestions = [];
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF1C1C1E),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (c) => StatefulBuilder(
+        builder: (ctx, setS) {
+          void updateSets(String val) {
+            final n = (int.tryParse(val) ?? 1).clamp(1, 20);
+            setS(() {
+              currentSets = n;
+              while (repsCtrls.length < n) repsCtrls.add(TextEditingController(text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10'));
+              while (repsCtrls.length > n) { repsCtrls.last.dispose(); repsCtrls.removeLast(); }
+            });
+          }
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.9, minChildSize: 0.5, maxChildSize: 0.95, expand: false,
+              builder: (_, scrollCtrl) => ListView(
+                controller: scrollCtrl,
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                children: [
+                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
+                  Text(AppL.lang == 'en' ? 'Edit Exercise' : 'Modifica Esercizio', style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: nameCtrl,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(labelText: AppL.exerciseName, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
+                    onChanged: (v) => setS(() => suggestions = searchExercisesWithItalian(v, limit: 6)),
+                  ),
+                  if (suggestions.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(12)),
+                      constraints: const BoxConstraints(maxHeight: 240),
+                      child: ListView.separated(
+                        shrinkWrap: true, physics: const ClampingScrollPhysics(),
+                        itemCount: suggestions.length,
+                        separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 1),
+                        itemBuilder: (_, i) {
+                          final ex = suggestions[i];
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            leading: ex.gifFilename != null ? ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.asset('assets/gif/${ex.gifFilename}.gif', width: 48, height: 48, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, color: Colors.white30))) : const Icon(Icons.fitness_center, color: Colors.white30),
+                            title: Text(ex.name, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                            onTap: () { nameCtrl.text = ex.name; setS(() { suggestions = []; selectedExInfo = ex; }); },
+                          );
+                        },
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  if (selectedExInfo != null && selectedExInfo!.gifFilename != null) ...[
+                    ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/gif/${selectedExInfo!.gifFilename}.gif', height: 140, width: double.infinity, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
+                    const SizedBox(height: 12),
+                  ],
+                  Row(children: [
+                    Expanded(child: TextField(controller: setsCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.sets, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)), onChanged: updateSets)),
+                    const SizedBox(width: 12),
+                    Expanded(child: TextField(controller: recoveryCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.recovery, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+                    const SizedBox(width: 12),
+                    Expanded(child: TextField(controller: pausaCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.pauseSec, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+                  ]),
+                  const SizedBox(height: 12),
+                  Text(AppL.repsPerSet, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  const SizedBox(height: 6),
+                  Wrap(spacing: 8, runSpacing: 8, children: List.generate(currentSets, (i) => SizedBox(
+                    width: 58,
+                    child: TextField(controller: repsCtrls[i], keyboardType: TextInputType.number, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 13),
+                      decoration: InputDecoration(labelText: 'S${i+1}', labelStyle: const TextStyle(color: Colors.white38, fontSize: 11), filled: true, fillColor: Colors.black26, contentPadding: const EdgeInsets.symmetric(vertical: 8), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none))),
+                  ))),
+                  const SizedBox(height: 16),
+                  TextField(controller: noteCtrl, maxLines: 3, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.notes, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none))),
+                  const SizedBox(height: 16),
+                  Text('🔗  ${AppL.circuit}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 4),
+                  Text(AppL.circuitHint, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                  const SizedBox(height: 8),
+                  Row(children: List.generate(6, (i) => Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GestureDetector(
+                      onTap: () => setS(() => supersetGroup = i),
+                      child: Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(color: supersetGroup == i ? accent : Colors.white10, borderRadius: BorderRadius.circular(10)),
+                        child: Center(child: Text('$i', style: TextStyle(color: supersetGroup == i ? Colors.black : Colors.white, fontWeight: FontWeight.bold))),
+                      ),
+                    ),
+                  ))),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final name = nameCtrl.text.trim();
+                        if (name.isEmpty) return;
+                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(1, 20);
+                        final repsList = repsCtrls.map((c) => int.tryParse(c.text) ?? 10).toList();
+                        final recovery = int.tryParse(recoveryCtrl.text) ?? 90;
+                        final pausa = int.tryParse(pausaCtrl.text) ?? 120;
+                        Navigator.pop(c);
+                        setState(() {
+                          final updated = ExerciseConfig(name: name, targetSets: sets, repsList: repsList, recoveryTime: recovery, interExercisePause: pausa, notePT: noteCtrl.text.trim(), noteCliente: original.noteCliente, supersetGroup: supersetGroup, gifFilename: selectedExInfo?.gifFilename ?? original.gifFilename);
+                          updated.results = original.results;
+                          myRoutine[dayIdx].exercises[exIdx] = updated;
+                        });
+                        _saveMyRoutine();
+                      },
+                      child: Text(AppL.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
 
 // --- COSTRUTTORE SCHEDA AUTONOMO ---
 class ScheduleBuilderScreen extends StatefulWidget {
@@ -2958,7 +3773,9 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     final raw = prefs.getString('client_routine') ?? '[]';
     try {
       final list = jsonDecode(raw) as List;
-      _days = list.map((e) => WorkoutDay.fromJson(e as Map<String, dynamic>)).toList();
+      _days = list
+          .map((e) => WorkoutDay.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       _days = [];
     }
@@ -2967,7 +3784,10 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
 
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('client_routine', jsonEncode(_days.map((d) => d.toJson()).toList()));
+    await prefs.setString(
+      'client_routine',
+      jsonEncode(_days.map((d) => d.toJson()).toList()),
+    );
   }
 
   void _aggiungiGiorno() {
@@ -2981,64 +3801,134 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
         builder: (c) => StatefulBuilder(
           builder: (c, setSInner) => AlertDialog(
             backgroundColor: const Color(0xFF1C1C1E),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text(AppL.chooseMuscleImage, style: const TextStyle(color: Colors.white, fontSize: 16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              AppL.chooseMuscleImage,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
             content: SizedBox(
               width: double.maxFinite,
               child: GridView.builder(
                 shrinkWrap: true,
                 itemCount: kMuscleImages.length + 1,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.75,
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.75,
                 ),
                 itemBuilder: (_, i) {
                   if (i == 0) {
                     final bool sel = selectedMuscleImage == null;
                     return GestureDetector(
-                      onTap: () { setSInner(() {}); setS(() => selectedMuscleImage = null); Navigator.pop(c); },
+                      onTap: () {
+                        setSInner(() {});
+                        setS(() => selectedMuscleImage = null);
+                        Navigator.pop(c);
+                      },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: sel ? appAccentNotifier.value.withAlpha(40) : Colors.white10,
+                          color: sel
+                              ? appAccentNotifier.value.withAlpha(40)
+                              : Colors.white10,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: sel ? appAccentNotifier.value : Colors.transparent, width: 2),
+                          border: Border.all(
+                            color: sel
+                                ? appAccentNotifier.value
+                                : Colors.transparent,
+                            width: 2,
+                          ),
                         ),
-                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.hide_image_outlined, color: sel ? appAccentNotifier.value : Colors.white38, size: 28),
-                          const SizedBox(height: 4),
-                          Text(AppL.noImage, style: TextStyle(color: sel ? appAccentNotifier.value : Colors.white38, fontSize: 11)),
-                        ]),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.hide_image_outlined,
+                              color: sel
+                                  ? appAccentNotifier.value
+                                  : Colors.white38,
+                              size: 28,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              AppL.noImage,
+                              style: TextStyle(
+                                color: sel
+                                    ? appAccentNotifier.value
+                                    : Colors.white38,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
                   final img = kMuscleImages[i - 1];
                   final bool sel = selectedMuscleImage == img['file'];
                   return GestureDetector(
-                    onTap: () { setSInner(() {}); setS(() => selectedMuscleImage = img['file']); Navigator.pop(c); },
+                    onTap: () {
+                      setSInner(() {});
+                      setS(() => selectedMuscleImage = img['file']);
+                      Navigator.pop(c);
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: sel ? appAccentNotifier.value : Colors.transparent, width: 2),
+                        border: Border.all(
+                          color: sel
+                              ? appAccentNotifier.value
+                              : Colors.transparent,
+                          width: 2,
+                        ),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(9),
-                        child: Stack(fit: StackFit.expand, children: [
-                          Image.asset('assets/muscle/${img['file']}', fit: BoxFit.cover),
-                          Positioned(bottom: 0, left: 0, right: 0,
-                            child: Container(
-                              color: Colors.black54,
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text(img['label']!, textAlign: TextAlign.center,
-                                style: TextStyle(color: sel ? appAccentNotifier.value : Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.asset(
+                              'assets/muscle/${img['file']}',
+                              fit: BoxFit.cover,
                             ),
-                          ),
-                        ]),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                color: Colors.black54,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
+                                child: Text(
+                                  muscleImageLabel(img),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: sel
+                                        ? appAccentNotifier.value
+                                        : Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
                 },
               ),
             ),
-            actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('ANNULLA'))],
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c),
+                child: Text(AppL.cancel),
+              ),
+            ],
           ),
         ),
       );
@@ -3049,7 +3939,9 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       builder: (c) => StatefulBuilder(
         builder: (ctx, setS) => AlertDialog(
           backgroundColor: const Color(0xFF1C1C1E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(AppL.day, style: const TextStyle(color: Colors.white)),
           content: SingleChildScrollView(
             child: Column(
@@ -3061,24 +3953,43 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                   decoration: InputDecoration(
                     labelText: AppL.day,
                     labelStyle: const TextStyle(color: Colors.white54),
-                    enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: appAccentNotifier.value)),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white24),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: appAccentNotifier.value),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
-                  spacing: 8, runSpacing: 8,
-                  children: kBodyPartNames.entries.where((e) => e.key != 'nessuno').map((e) {
-                    final sel = selectedParts.contains(e.key);
-                    return FilterChip(
-                      label: Text('${kBodyPartIcons[e.key] ?? ''} ${e.value}', style: TextStyle(fontSize: 12, color: sel ? Colors.black : Colors.white70)),
-                      selected: sel,
-                      onSelected: (v) => setS(() { if (v) selectedParts.add(e.key); else selectedParts.remove(e.key); }),
-                      backgroundColor: Colors.white10,
-                      selectedColor: appAccentNotifier.value,
-                      checkmarkColor: Colors.black,
-                    );
-                  }).toList(),
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: kBodyPartNames.entries
+                      .where((e) => e.key != 'nessuno')
+                      .map((e) {
+                        final sel = selectedParts.contains(e.key);
+                        return FilterChip(
+                          label: Text(
+                            '${kBodyPartIcons[e.key] ?? ''} ${bodyPartName(e.key)}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: sel ? Colors.black : Colors.white70,
+                            ),
+                          ),
+                          selected: sel,
+                          onSelected: (v) => setS(() {
+                            if (v)
+                              selectedParts.add(e.key);
+                            else
+                              selectedParts.remove(e.key);
+                          }),
+                          backgroundColor: Colors.white10,
+                          selectedColor: appAccentNotifier.value,
+                          checkmarkColor: Colors.black,
+                        );
+                      })
+                      .toList(),
                 ),
                 const SizedBox(height: 12),
                 // Selezione immagine muscolo
@@ -3089,43 +4000,92 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white10,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: appAccentNotifier.value.withAlpha(80)),
+                      border: Border.all(
+                        color: appAccentNotifier.value.withAlpha(80),
+                      ),
                     ),
-                    child: Row(children: [
-                      if (selectedMuscleImage != null)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.asset('assets/muscle/$selectedMuscleImage', width: 48, height: 48, fit: BoxFit.cover),
-                        )
-                      else
-                        const Icon(Icons.image_outlined, color: Colors.white38, size: 48),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(
-                        selectedMuscleImage != null
-                            ? (kMuscleImages.firstWhere((m) => m['file'] == selectedMuscleImage, orElse: () => {'label': selectedMuscleImage!})['label'] ?? selectedMuscleImage!)
-                            : AppL.tapToChooseMuscle,
-                        style: TextStyle(color: selectedMuscleImage != null ? Colors.white : Colors.white38, fontSize: 13),
-                      )),
-                      Icon(Icons.chevron_right, color: appAccentNotifier.value),
-                    ]),
+                    child: Row(
+                      children: [
+                        if (selectedMuscleImage != null)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              'assets/muscle/$selectedMuscleImage',
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        else
+                          const Icon(
+                            Icons.image_outlined,
+                            color: Colors.white38,
+                            size: 48,
+                          ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            selectedMuscleImage != null
+                                ? (muscleImageLabel(
+                                    kMuscleImages.firstWhere(
+                                      (m) => m['file'] == selectedMuscleImage,
+                                      orElse: () => {
+                                        'label': selectedMuscleImage!,
+                                      },
+                                    ),
+                                  ))
+                                : AppL.tapToChooseMuscle,
+                            style: TextStyle(
+                              color: selectedMuscleImage != null
+                                  ? Colors.white
+                                  : Colors.white38,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: appAccentNotifier.value,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(c), child: Text(AppL.cancel, style: const TextStyle(color: Colors.white54))),
+            TextButton(
+              onPressed: () => Navigator.pop(c),
+              child: Text(
+                AppL.cancel,
+                style: const TextStyle(color: Colors.white54),
+              ),
+            ),
             TextButton(
               onPressed: () {
                 final name = nameCtrl.text.trim();
                 if (name.isEmpty) return;
                 Navigator.pop(c);
                 setState(() {
-                  _days.add(WorkoutDay(dayName: name, bodyParts: List.from(selectedParts), muscleImage: selectedMuscleImage, exercises: []));
+                  _days.add(
+                    WorkoutDay(
+                      dayName: name,
+                      bodyParts: List.from(selectedParts),
+                      muscleImage: selectedMuscleImage,
+                      exercises: [],
+                    ),
+                  );
                 });
                 _save();
               },
-              child: Text(AppL.add, style: TextStyle(color: appAccentNotifier.value, fontWeight: FontWeight.bold)),
+              child: Text(
+                AppL.add,
+                style: TextStyle(
+                  color: appAccentNotifier.value,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -3138,10 +4098,22 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: Text(AppL.deleteDay, style: const TextStyle(color: Colors.white)),
+        title: Text(
+          AppL.deleteDay,
+          style: const TextStyle(color: Colors.white),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppL.cancel)),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(AppL.delete, style: const TextStyle(color: Colors.redAccent))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppL.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              AppL.delete,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
+          ),
         ],
       ),
     );
@@ -3150,17 +4122,98 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     _save();
   }
 
+  List<WorkoutDay> _getSampleWorkouts() => [
+    WorkoutDay(
+      dayName: AppL.lang == 'en' ? 'Chest & Triceps' : 'Petto & Tricipiti',
+      bodyParts: ['petto', 'braccia'],
+      muscleImage: 'petto.png',
+      exercises: [
+        ExerciseConfig(name: 'Bench Press', targetSets: 4, repsList: [8, 8, 8, 6], recoveryTime: 90, notePT: ''),
+        ExerciseConfig(name: 'Incline Dumbbell Press', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 75, notePT: ''),
+        ExerciseConfig(name: 'Cable Fly', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 60, notePT: ''),
+        ExerciseConfig(name: 'Tricep Pushdown', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 60, notePT: ''),
+      ],
+    ),
+    WorkoutDay(
+      dayName: AppL.lang == 'en' ? 'Back & Biceps' : 'Schiena & Bicipiti',
+      bodyParts: ['schiena', 'braccia'],
+      muscleImage: 'dorso.png',
+      exercises: [
+        ExerciseConfig(name: 'Pull Up', targetSets: 4, repsList: [8, 8, 6, 6], recoveryTime: 90, notePT: ''),
+        ExerciseConfig(name: 'Barbell Row', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 90, notePT: ''),
+        ExerciseConfig(name: 'Lat Pulldown', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 75, notePT: ''),
+        ExerciseConfig(name: 'Barbell Curl', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 60, notePT: ''),
+      ],
+    ),
+    WorkoutDay(
+      dayName: AppL.lang == 'en' ? 'Legs' : 'Gambe',
+      bodyParts: ['gambe'],
+      muscleImage: 'gambe.png',
+      exercises: [
+        ExerciseConfig(name: 'Squat', targetSets: 4, repsList: [8, 8, 8, 6], recoveryTime: 120, notePT: ''),
+        ExerciseConfig(name: 'Romanian Deadlift', targetSets: 3, repsList: [10, 10, 10], recoveryTime: 90, notePT: ''),
+        ExerciseConfig(name: 'Leg Press', targetSets: 3, repsList: [12, 12, 12], recoveryTime: 90, notePT: ''),
+      ],
+    ),
+    WorkoutDay(
+      dayName: AppL.lang == 'en' ? 'Shoulders' : 'Spalle',
+      bodyParts: ['spalle'],
+      muscleImage: 'spalle.png',
+      exercises: [
+        ExerciseConfig(name: 'Shoulder Press', targetSets: 4, repsList: [10, 10, 8, 8], recoveryTime: 90, notePT: ''),
+        ExerciseConfig(name: 'Lateral Raise', targetSets: 3, repsList: [15, 15, 12], recoveryTime: 60, notePT: ''),
+      ],
+    ),
+    WorkoutDay(
+      dayName: AppL.lang == 'en' ? 'Core & Cardio' : 'Core & Cardio',
+      bodyParts: ['core'],
+      muscleImage: null,
+      exercises: [
+        ExerciseConfig(name: 'Plank', targetSets: 3, repsList: [30, 30, 30], recoveryTime: 60, notePT: ''),
+      ],
+    ),
+  ];
+
+  Future<void> _caricaEsempio() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        title: Text(AppL.loadExample, style: const TextStyle(color: Colors.white)),
+        content: Text(
+          AppL.lang == 'en'
+              ? 'Load a 5-day sample plan? This will replace the current schedule.'
+              : 'Caricare un piano di esempio a 5 giorni? Questo sostituirà la scheda attuale.',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppL.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(AppL.confirm, style: TextStyle(color: appAccentNotifier.value)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    setState(() => _days = _getSampleWorkouts());
+    await _save();
+  }
+
   void _aggiungiEsercizio(int dayIdx) {
     final accent = appAccentNotifier.value;
     final nameCtrl = TextEditingController();
     final setsCtrl = TextEditingController(text: '3');
-    final recoveryCtrl = TextEditingController(text: '60');
+    final recoveryCtrl = TextEditingController(text: '90');
     final pausaCtrl = TextEditingController(text: '120');
     final noteCtrl = TextEditingController();
     int supersetGroup = 0;
 
     int currentSets = 3;
-    List<TextEditingController> repsCtrls = List.generate(3, (_) => TextEditingController(text: '10'));
+    List<TextEditingController> repsCtrls = List.generate(
+      3,
+      (_) => TextEditingController(text: '10'),
+    );
     ExerciseInfo? selectedExInfo;
     List<ExerciseInfo> suggestions = [];
 
@@ -3168,7 +4221,9 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF1C1C1E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (c) => StatefulBuilder(
         builder: (ctx, setS) {
           void updateSets(String val) {
@@ -3176,7 +4231,11 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
             setS(() {
               currentSets = n;
               while (repsCtrls.length < n) {
-                repsCtrls.add(TextEditingController(text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10'));
+                repsCtrls.add(
+                  TextEditingController(
+                    text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10',
+                  ),
+                );
               }
               while (repsCtrls.length > n) {
                 repsCtrls.last.dispose();
@@ -3186,7 +4245,9 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
           }
 
           return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            ),
             child: DraggableScrollableSheet(
               initialChildSize: 0.9,
               minChildSize: 0.5,
@@ -3196,8 +4257,25 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                 controller: scrollCtrl,
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 children: [
-                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-                  Text(AppL.exercises, style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    AppL.exercises,
+                    style: TextStyle(
+                      color: accent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 16),
 
                   // — Nome esercizio
@@ -3208,46 +4286,110 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       labelText: AppL.exerciseName,
                       labelStyle: const TextStyle(color: Colors.white54),
                       suffixIcon: nameCtrl.text.isNotEmpty
-                          ? IconButton(icon: const Icon(Icons.clear, color: Colors.white38), onPressed: () { nameCtrl.clear(); setS(() { suggestions = []; selectedExInfo = null; }); })
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.clear,
+                                color: Colors.white38,
+                              ),
+                              onPressed: () {
+                                nameCtrl.clear();
+                                setS(() {
+                                  suggestions = [];
+                                  selectedExInfo = null;
+                                });
+                              },
+                            )
                           : null,
-                      filled: true, fillColor: Colors.black26,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      filled: true,
+                      fillColor: Colors.black26,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                    onChanged: (v) => setS(() => suggestions = searchExercisesWithItalian(v, limit: 6)),
+                    onChanged: (v) => setS(
+                      () =>
+                          suggestions = searchExercisesWithItalian(v, limit: 6),
+                    ),
                   ),
 
                   // — Suggerimenti con GIF
                   if (suggestions.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(top: 4),
-                      decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2C2C2E),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       constraints: const BoxConstraints(maxHeight: 300),
                       child: ListView.separated(
                         shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
                         itemCount: suggestions.length,
-                        separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 1),
+                        separatorBuilder: (_, __) =>
+                            const Divider(color: Colors.white10, height: 1),
                         itemBuilder: (_, i) {
                           final ex = suggestions[i];
                           return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
                             leading: ex.gifFilename != null
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.asset(
                                       'assets/gif/${ex.gifFilename}.gif',
-                                      width: 64, height: 64, fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => const SizedBox(width: 64, height: 64, child: Icon(Icons.fitness_center, color: Colors.white30)),
+                                      width: 64,
+                                      height: 64,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox(
+                                            width: 64,
+                                            height: 64,
+                                            child: Icon(
+                                              Icons.fitness_center,
+                                              color: Colors.white30,
+                                            ),
+                                          ),
                                     ),
                                   )
-                                : const SizedBox(width: 64, height: 64, child: Icon(Icons.fitness_center, color: Colors.white30)),
-                            title: Text(ex.name, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                            subtitle: ex.primaryMuscle.isNotEmpty && ex.primaryMuscle != 'Muscolatura principale coinvolta'
-                                ? Text(ex.primaryMuscle, style: const TextStyle(color: Colors.white38, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)
+                                : const SizedBox(
+                                    width: 64,
+                                    height: 64,
+                                    child: Icon(
+                                      Icons.fitness_center,
+                                      color: Colors.white30,
+                                    ),
+                                  ),
+                            title: Text(
+                              ex.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle:
+                                ex.primaryMuscle.isNotEmpty &&
+                                    ex.primaryMuscle !=
+                                        'Muscolatura principale coinvolta'
+                                ? Text(
+                                    translateMuscle(ex.primaryMuscle),
+                                    style: const TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: 11,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )
                                 : null,
                             onTap: () {
                               nameCtrl.text = ex.name;
-                              setS(() { suggestions = []; selectedExInfo = ex; });
+                              setS(() {
+                                suggestions = [];
+                                selectedExInfo = ex;
+                              });
                             },
                           );
                         },
@@ -3260,100 +4402,155 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                   OutlinedButton.icon(
                     onPressed: () => _apriArchivioEsercizi(ctx, setS, (ex) {
                       nameCtrl.text = ex.name;
-                      setS(() { selectedExInfo = ex; suggestions = []; });
+                      setS(() {
+                        selectedExInfo = ex;
+                        suggestions = [];
+                      });
                     }),
                     icon: const Icon(Icons.library_books_rounded, size: 18),
                     label: Text(AppL.browseArchive),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: accent,
                       side: BorderSide(color: accent.withAlpha(80)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
 
                   const SizedBox(height: 12),
 
                   // — Preview GIF selezionata
-                  if (selectedExInfo != null && selectedExInfo!.gifFilename != null) ...[
+                  if (selectedExInfo != null &&
+                      selectedExInfo!.gifFilename != null) ...[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.asset(
                         'assets/gif/${selectedExInfo!.gifFilename}.gif',
-                        height: 160, width: double.infinity, fit: BoxFit.contain,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                       ),
                     ),
-                    if (selectedExInfo!.primaryMuscle.isNotEmpty && selectedExInfo!.primaryMuscle != 'Muscolatura principale coinvolta')
+                    if (selectedExInfo!.primaryMuscle.isNotEmpty &&
+                        selectedExInfo!.primaryMuscle !=
+                            'Muscolatura principale coinvolta')
                       Padding(
                         padding: const EdgeInsets.only(top: 6),
-                        child: Text('💪 ${selectedExInfo!.primaryMuscle}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                        child: Text(
+                          '💪 ${translateMuscle(selectedExInfo!.primaryMuscle)}',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     const SizedBox(height: 12),
                   ],
 
                   // — Serie
-                  Row(children: [
-                    Expanded(child: TextField(
-                      controller: setsCtrl,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: AppL.sets,
-                        labelStyle: const TextStyle(color: Colors.white54),
-                        filled: true, fillColor: Colors.black26,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: setsCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.sets,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onChanged: updateSets,
+                        ),
                       ),
-                      onChanged: updateSets,
-                    )),
-                    const SizedBox(width: 12),
-                    Expanded(child: TextField(
-                      controller: recoveryCtrl,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: AppL.recovery,
-                        labelStyle: const TextStyle(color: Colors.white54),
-                        filled: true, fillColor: Colors.black26,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: recoveryCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.recovery,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
                       ),
-                    )),
-                    const SizedBox(width: 12),
-                    Expanded(child: TextField(
-                      controller: pausaCtrl,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: AppL.pauseSec,
-                        labelStyle: const TextStyle(color: Colors.white54),
-                        filled: true, fillColor: Colors.black26,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: pausaCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: AppL.pauseSec,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
                       ),
-                    )),
-                  ]),
+                    ],
+                  ),
 
                   const SizedBox(height: 12),
 
                   // — Reps per serie
-                  Text(AppL.repsPerSet, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  Text(
+                    AppL.repsPerSet,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
                   const SizedBox(height: 6),
                   Wrap(
-                    spacing: 8, runSpacing: 8,
-                    children: List.generate(currentSets, (i) => SizedBox(
-                      width: 58,
-                      child: TextField(
-                        controller: repsCtrls[i],
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
-                        decoration: InputDecoration(
-                          labelText: 'S${i + 1}',
-                          labelStyle: const TextStyle(color: Colors.white38, fontSize: 11),
-                          filled: true, fillColor: Colors.black26,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: List.generate(
+                      currentSets,
+                      (i) => SizedBox(
+                        width: 58,
+                        child: TextField(
+                          controller: repsCtrls[i],
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: 'S${i + 1}',
+                            labelStyle: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 11,
+                            ),
+                            filled: true,
+                            fillColor: Colors.black26,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
                         ),
                       ),
-                    )),
+                    ),
                   ),
 
                   const SizedBox(height: 16),
@@ -3366,8 +4563,12 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                     decoration: InputDecoration(
                       labelText: AppL.notes,
                       labelStyle: const TextStyle(color: Colors.white54),
-                      filled: true, fillColor: Colors.black26,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      filled: true,
+                      fillColor: Colors.black26,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
 
@@ -3376,7 +4577,11 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                   // — Superserie / Circuito
                   Text(
                     '🔗  ${AppL.circuit}',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -3385,29 +4590,36 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                   ),
                   const SizedBox(height: 8),
                   Row(
-                    children: List.generate(6, (i) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () => setS(() => supersetGroup = i),
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: supersetGroup == i ? accent : Colors.white10,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '$i',
-                              style: TextStyle(
-                                color: supersetGroup == i ? Colors.black : Colors.white,
-                                fontWeight: FontWeight.bold,
+                    children: List.generate(
+                      6,
+                      (i) => Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: GestureDetector(
+                          onTap: () => setS(() => supersetGroup = i),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: supersetGroup == i
+                                  ? accent
+                                  : Colors.white10,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$i',
+                                style: TextStyle(
+                                  color: supersetGroup == i
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    )),
+                    ),
                   ),
 
                   const SizedBox(height: 20),
@@ -3418,9 +4630,14 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       onPressed: () {
                         final name = nameCtrl.text.trim();
                         if (name.isEmpty) return;
-                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(1, 20);
-                        final repsList = repsCtrls.map((c) => int.tryParse(c.text) ?? 10).toList();
-                        final recovery = int.tryParse(recoveryCtrl.text) ?? 60;
+                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(
+                          1,
+                          20,
+                        );
+                        final repsList = repsCtrls
+                            .map((c) => int.tryParse(c.text) ?? 10)
+                            .toList();
+                        final recovery = int.tryParse(recoveryCtrl.text) ?? 90;
                         final pausa = int.tryParse(pausaCtrl.text) ?? 120;
                         final ex = ExerciseConfig(
                           name: name,
@@ -3437,7 +4654,13 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                         setState(() => _days[dayIdx].exercises.add(ex));
                         _save();
                       },
-                      child: Text(AppL.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      child: Text(
+                        AppL.save,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -3449,116 +4672,156 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     );
   }
 
-  void _apriArchivioEsercizi(BuildContext context, StateSetter setS, Function(ExerciseInfo) onSelect) {
+
+  void _apriArchivioEsercizi(
+    BuildContext context,
+    StateSetter setS,
+    Function(ExerciseInfo) onSelect,
+  ) {
     String? selectedCategory;
+    String searchQuery = '';
+
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1C1C1E),
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (c) => StatefulBuilder(
         builder: (ctx, setA) {
-          // Categorie disponibili (escludi 'altro')
           final cats = kGifCatalog
               .map((e) => e.category)
               .toSet()
-              .where((c) => c.isNotEmpty)
-              .toList()..sort();
+              .where((c) => c.isNotEmpty && c != 'altro')
+              .toList()
+            ..sort();
 
-          final exercisesInCat = selectedCategory != null
+          List<ExerciseInfo> filtered = selectedCategory != null
               ? kGifCatalog.where((e) => e.category == selectedCategory).toList()
-              : <ExerciseInfo>[];
+              : kGifCatalog.where((e) => e.category != 'altro').toList();
+
+          if (searchQuery.isNotEmpty) {
+            final q = searchQuery.toLowerCase();
+            filtered = filtered
+                .where((e) => e.name.toLowerCase().contains(q))
+                .toList();
+          }
 
           return Container(
-            height: MediaQuery.of(ctx).size.height * 0.78,
+            height: MediaQuery.of(ctx).size.height * 0.85,
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 12), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-                if (selectedCategory != null)
-                  Row(children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-                      onPressed: () => setA(() => selectedCategory = null),
-                    ),
-                    Text(selectedCategory!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                  ])
-                else
-                  Text(AppL.muscleGroup, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 12),
-                if (selectedCategory == null)
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Wrap(
-                        spacing: 8, runSpacing: 8,
-                        children: cats.map((cat) {
-                          final icon = kBodyPartIcons[cat] ?? '⚡';
-                          final label = kBodyPartNames[cat] ?? cat;
-                          return ActionChip(
-                            avatar: Text(icon, style: const TextStyle(fontSize: 18)),
-                            label: Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
-                            backgroundColor: Colors.white10,
-                            side: const BorderSide(color: Colors.white12),
-                            onPressed: () => setA(() => selectedCategory = cat),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.85,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                      ),
-                      itemCount: exercisesInCat.length,
-                      itemBuilder: (_, i) {
-                        final ex = exercisesInCat[i];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.pop(c);
-                            setS(() => onSelect(ex));
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white10,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                    child: ex.gifFilename != null
-                                        ? Image.asset(
-                                            'assets/gif/${ex.gifFilename}.gif',
-                                            fit: BoxFit.cover, width: double.infinity,
-                                            errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.fitness_center, color: Colors.white30, size: 32)),
-                                          )
-                                        : const Center(child: Icon(Icons.fitness_center, color: Colors.white30, size: 32)),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(6),
-                                  child: Text(
-                                    ex.name,
-                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
+                ),
+                TextField(
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: AppL.lang == 'en' ? 'Search exercise...' : 'Cerca esercizio...',
+                    hintStyle: const TextStyle(color: Colors.white38),
+                    prefixIcon: const Icon(Icons.search, color: Colors.white38),
+                    filled: true,
+                    fillColor: Colors.white10,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                  onChanged: (v) => setA(() => searchQuery = v),
+                ),
+                const SizedBox(height: 10),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _archiveChip(
+                        label: AppL.lang == 'en' ? 'All' : 'Tutti',
+                        selected: selectedCategory == null,
+                        onTap: () => setA(() => selectedCategory = null),
+                        accent: appAccentNotifier.value,
+                      ),
+                      ...cats.map((cat) => _archiveChip(
+                        label: '${kBodyPartIcons[cat] ?? ''} ${bodyPartName(cat)}',
+                        selected: selectedCategory == cat,
+                        onTap: () => setA(() => selectedCategory = cat),
+                        accent: appAccentNotifier.value,
+                      )),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.85,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                    ),
+                    itemCount: filtered.length,
+                    itemBuilder: (_, i) {
+                      final ex = filtered[i];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pop(c);
+                          setS(() => onSelect(ex));
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white10,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(12),
+                                  ),
+                                  child: ex.gifFilename != null
+                                      ? Image.asset(
+                                          'assets/gif/${ex.gifFilename}.gif',
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          errorBuilder: (_, __, ___) =>
+                                              const Center(
+                                                child: Icon(Icons.fitness_center, color: Colors.white30, size: 32),
+                                              ),
+                                        )
+                                      : const Center(
+                                          child: Icon(Icons.fitness_center, color: Colors.white30, size: 32),
+                                        ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: Text(
+                                  ex.name,
+                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           );
@@ -3567,9 +4830,198 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
     );
   }
 
+  Widget _archiveChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+    required Color accent,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? accent.withAlpha(40) : Colors.white10,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? accent : Colors.white24,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? accent : Colors.white60,
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
   void _eliminaEsercizio(int dayIdx, int exIdx) {
     setState(() => _days[dayIdx].exercises.removeAt(exIdx));
     _save();
+  }
+
+  void _rinominaGiorno(int dayIdx) {
+    final ctrl = TextEditingController(text: _days[dayIdx].dayName);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        title: Text(AppL.renameSession, style: const TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: AppL.sessionName,
+            labelStyle: const TextStyle(color: Colors.white54),
+            filled: true,
+            fillColor: Colors.black26,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppL.cancel)),
+          TextButton(
+            onPressed: () {
+              final name = ctrl.text.trim();
+              if (name.isEmpty) return;
+              setState(() => _days[dayIdx].dayName = name);
+              _save();
+              Navigator.pop(context);
+            },
+            child: Text(AppL.save, style: TextStyle(color: appAccentNotifier.value, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _modificaEsercizio(int dayIdx, int exIdx) {
+    final orig = _days[dayIdx].exercises[exIdx];
+    final accent = appAccentNotifier.value;
+    final nameCtrl = TextEditingController(text: orig.name);
+    final setsCtrl = TextEditingController(text: '${orig.targetSets}');
+    final recoveryCtrl = TextEditingController(text: '${orig.recoveryTime}');
+    final pausaCtrl = TextEditingController(text: '${orig.interExercisePause}');
+    final noteCtrl = TextEditingController(text: orig.notePT);
+    int supersetGroup = orig.supersetGroup;
+    int currentSets = orig.targetSets;
+    List<TextEditingController> repsCtrls = List.generate(
+      orig.repsList.length,
+      (i) => TextEditingController(text: '${orig.repsList[i]}'),
+    );
+    if (repsCtrls.isEmpty) repsCtrls = [TextEditingController(text: '10')];
+    ExerciseInfo? selectedExInfo;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF1C1C1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (c) => StatefulBuilder(
+        builder: (ctx, setS) {
+          void updateSets(String val) {
+            final n = (int.tryParse(val) ?? 1).clamp(1, 20);
+            setS(() {
+              currentSets = n;
+              while (repsCtrls.length < n) {
+                repsCtrls.add(TextEditingController(text: repsCtrls.isNotEmpty ? repsCtrls.last.text : '10'));
+              }
+              while (repsCtrls.length > n) {
+                repsCtrls.last.dispose();
+                repsCtrls.removeLast();
+              }
+            });
+          }
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.9,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (_, scrollCtrl) => ListView(
+                controller: scrollCtrl,
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                children: [
+                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
+                  Text(AppL.editExercise, style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: nameCtrl,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: AppL.exerciseName,
+                      labelStyle: const TextStyle(color: Colors.white54),
+                      filled: true,
+                      fillColor: Colors.black26,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(child: TextField(controller: setsCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.sets, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)), onChanged: updateSets)),
+                      const SizedBox(width: 12),
+                      Expanded(child: TextField(controller: recoveryCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.recovery, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+                      const SizedBox(width: 12),
+                      Expanded(child: TextField(controller: pausaCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.pauseSec, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(AppL.repsPerSet, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: List.generate(currentSets, (i) => SizedBox(width: 58, child: TextField(controller: repsCtrls[i], keyboardType: TextInputType.number, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 13), decoration: InputDecoration(labelText: 'S${i+1}', labelStyle: const TextStyle(color: Colors.white38, fontSize: 11), filled: true, fillColor: Colors.black26, contentPadding: const EdgeInsets.symmetric(vertical: 8), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none))))),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(controller: noteCtrl, maxLines: 3, style: const TextStyle(color: Colors.white), decoration: InputDecoration(labelText: AppL.notes, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none))),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final name = nameCtrl.text.trim();
+                        if (name.isEmpty) return;
+                        final sets = (int.tryParse(setsCtrl.text) ?? 3).clamp(1, 20);
+                        final repsList = repsCtrls.map((c) => int.tryParse(c.text) ?? 10).toList();
+                        final recovery = int.tryParse(recoveryCtrl.text) ?? 90;
+                        final pausa = int.tryParse(pausaCtrl.text) ?? 120;
+                        final newEx = ExerciseConfig(
+                          name: name,
+                          targetSets: sets,
+                          repsList: repsList,
+                          recoveryTime: recovery,
+                          interExercisePause: pausa,
+                          notePT: noteCtrl.text.trim(),
+                          noteCliente: orig.noteCliente,
+                          supersetGroup: supersetGroup,
+                          gifFilename: selectedExInfo?.gifFilename ?? orig.gifFilename,
+                        );
+                        Navigator.pop(c);
+                        setState(() => _days[dayIdx].exercises[exIdx] = newEx);
+                        _save();
+                      },
+                      child: Text(AppL.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -3585,8 +5037,21 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () async { await _save(); if (mounted) Navigator.pop(context); },
-            child: Text(AppL.save, style: TextStyle(color: accent, fontWeight: FontWeight.bold)),
+            onPressed: _caricaEsempio,
+            child: Text(
+              AppL.loadExample,
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              await _save();
+              if (mounted) Navigator.pop(context);
+            },
+            child: Text(
+              AppL.save,
+              style: TextStyle(color: accent, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -3604,11 +5069,21 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.fitness_center_rounded, color: accent.withAlpha(60), size: 64),
+                  Icon(
+                    Icons.fitness_center_rounded,
+                    color: accent.withAlpha(60),
+                    size: 64,
+                  ),
                   const SizedBox(height: 16),
-                  Text(AppL.noScheduleYet, style: const TextStyle(color: Colors.white38, fontSize: 16)),
+                  Text(
+                    AppL.noScheduleYet,
+                    style: const TextStyle(color: Colors.white38, fontSize: 16),
+                  ),
                   const SizedBox(height: 8),
-                  Text(AppL.addFirstDay, style: const TextStyle(color: Colors.white24, fontSize: 13)),
+                  Text(
+                    AppL.addFirstDay,
+                    style: const TextStyle(color: Colors.white24, fontSize: 13),
+                  ),
                 ],
               ),
             )
@@ -3620,17 +5095,48 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                 return Card(
                   color: const Color(0xFF1C1C1E),
                   margin: const EdgeInsets.only(bottom: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: ExpansionTile(
-                    tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    leading: Text(day.bodyParts.map((k) => kBodyPartIcons[k] ?? '').where((e) => e.isNotEmpty).join(' '), style: const TextStyle(fontSize: 22)),
-                    title: Text(day.dayName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                    subtitle: Text('${day.exercises.length} ${AppL.exercises.toLowerCase()}', style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                    tilePadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    leading: Text(
+                      day.bodyParts
+                          .map((k) => kBodyPartIcons[k] ?? '')
+                          .where((e) => e.isNotEmpty)
+                          .join(' '),
+                      style: const TextStyle(fontSize: 22),
+                    ),
+                    title: Text(
+                      day.dayName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${day.exercises.length} ${AppL.exercises.toLowerCase()}',
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 12,
+                      ),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                          icon: const Icon(Icons.edit_rounded, color: Colors.white38, size: 20),
+                          onPressed: () => _rinominaGiorno(dayIdx),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.redAccent,
+                            size: 20,
+                          ),
                           onPressed: () => _eliminaGiorno(dayIdx),
                         ),
                         const Icon(Icons.expand_more, color: Colors.white38),
@@ -3640,31 +5146,79 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                       ...day.exercises.asMap().entries.map((e) {
                         final ex = e.value;
                         return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
                           leading: ex.gifFilename != null
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(6),
-                                  child: Image.asset('assets/gif/${ex.gifFilename}.gif', width: 40, height: 40, fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, color: Colors.white30, size: 28)),
+                                  child: Image.asset(
+                                    'assets/gif/${ex.gifFilename}.gif',
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                      Icons.fitness_center,
+                                      color: Colors.white30,
+                                      size: 28,
+                                    ),
+                                  ),
                                 )
-                              : const Icon(Icons.fitness_center_rounded, color: Colors.white30),
-                          title: Text(ex.name, style: const TextStyle(color: Colors.white, fontSize: 14)),
-                          subtitle: Builder(builder: (context) {
-                            final exInfo = findAnyExercise(ex.name);
-                            return Row(
-                              children: [
-                                Text('${ex.targetSets}x${ex.repsList.isNotEmpty ? ex.repsList.first : "?"} | ${ex.recoveryTime}s', style: const TextStyle(color: Colors.white38, fontSize: 12)),
-                                if (exInfo != null && exInfo.muscleImages.isNotEmpty) ...[
-                                  const SizedBox(width: 6),
-                                  Image.asset('assets/muscle/${exInfo.muscleImages.first}', height: 20, width: 20, fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                              : const Icon(
+                                  Icons.fitness_center_rounded,
+                                  color: Colors.white30,
+                                ),
+                          title: Text(
+                            ex.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Builder(
+                            builder: (context) {
+                              final exInfo = findAnyExercise(ex.name);
+                              return Row(
+                                children: [
+                                  Text(
+                                    '${ex.targetSets}x${ex.repsList.isNotEmpty ? ex.repsList.first : "?"} | ${ex.recoveryTime}s',
+                                    style: const TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  if (exInfo != null &&
+                                      exInfo.muscleImages.isNotEmpty) ...[
+                                    const SizedBox(width: 6),
+                                    Image.asset(
+                                      'assets/muscle/${exInfo.muscleImages.first}',
+                                      height: 20,
+                                      width: 20,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox.shrink(),
+                                    ),
+                                  ],
                                 ],
-                              ],
-                            );
-                          }),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 20),
-                            onPressed: () => _eliminaEsercizio(dayIdx, e.key),
+                              );
+                            },
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit_rounded, color: Colors.white38, size: 18),
+                                onPressed: () => _modificaEsercizio(dayIdx, e.key),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.remove_circle_outline,
+                                  color: Colors.redAccent,
+                                  size: 20,
+                                ),
+                                onPressed: () => _eliminaEsercizio(dayIdx, e.key),
+                              ),
+                            ],
                           ),
                         );
                       }),
@@ -3675,10 +5229,15 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen> {
                           child: OutlinedButton.icon(
                             onPressed: () => _aggiungiEsercizio(dayIdx),
                             icon: Icon(Icons.add, color: accent, size: 18),
-                            label: Text('${AppL.add} ${AppL.exercises.toLowerCase()}', style: TextStyle(color: accent)),
+                            label: Text(
+                              '${AppL.add} ${AppL.exercises.toLowerCase()}',
+                              style: TextStyle(color: accent),
+                            ),
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: accent.withAlpha(80)),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
                         ),
@@ -3698,12 +5257,14 @@ class WorkoutEngine extends StatefulWidget {
   final List<dynamic> history;
   final Map<String, Map<String, dynamic>> carryoverWeights;
   final Function(Map<String, dynamic>) onDone;
+  final List<String> allSessionNames; // per calcolo streak
   const WorkoutEngine({
     super.key,
     required this.day,
     required this.history,
     required this.onDone,
     this.carryoverWeights = const {},
+    this.allSessionNames = const [],
   });
   @override
   State<WorkoutEngine> createState() => _WorkoutEngineState();
@@ -3729,6 +5290,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
   final Map<String, TextEditingController> _noteControllers = {};
   List<Map<String, dynamic>> _allCompletedExercises = [];
   bool _isNewRecord = false;
+  int _currentStreak = 0; // streak aggiornata dopo fine allenamento
   final Map<int, List<Map<String, dynamic>>> _supersetAccumulated = {};
   // Risultati sessione precedente: nome esercizio → lista serie {w, r}
   final Map<String, List<Map<String, dynamic>>> _previousResults = {};
@@ -4227,6 +5789,31 @@ class _WorkoutEngineState extends State<WorkoutEngine>
               _recapRow(Icons.repeat, AppL.totalSeries, '$totalSeries'),
               const SizedBox(height: 8),
               const Divider(color: Colors.white24),
+              // Streak display
+              if (_currentStreak > 0) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [Color(0xFFFF6B00), Color(0xFFFFAA00)]),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 22)),
+                      const SizedBox(width: 8),
+                      Text(
+                        AppL.lang == 'en'
+                          ? '$_currentStreak week${_currentStreak == 1 ? '' : 's'} streak!'
+                          : '$_currentStreak ${_currentStreak == 1 ? 'settimana' : 'settimane'} di fila!',
+                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
               const SizedBox(height: 4),
               Text(
                 widget.day.dayName,
@@ -4442,10 +6029,12 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       int groupStart = exI, groupEnd = exI;
       while (groupStart > 0 &&
           widget.day.exercises[groupStart - 1].supersetGroup ==
-              currentEx.supersetGroup) groupStart--;
+              currentEx.supersetGroup)
+        groupStart--;
       while (groupEnd < widget.day.exercises.length - 1 &&
           widget.day.exercises[groupEnd + 1].supersetGroup ==
-              currentEx.supersetGroup) groupEnd++;
+              currentEx.supersetGroup)
+        groupEnd++;
       previewRecovery = widget.day.exercises
           .sublist(groupStart, groupEnd + 1)
           .map((e) => e.recoveryTime)
@@ -4550,6 +6139,60 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     );
   }
 
+  void _showNewRecordOverlay() {
+    HapticFeedback.heavyImpact();
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (_) => Positioned(
+        top: MediaQuery.of(context).size.height * 0.25,
+        left: 24,
+        right: 24,
+        child: Material(
+          color: Colors.transparent,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.elasticOut,
+            builder: (_, v, child) => Transform.scale(scale: v, child: child),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: Colors.amber.withAlpha(120), blurRadius: 20, spreadRadius: 2)],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('🏆', style: TextStyle(fontSize: 44)),
+                  const SizedBox(height: 8),
+                  Text(
+                    AppL.lang == 'en' ? 'NEW PERSONAL RECORD!' : 'NUOVO RECORD PERSONALE!',
+                    style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    AppL.lang == 'en' ? 'Great job! Keep pushing! 💪' : 'Ottimo lavoro! Continua così! 💪',
+                    style: const TextStyle(color: Colors.black87, fontSize: 13),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    overlay.insert(entry);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (entry.mounted) entry.remove();
+    });
+  }
+
   Widget _chipConferma(String text, Color color) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     decoration: BoxDecoration(
@@ -4582,6 +6225,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       }
     }
     setState(() => _isNewRecord = maxPast > 0 && w > maxPast);
+    if (_isNewRecord && mounted) {
+      _showNewRecordOverlay();
+    }
 
     final entry = {'s': setN, 'w': w, 'r': r};
 
@@ -4691,6 +6337,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
             }
             await prefs.setString('client_routine', jsonEncode(full));
           }
+          // Aggiorna streak
+          final streak = await updateStreak(widget.day.dayName, widget.allSessionNames);
+          if (mounted) setState(() => _currentStreak = streak);
           if (mounted) {
             if (!kIsWeb) {
               AdManager.instance.showInterstitialThenRun(_showRecapDialog);
@@ -4711,7 +6360,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
             _isNewRecord = false;
           });
           _setDrumValues(groupEnd + 1, 1);
-          _triggerTimer(pause, force: true); // fine gruppo superset: pausa inter-esercizio
+          _triggerTimer(
+            pause,
+            force: true,
+          ); // fine gruppo superset: pausa inter-esercizio
         } else {}
       }
       _persistInProgress();
@@ -4762,6 +6414,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           }
           await prefs.setString('client_routine', jsonEncode(full));
         }
+        // Aggiorna streak
+        final streak = await updateStreak(widget.day.dayName, widget.allSessionNames);
+        if (mounted) setState(() => _currentStreak = streak);
         if (mounted) {
           if (!kIsWeb) {
             AdManager.instance.showInterstitialThenRun(_showRecapDialog);
@@ -4782,14 +6437,15 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           _isNewRecord = false;
         });
         _setDrumValues(exI, 1);
-        _triggerTimer(pauseTime, force: true); // fine esercizio: sempre pausa inter-esercizio
+        _triggerTimer(
+          pauseTime,
+          force: true,
+        ); // fine esercizio: sempre pausa inter-esercizio
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.orange,
-            content: Text(
-              AppL.workoutNotDone,
-            ),
+            content: Text(AppL.workoutNotDone),
           ),
         );
       }
@@ -4876,7 +6532,8 @@ class _WorkoutEngineState extends State<WorkoutEngine>
       _prossimoNome = ex.name;
     } else if (exI < widget.day.exercises.length - 1) {
       var prossimoEs = widget.day.exercises[exI + 1];
-      _infoProssimo = "${AppL.changeExercise}:\n${prossimoEs.name.toUpperCase()}";
+      _infoProssimo =
+          "${AppL.changeExercise}:\n${prossimoEs.name.toUpperCase()}";
       _prossimoNome = prossimoEs.name;
     } else {
       _infoProssimo = AppL.workoutComplete;
@@ -4889,11 +6546,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {
           if (didPop) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppL.skipUseButton),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(AppL.skipUseButton)));
         },
         child: _buildRestUI(),
       );
@@ -4927,7 +6582,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     bool isLastSet = (setN >= ex.targetSets);
     int timeToUse = isLastSet
         ? (ex.interExercisePause > 0 ? ex.interExercisePause : 120)
-        : (ex.recoveryTime > 0 ? ex.recoveryTime : 60);
+        : (ex.recoveryTime > 0 ? ex.recoveryTime : 90);
     final Color accent = Theme.of(context).colorScheme.primary;
 
     // CONTROLLO CRUCIALE: L'esercizio attuale è nella lista dei completati?
@@ -5011,44 +6666,13 @@ class _WorkoutEngineState extends State<WorkoutEngine>
           onTap: () => _triggerTimer(timeToUse, force: false),
           child: Column(
             children: [
-              // Compact badges row (only if needed)
-              if (_isNewRecord || ex.supersetGroup > 0)
+              // Compact badges row (only superset, record badge removed - shown as overlay at save time)
+              if (ex.supersetGroup > 0)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: Wrap(
                     spacing: 8,
                     children: [
-                      if (_isNewRecord)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.amber,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.emoji_events,
-                                color: Colors.black,
-                                size: 16,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'NUOVO RECORD! 🔥',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (ex.supersetGroup > 0)
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -5083,7 +6707,14 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                 ),
 
               // Info panel: ultima volta + notes
-              _buildInfoPanel(ex, lastW, lastR, suggerisciAumento, accent, timeToUse),
+              _buildInfoPanel(
+                ex,
+                lastW,
+                lastR,
+                suggerisciAumento,
+                accent,
+                timeToUse,
+              ),
 
               // Drums or completed box
               if (giaFatto)
@@ -5278,7 +6909,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
             onChanged: (v) {
               ex.noteCliente = v;
               _aggiornaJsonSuDisco();
-              _avviaTimerSeNonAttivo(timeToUse > 0 ? timeToUse : 60);
+              _avviaTimerSeNonAttivo(timeToUse > 0 ? timeToUse : 90);
             },
           ),
         ],
@@ -5291,11 +6922,14 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     final accent = Theme.of(context).colorScheme.primary;
     // Se c'è una GIF assegnata, le info seguono la GIF (muscoli/esecuzione dalla GIF)
     // Solo se la GIF non ha info si fa fallback sul nome
-    final info = (gifFilename != null ? findByGifSlug(gifFilename) : null) ??
+    final info =
+        (gifFilename != null ? findByGifSlug(gifFilename) : null) ??
         findAnyExercise(exName);
     final gifPath = gifFilename != null
         ? 'assets/gif/$gifFilename.gif'
-        : info != null ? 'assets/gif/${info.gifSlug}.gif' : null;
+        : info != null
+        ? 'assets/gif/${info.gifSlug}.gif'
+        : null;
 
     showModalBottomSheet(
       context: context,
@@ -5421,7 +7055,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            info.primaryMuscle,
+                            translateMuscle(info.primaryMuscle),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 13,
@@ -5454,7 +7088,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      info.execution,
+                      translateExerciseText(info.execution),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 13,
@@ -5485,7 +7119,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      info.tips,
+                      translateExerciseText(info.tips),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 13,
@@ -5538,15 +7172,15 @@ class _WorkoutEngineState extends State<WorkoutEngine>
     }
     final prossimoInfo = _prossimoNome.isNotEmpty
         ? ((prossimoConfig?.gifFilename != null
-                ? findByGifSlug(prossimoConfig!.gifFilename!)
-                : null) ??
-            findAnyExercise(_prossimoNome))
+                  ? findByGifSlug(prossimoConfig!.gifFilename!)
+                  : null) ??
+              findAnyExercise(_prossimoNome))
         : null;
     final prossimoGifPath = prossimoConfig?.gifFilename != null
         ? 'assets/gif/${prossimoConfig!.gifFilename}.gif'
         : prossimoInfo != null
-            ? 'assets/gif/${prossimoInfo.gifSlug}.gif'
-            : null;
+        ? 'assets/gif/${prossimoInfo.gifSlug}.gif'
+        : null;
 
     final accent = Theme.of(context).colorScheme.primary;
     final progress = timerActive
@@ -5575,8 +7209,10 @@ class _WorkoutEngineState extends State<WorkoutEngine>
               child: LayoutBuilder(
                 builder: (ctx, constraints) {
                   // Il ring occupa l'85% dell'altezza disponibile (max 320)
-                  final ringSize =
-                      (constraints.maxHeight * 0.85).clamp(80.0, 320.0);
+                  final ringSize = (constraints.maxHeight * 0.85).clamp(
+                    80.0,
+                    320.0,
+                  );
                   return Center(
                     child: Stack(
                       alignment: Alignment.center,
@@ -5617,9 +7253,9 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                     GestureDetector(
                       onTap: _prossimoNome.isNotEmpty
                           ? () => _showCatalogDetail(
-                                _prossimoNome,
-                                gifFilename: prossimoConfig?.gifFilename,
-                              )
+                              _prossimoNome,
+                              gifFilename: prossimoConfig?.gifFilename,
+                            )
                           : null,
                       child: Container(
                         width: double.infinity,
@@ -5723,9 +7359,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                           vertical: 16,
                         ),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.white.withAlpha(40),
-                          ),
+                          border: Border.all(color: Colors.white.withAlpha(40)),
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: const Text(
@@ -5758,8 +7392,11 @@ class _WorkoutEngineState extends State<WorkoutEngine>
         if (carry != null) return carry;
         return {'w': 0.0, 'r': 0};
       }
-      final setData = s <= prevSeries.length ? prevSeries[s - 1] : prevSeries.last;
-      final double weight = (setData['w'] ?? setData['weight'] ?? 0.0).toDouble();
+      final setData = s <= prevSeries.length
+          ? prevSeries[s - 1]
+          : prevSeries.last;
+      final double weight = (setData['w'] ?? setData['weight'] ?? 0.0)
+          .toDouble();
       final int reps = (setData['r'] ?? setData['reps'] ?? 0).toInt();
       return {'w': weight, 'r': reps};
     } catch (e) {
@@ -5996,9 +7633,10 @@ class _DrumPickersState extends State<_DrumPickers>
       vsync: this,
       duration: const Duration(milliseconds: 700),
     )..repeat(reverse: true);
-    _arrowAnim = Tween<double>(begin: 0, end: -10).animate(
-      CurvedAnimation(parent: _arrowCtrl, curve: Curves.easeInOut),
-    );
+    _arrowAnim = Tween<double>(
+      begin: 0,
+      end: -10,
+    ).animate(CurvedAnimation(parent: _arrowCtrl, curve: Curves.easeInOut));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -6128,32 +7766,47 @@ class _DrumPickersState extends State<_DrumPickers>
   }) {
     final accent = widget.accent;
     // Rimbalzo quando il peso NON è ancora stato aumentato (invita a salire)
-    final bool showNudge = isKg && highlightAbove &&
+    final bool showNudge =
+        isKg &&
+        highlightAbove &&
         selectedIdx < items.length &&
         (items[selectedIdx] as double) <= referenceKg;
 
     // Dimensioni e opacità basate sulla distanza dal centro
     double _itemSize(int dist) {
       switch (dist) {
-        case 0: return 82;
-        case 1: return 54;
-        case 2: return 38;
-        default: return 26;
+        case 0:
+          return 82;
+        case 1:
+          return 54;
+        case 2:
+          return 38;
+        default:
+          return 26;
       }
     }
+
     int _itemAlpha(int dist) {
       switch (dist) {
-        case 0: return 255;
-        case 1: return 160;
-        case 2: return 100;
-        default: return 55;
+        case 0:
+          return 255;
+        case 1:
+          return 160;
+        case 2:
+          return 100;
+        default:
+          return 55;
       }
     }
+
     FontWeight _itemWeight(int dist) {
       switch (dist) {
-        case 0: return FontWeight.w700;
-        case 1: return FontWeight.w500;
-        default: return FontWeight.w300;
+        case 0:
+          return FontWeight.w700;
+        case 1:
+          return FontWeight.w500;
+        default:
+          return FontWeight.w300;
       }
     }
 
@@ -6193,61 +7846,66 @@ class _DrumPickersState extends State<_DrumPickers>
                       Container(
                         height: 1.5,
                         margin: const EdgeInsets.symmetric(horizontal: 8),
-                      color: accent.withAlpha(130),
-                    ),
-                  ],
-                ),
-              ),
-              // Scroller
-              ListWheelScrollView.useDelegate(
-                controller: ctrl,
-                itemExtent: 96,
-                diameterRatio: 1.2,
-                perspective: 0.003,
-                squeeze: 0.85,
-                physics: const FixedExtentScrollPhysics(),
-                onSelectedItemChanged: (i) {
-                  setState(() {
-                    if (isKg) _selKg = i;
-                    else _selReps = i;
-                  });
-                  onChanged(i);
-                  _triggerInteraction();
-                },
-                childDelegate: ListWheelChildBuilderDelegate(
-                  childCount: items.length,
-                  builder: (ctx, i) {
-                    final dist = (i - selectedIdx).abs();
-                    final isSel = dist == 0;
-                    final isAmber = isKg && highlightAbove && isSel &&
-                        (items[i] as double) > referenceKg;
-                    final color = isSel
-                        ? (isAmber ? Colors.amber : accent)
-                        : Colors.white.withAlpha(_itemAlpha(dist));
-                    final textWidget = Text(
-                      formatter(items[i]),
-                      style: TextStyle(
-                        fontSize: _itemSize(dist),
-                        height: 1.0,
-                        color: color,
-                        fontWeight: _itemWeight(dist),
-                        letterSpacing: isSel ? 1 : 0,
+                        color: accent.withAlpha(130),
                       ),
-                    );
-                    return Center(
-                      child: isSel
-                          ? GestureDetector(
-                              onTap: () => _editValue(isKg: isKg),
-                              child: textWidget,
-                            )
-                          : textWidget,
-                    );
-                  },
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                // Scroller
+                ListWheelScrollView.useDelegate(
+                  controller: ctrl,
+                  itemExtent: 96,
+                  diameterRatio: 1.2,
+                  perspective: 0.003,
+                  squeeze: 0.85,
+                  physics: const FixedExtentScrollPhysics(),
+                  onSelectedItemChanged: (i) {
+                    setState(() {
+                      if (isKg)
+                        _selKg = i;
+                      else
+                        _selReps = i;
+                    });
+                    onChanged(i);
+                    _triggerInteraction();
+                  },
+                  childDelegate: ListWheelChildBuilderDelegate(
+                    childCount: items.length,
+                    builder: (ctx, i) {
+                      final dist = (i - selectedIdx).abs();
+                      final isSel = dist == 0;
+                      final isAmber =
+                          isKg &&
+                          highlightAbove &&
+                          isSel &&
+                          (items[i] as double) > referenceKg;
+                      final color = isSel
+                          ? (isAmber ? Colors.amber : accent)
+                          : Colors.white.withAlpha(_itemAlpha(dist));
+                      final textWidget = Text(
+                        formatter(items[i]),
+                        style: TextStyle(
+                          fontSize: _itemSize(dist),
+                          height: 1.0,
+                          color: color,
+                          fontWeight: _itemWeight(dist),
+                          letterSpacing: isSel ? 1 : 0,
+                        ),
+                      );
+                      return Center(
+                        child: isSel
+                            ? GestureDetector(
+                                onTap: () => _editValue(isKg: isKg),
+                                child: textWidget,
+                              )
+                            : textWidget,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
         ),
       ],
     );
@@ -6322,10 +7980,9 @@ class _WorkoutProgressChart extends StatelessWidget {
       final dateRaw = h['date'] as String? ?? '';
       if (dateRaw.isEmpty) continue;
       final dateOnly = dateRaw.substring(0, 10);
-      final sessionKey =
-          (h['session_id'] as String?)?.isNotEmpty == true
-              ? h['session_id'] as String
-              : dateOnly;
+      final sessionKey = (h['session_id'] as String?)?.isNotEmpty == true
+          ? h['session_id'] as String
+          : dateOnly;
       sessionDate.putIfAbsent(sessionKey, () => dateOnly);
       final series = h['series'] as List? ?? [];
       double maxEst1RM = 0;
@@ -6361,7 +8018,9 @@ class _WorkoutProgressChart extends StatelessWidget {
     final Map<String, int> dateCounter = {};
     final labels = sessions.map((s) {
       final d = sessionDate[s] ?? s;
-      final dd = d.length >= 10 ? '${d.substring(8, 10)}/${d.substring(5, 7)}' : d;
+      final dd = d.length >= 10
+          ? '${d.substring(8, 10)}/${d.substring(5, 7)}'
+          : d;
       if ((dateTotal[d] ?? 1) > 1) {
         dateCounter[d] = (dateCounter[d] ?? 0) + 1;
         return '$dd(${dateCounter[d]})';
@@ -6712,9 +8371,7 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
     }
 
     // Rimuovi giorni vuoti e restituisci come lista ordinata
-    return byDay.entries
-        .where((e) => e.value.isNotEmpty)
-        .toList();
+    return byDay.entries.where((e) => e.value.isNotEmpty).toList();
   }
 
   Future<void> _eliminaSelezionati() async {
@@ -6770,7 +8427,10 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: Text(AppL.areYouSure, style: const TextStyle(color: Colors.white)),
+        title: Text(
+          AppL.areYouSure,
+          style: const TextStyle(color: Colors.white),
+        ),
         content: Text(
           AppL.irreversible,
           style: const TextStyle(color: Colors.red),
@@ -6833,7 +8493,11 @@ class _CancellazioneScreenState extends State<CancellazioneScreen> {
         ),
         title: Row(
           children: [
-            const Icon(Icons.storage_rounded, color: Colors.redAccent, size: 20),
+            const Icon(
+              Icons.storage_rounded,
+              color: Colors.redAccent,
+              size: 20,
+            ),
             const SizedBox(width: 8),
             Text(
               AppL.dataManagement,
@@ -7283,7 +8947,7 @@ class _DettaglioEsercizioScreenState extends State<_DettaglioEsercizioScreen> {
                                 color: Colors.redAccent,
                                 size: 20,
                               ),
-                              tooltip: 'Elimina sessione',
+                              tooltip: AppL.lang == 'en' ? 'Delete session' : 'Elimina sessione',
                               onPressed: () => _eliminaSessione(sIdx),
                             ),
                           ],
