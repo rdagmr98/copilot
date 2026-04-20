@@ -1,0 +1,37 @@
+{
+    "name": "GymApp",
+    "short_name": "GymApp",
+    "id": "/GymApp/",
+    "start_url": "/GymApp/",
+    "scope": "/GymApp/",
+    "display": "standalone",
+    "background_color": "#0B0B0D",
+    "theme_color": "#0B0B0D",
+    "description": "GymApp Web per iPhone e iPad: scheda, timer e progressi in stile app.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/gymapp-icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/gymapp-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/gymapp-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/gymapp-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

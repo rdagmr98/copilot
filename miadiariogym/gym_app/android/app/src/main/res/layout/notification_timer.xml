@@ -16,7 +16,7 @@
         android:textSize="12sp"
         android:text="⏱ Recupero in corso" />
 
-    <TextView
+    <Chronometer
         android:id="@+id/notif_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
