@@ -24,6 +24,7 @@ import 'package:path_provider/path_provider.dart';
 import 'js_stub.dart' if (dart.library.js) 'dart:js' as js;
 import 'gif_exercise_catalog.dart';
 import 'exercise_catalog.dart';
+import 'workout_tutorial.dart';
 
 // Colore accento globale (tema)
 final ValueNotifier<Color> appAccentNotifier = ValueNotifier<Color>(
@@ -615,7 +616,7 @@ class AppL {
   static String get editExercise =>
       _lang == 'en' ? 'Edit exercise' : 'Modifica esercizio';
   static String get streakWeeks =>
-      _lang == 'en' ? 'Week streak' : 'Settimane di fila';
+      _lang == 'en' ? 'Week streak' : 'Microcicli di fila';
   static String get streakMsg => _lang == 'en'
       ? '🔥 Keep your streak alive!'
       : '🔥 Mantieni la tua streak!';
@@ -1357,59 +1358,51 @@ String _isoWeek(DateTime d) {
 Future<int> updateStreak(String dayName, List<String> totalSessionNames) async {
   final prefs = await SharedPreferences.getInstance();
   final now = DateTime.now();
-  final thisWeek = _isoWeek(now);
-  final lastWeek = prefs.getString('streak_last_week') ?? '';
-  int streak = prefs.getInt('streak_count') ?? 0; // Numero di microcicli completati
-  int totalWorkouts = prefs.getInt('total_workouts_count') ?? 0; // Numero totale allenamenti
+  int streak = prefs.getInt('streak_count') ?? 0;
 
-  // Sessioni completate questo microciclo
-  final completedJson = prefs.getString('streak_completed_sessions') ?? '[]';
-  Set<String> completed = Set<String>.from(jsonDecode(completedJson));
-
-  // Incrementa totale allenamenti
-  totalWorkouts++;
-  await prefs.setInt('total_workouts_count', totalWorkouts);
-
-  // Aggiungi questa sessione al set
-  completed.add(dayName);
-  await prefs.setString(
-    'streak_completed_sessions',
-    jsonEncode(completed.toList()),
-  );
-
-  // Verifica se il microciclo è completo (tutte le sessioni)
-  bool microcycleComplete = completed.length >= totalSessionNames.length;
-
-  if (microcycleComplete) {
-    // Un nuovo microciclo è stato completato
-    final lastMicrocycleWeek = prefs.getString('last_microcycle_week') ?? '';
-
-    // Se l'ultimo microciclo completato era in una settimana diversa E è passata più di una settimana, resetta
-    if (lastMicrocycleWeek.isNotEmpty && lastMicrocycleWeek != thisWeek) {
-      // Controlla se è passato più di 7 giorni dalla fine del microciclo precedente
-      // Per semplicità: se il numero di settimane è diverso da 1, resetta (tolleranza: se la settimana successiva, continua)
-      final lastMicrocycleWeekNum = int.tryParse(lastMicrocycleWeek.split('-').last) ?? 0;
-      final thisWeekNum = int.tryParse(thisWeek.split('-').last) ?? 0;
-      final weekDiff = (thisWeekNum - lastMicrocycleWeekNum).abs();
-      
-      // Se passata più di 1 settimana senza completare un microciclo, resetta a 0
-      if (weekDiff > 1) {
-        streak = 0;
-      }
-    }
-
-    streak++;
-    await prefs.setInt('streak_count', streak);
-    await prefs.setString('last_microcycle_week', thisWeek);
-
-    // Resetta le sessioni completate per il nuovo microciclo
-    completed = {};
-    await prefs.setString('streak_completed_sessions', jsonEncode([]));
+  // Sessioni già completate nel microciclo corrente
+  final microJson = prefs.getString('microcycle_done') ?? '[]';
+  Set<String> microDone = Set<String>.from(jsonDecode(microJson));
+  // Rimuovi sessioni non più presenti nella scheda
+  if (totalSessionNames.isNotEmpty) {
+    microDone = microDone.intersection(Set<String>.from(totalSessionNames));
   }
 
-  await prefs.setString('streak_last_week', thisWeek);
-  // Aggiorna data ultimo allenamento per notifiche
+  // REGOLA 7 GIORNI: se una sessione del piano non è stata fatta da >7 giorni → reset streak
+  for (final name in totalSessionNames) {
+    if (name == dayName) continue;
+    final lastStr = prefs.getString('last_session_date_$name');
+    if (lastStr != null) {
+      final last = DateTime.tryParse(lastStr);
+      if (last != null && now.difference(last).inDays > 7) {
+        streak = 0;
+        break;
+      }
+    }
+  }
+
+  // LOGICA MICROCICLO
+  if (microDone.contains(dayName)) {
+    // Questa sessione era già nel microciclo corrente → microciclo incompleto, si ricomincia
+    streak = 0;
+    microDone = {dayName};
+  } else {
+    microDone.add(dayName);
+    // Microciclo completo quando tutte le sessioni sono state fatte
+    if (totalSessionNames.isNotEmpty &&
+        totalSessionNames.every((n) => microDone.contains(n))) {
+      streak++;
+      microDone = {}; // Azzera per il prossimo microciclo
+    }
+  }
+
+  await prefs.setInt('streak_count', streak);
+  await prefs.setString('microcycle_done', jsonEncode(microDone.toList()));
+  await prefs.setString('last_session_date_$dayName', now.toIso8601String());
   await prefs.setString('last_workout_date', now.toIso8601String());
+
+  // Gestisci il reset dei badge
+  await manageBadgeReset();
 
   return streak;
 }
@@ -1420,13 +1413,51 @@ Future<int> getStreak() async {
   return prefs.getInt('streak_count') ?? 0;
 }
 
-/// Legge streak count + sessioni completate questa settimana.
+/// Legge streak count + sessioni completate nel microciclo corrente.
 Future<({int count, Set<String> done})> getStreakData() async {
   final prefs = await SharedPreferences.getInstance();
   final count = prefs.getInt('streak_count') ?? 0;
-  final json = prefs.getString('streak_completed_sessions') ?? '[]';
+  final json = prefs.getString('microcycle_done') ?? '[]';
   final done = Set<String>.from(jsonDecode(json));
   return (count: count, done: done);
+}
+
+/// Gestisce il reset dei badge se 1 settimana dal primo conquistato OR nuovo microciclo
+Future<void> manageBadgeReset() async {
+  final prefs = await SharedPreferences.getInstance();
+  final now = DateTime.now();
+  final thisWeek = _isoWeek(now);
+  
+  // Data di quando è stato conquistato il primo badge
+  final badgesStartStr = prefs.getString('badges_start_date');
+  if (badgesStartStr == null) {
+    // Primo accesso, salva la data
+    await prefs.setString('badges_start_date', now.toIso8601String());
+    return;
+  }
+  
+  final badgesStart = DateTime.tryParse(badgesStartStr);
+  if (badgesStart == null) return;
+  
+  // Controlla se è passata 1 settimana
+  final daysPassed = now.difference(badgesStart).inDays;
+  final shouldResetByTime = daysPassed >= 7;
+  
+  // Controlla se è iniziato un nuovo microciclo
+  final lastBadgeMicrocycleWeek = prefs.getString('last_badge_microcycle_week') ?? '';
+  final currentMicrocycleWeek = prefs.getString('current_microcycle_week') ?? thisWeek;
+  final shouldResetByMicrocycle = lastBadgeMicrocycleWeek.isNotEmpty && lastBadgeMicrocycleWeek != currentMicrocycleWeek;
+  
+  if (shouldResetByTime || shouldResetByMicrocycle) {
+    // Reset badge
+    await prefs.remove('badges_start_date');
+    if (shouldResetByTime) {
+      await prefs.setString('last_badge_reset_week', thisWeek);
+    }
+  } else {
+    // Aggiorna il microciclo corrente
+    await prefs.setString('current_microcycle_week', thisWeek);
+  }
 }
 
 /// Controlla se l'utente non si allena da più di 2 giorni e mostra notifica giornaliera.
@@ -4479,6 +4510,73 @@ class _ClientMainPageState extends State<ClientMainPage>
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Text(
+                  'TUTORIAL',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('workout_tutorial_shown', false);
+                  if (mounted) {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (c, anim, _) => WorkoutTutorial(
+                          accentColor: accent,
+                          onComplete: () {
+                            Navigator.pop(context);
+                            prefs.setBool('workout_tutorial_shown', true);
+                          },
+                        ),
+                        transitionsBuilder: (c, anim, _, child) => FadeTransition(
+                          opacity: anim,
+                          child: child,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(10),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: accent.withAlpha(100),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.school_outlined,
+                        color: accent,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          AppL.lang == 'en' ? 'Watch Tutorial' : 'Rivedere Tutorial',
+                          style: TextStyle(
+                            color: accent,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(color: Colors.white12),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text(
                   'COLORE TEMA',
                   style: TextStyle(
                     color: Colors.white38,
@@ -6407,9 +6505,35 @@ class _ClientMainPageState extends State<ClientMainPage>
 
   void _startWorkout(WorkoutDay d) async {
     if (!await _handleWebDonationStartGate()) return;
+    
+    // Check if tutorial should be shown
+    final prefs = await SharedPreferences.getInstance();
+    final tutorialShown = prefs.getBool('workout_tutorial_shown') ?? false;
+    
+    if (!tutorialShown && !kIsWeb) {
+      // Show tutorial first
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (c, anim, _) => WorkoutTutorial(
+            accentColor: appAccentNotifier.value,
+            onComplete: () {
+              Navigator.pop(context);
+            },
+          ),
+          transitionsBuilder: (c, anim, _, child) => FadeTransition(
+            opacity: anim,
+            child: child,
+          ),
+        ),
+      );
+      await prefs.setBool('workout_tutorial_shown', true);
+      if (!mounted) return;
+    }
+    
     // Cancella SEMPRE lo snapshot precedente: ogni tap su "Allena ora" è una nuova sessione.
     // Il ripristino automatico avviene solo se l'app viene chiusa MID-workout.
-    final prefs = await SharedPreferences.getInstance();
     await prefs.remove('workout_in_progress_${d.dayName}');
     // Resetta i risultati in memoria dell'allenamento precedente
     for (final ex in d.exercises) {
@@ -6502,7 +6626,7 @@ class _ClientMainPageState extends State<ClientMainPage>
             Text(
               AppL.lang == 'en'
                   ? (_streak == 1 ? 'week streak' : 'weeks streak')
-                  : (_streak == 1 ? 'settimana' : 'settimane'),
+                  : (_streak == 1 ? 'microciclo' : 'microcicli'),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.orange,
@@ -6517,8 +6641,8 @@ class _ClientMainPageState extends State<ClientMainPage>
           children: [
             Text(
               AppL.lang == 'en'
-                  ? 'Complete ALL sessions in your plan to complete a microcycle and increase your streak counter.\n\nIf you miss a microcycle for more than a week, your streak resets to 0.\n\nStay consistent — every microcycle counts! 💪'
-                  : 'Completa TUTTE le sessioni della tua scheda per completare un microciclo e incrementare il contatore.\n\nSe salti un microciclo per più di una settimana, la streak si azzera.\n\nSii costante — ogni microciclo conta! 💪',
+                  ? 'Complete ALL sessions in your plan every microcycle to increase your streak counter.\n\nMiss even one session in a microcycle and your streak resets to 0.\n\nStay consistent — every microcycle counts! 💪'
+                  : 'Completa TUTTE le sessioni della tua scheda ogni microciclo per incrementare il contatore.\n\nSe salti anche solo una sessione in un microciclo, la streak si azzera.\n\nSii costante — ogni microciclo conta! 💪',
               style: const TextStyle(color: Colors.white70, fontSize: 13),
               textAlign: TextAlign.center,
             ),
@@ -6526,7 +6650,7 @@ class _ClientMainPageState extends State<ClientMainPage>
             // Mini progress strip
             if (myRoutine.isNotEmpty) ...[
               Text(
-                '${_streakDone.where((n) => myRoutine.any((d) => d.dayName == n)).length}/${myRoutine.length} ${AppL.lang == 'en' ? 'sessions this week' : 'sessioni questa settimana'}',
+                '${_streakDone.where((n) => myRoutine.any((d) => d.dayName == n)).length}/${myRoutine.length} ${AppL.lang == 'en' ? 'sessions this microcycle' : 'sessioni questo microciclo'}',
                 style: const TextStyle(color: Colors.white54, fontSize: 11),
               ),
               const SizedBox(height: 6),
@@ -6794,8 +6918,8 @@ class _ClientMainPageState extends State<ClientMainPage>
                                         AppL.lang == 'en'
                                             ? (_streak == 1 ? 'week' : 'weeks')
                                             : (_streak == 1
-                                                  ? 'settimana'
-                                                  : 'settimane'),
+                                                  ? 'micro'
+                                                  : 'micro'),
                                         style: const TextStyle(
                                           color: Colors.white38,
                                           fontSize: 10,
@@ -6838,7 +6962,7 @@ class _ClientMainPageState extends State<ClientMainPage>
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      '$_streak ${AppL.lang == 'en' ? (_streak == 1 ? 'week' : 'weeks') : (_streak == 1 ? 'settimana' : 'settimane')}',
+                                      '$_streak ${AppL.lang == 'en' ? (_streak == 1 ? 'week' : 'weeks') : (_streak == 1 ? 'micro' : 'micro')}',
                                       style: const TextStyle(
                                         color: Colors.orange,
                                         fontSize: 13,
@@ -7585,10 +7709,8 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen>
       'client_routine',
       jsonEncode(_days.map((d) => d.toJson()).toList()),
     );
-    // Reset this week's completed sessions when the routine changes
-    // (but keep the week streak count intact)
-    await prefs.setString('streak_completed_sessions', '[]');
-    await prefs.setInt('streak_required_count', _days.length);
+    // Reset microcycle in progress when the routine changes (keep streak count)
+    await prefs.setString('microcycle_done', '[]');
   }
 
   void _aggiungiGiorno() {
@@ -10414,8 +10536,8 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                           Flexible(
                             child: Text(
                               AppL.lang == 'en'
-                                  ? 'Session unlocked! $_streakDoneCount/$_streakTotalCount this week'
-                                  : 'Sessione sbloccata! $_streakDoneCount/$_streakTotalCount questa settimana',
+                                  ? 'Session unlocked! $_streakDoneCount/$_streakTotalCount this microcycle'
+                                  : 'Sessione sbloccata! $_streakDoneCount/$_streakTotalCount questo microciclo',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -10494,8 +10616,8 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                           _streakTotalCount > 0)
                         Text(
                           AppL.lang == 'en'
-                              ? '🔥 Week complete! Streak continues!'
-                              : '🔥 Settimana completata! La streak continua!',
+                              ? '🔥 Microcycle complete! Streak continues!'
+                              : '🔥 Microciclo completato! La streak continua!',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.orange,
@@ -10520,7 +10642,7 @@ class _WorkoutEngineState extends State<WorkoutEngine>
                         Text(
                           AppL.lang == 'en'
                               ? '🔥 $_currentStreak microcycle${_currentStreak == 1 ? '' : 's'} streak!'
-                              : '🔥 $_currentStreak ${_currentStreak == 1 ? 'microciclo' : 'microcicli'} di fila!',
+                              : '🔥 $_currentStreak ${_currentStreak == 1 ? 'micro' : 'micro'} di fila!',
                           style: const TextStyle(
                             color: Colors.orange,
                             fontSize: 14,
@@ -13166,7 +13288,7 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
                   _badgeChip(
                     icon: '🔥',
                     label: 'Streak',
-                    value: '${widget.streak} ${AppL.lang == 'en' ? 'wk' : 'sett.'}',
+                    value: '${widget.streak} ${AppL.lang == 'en' ? 'micro' : 'micro.'}',
                     accent: Colors.orange,
                   ),
                 if (_showSessionProgress && widget.progressPercent != null)
@@ -13186,20 +13308,23 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
                     : widget.streakDoneNames.toList();
                 final doneCount = widget.streakDoneNames.length;
                 final total = names.length;
-                return Column(
+                return SizedBox(
+                  width: double.infinity,
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Wrap(
                       spacing: 8,
                       runSpacing: 6,
                       alignment: WrapAlignment.center,
+                      runAlignment: WrapAlignment.center,
                       children: names.map((name) {
                         final done = widget.streakDoneNames.contains(name);
                         return Container(
-                          width: 80,
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+                          width: 60,
+                          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                             gradient: done ? const LinearGradient(
                               colors: [Color(0xFFFF6B00), Color(0xFFFFAB00)],
                               begin: Alignment.topLeft, end: Alignment.bottomRight,
@@ -13211,7 +13336,7 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
                           child: Column(
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                                 child: ColorFiltered(
                                   colorFilter: done
                                       ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
@@ -13221,14 +13346,14 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
                                           0.2126, 0.7152, 0.0722, 0, 0,
                                           0,      0,      0,      1, 0,
                                         ]),
-                                  child: Image.asset('assets/icon_client.png', width: 36, height: 36,
-                                      errorBuilder: (_, __, ___) => Icon(Icons.fitness_center, color: done ? Colors.white : Colors.white24, size: 32)),
+                                  child: Image.asset('assets/icon_client.png', width: 28, height: 28,
+                                      errorBuilder: (_, __, ___) => Icon(Icons.fitness_center, color: done ? Colors.white : Colors.white24, size: 24)),
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 3),
                               Text(
                                 name.length > 6 ? name.substring(0, 6) : name,
-                                style: TextStyle(fontSize: 9, color: done ? Colors.white : Colors.white38, fontWeight: FontWeight.w700),
+                                style: TextStyle(fontSize: 7, color: done ? Colors.white : Colors.white38, fontWeight: FontWeight.w700),
                                 textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -13238,10 +13363,12 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '$doneCount/$total questa settimana',
+                      '$doneCount/$total questo microciclo',
                       style: const TextStyle(color: Colors.white54, fontSize: 9),
+                      textAlign: TextAlign.center,
                     ),
                   ],
+                  ),
                 );
               }),
             ],
@@ -13250,7 +13377,7 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
           const SizedBox(height: 6),
           Center(
             child: Text(
-              '#GymApp #Fitness #Workout',
+              '',
               style: TextStyle(color: accent.withAlpha(120), fontSize: 10),
             ),
           ),
@@ -13296,7 +13423,7 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
       await file.writeAsBytes(byteData.buffer.asUint8List());
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'image/png')],
-        text: '#GymApp #Fitness #Workout',
+        text: '',
       );
     } finally {
       if (mounted) setState(() => _sharing = false);
@@ -13346,7 +13473,7 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
                 Colors.orange,
               ),
               _toggleChip(
-                AppL.lang == 'en' ? 'Weekly badges' : 'Badge settimana',
+                AppL.lang == 'en' ? 'Microcycle badges' : 'Badge microciclo',
                 _showWeeklyBadges,
                 () => setState(() => _showWeeklyBadges = !_showWeeklyBadges),
                 Colors.amber,
@@ -13514,8 +13641,8 @@ class _StreakShareSheetState extends State<_StreakShareSheet> {
                 const SizedBox(height: 8),
                 Text(
                   AppL.lang == 'en'
-                      ? '${widget.streak == 1 ? 'week' : 'weeks'} on fire! 🔥'
-                      : '${widget.streak == 1 ? 'settimana' : 'settimane'} di fila! 🔥',
+                      ? '${widget.streak == 1 ? 'microcycle' : 'microcycles'} on fire! 🔥'
+                      : '${widget.streak == 1 ? 'micro' : 'micro'} di fila! 🔥',
                   style: const TextStyle(
                     color: Colors.orange,
                     fontSize: 20,
@@ -13527,7 +13654,7 @@ class _StreakShareSheetState extends State<_StreakShareSheet> {
                 // Weekly badges: session circles
                 if (_showBadges && widget.allSessionNames.isNotEmpty) ...[
                   Text(
-                    AppL.lang == 'en' ? 'This week' : 'Questa settimana',
+                    AppL.lang == 'en' ? 'This microcycle' : 'Questo microciclo',
                     style: const TextStyle(color: Colors.white38, fontSize: 12),
                   ),
                   const SizedBox(height: 12),
@@ -13604,7 +13731,7 @@ class _StreakShareSheetState extends State<_StreakShareSheet> {
                 const Spacer(),
                 // Bottom hashtags
                 Text(
-                  '#GymApp #Streak #Fitness #Workout',
+                  '',
                   style: TextStyle(color: widget.accent.withAlpha(100), fontSize: 10),
                   textAlign: TextAlign.center,
                 ),
@@ -13631,8 +13758,8 @@ class _StreakShareSheetState extends State<_StreakShareSheet> {
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'image/png')],
         text: AppL.lang == 'en'
-            ? '🔥 ${widget.streak} week${widget.streak == 1 ? '' : 's'} streak! #GymApp #Fitness'
-            : '🔥 ${widget.streak} ${widget.streak == 1 ? 'settimana' : 'settimane'} di fila! #GymApp #Fitness',
+            ? '🔥 ${widget.streak} microcycle${widget.streak == 1 ? '' : 's'} streak!'
+            : '🔥 ${widget.streak} ${widget.streak == 1 ? 'micro' : 'micro'} di fila!',
       );
     } finally {
       if (mounted) setState(() => _sharing = false);
@@ -13731,13 +13858,11 @@ class _ProgressShareSheet extends StatefulWidget {
   final int streak;
   final List<_SessionPoint> points;
   final Color accent;
-  final int totalWorkouts;
   const _ProgressShareSheet({
     required this.chartKey,
     required this.streak,
     required this.points,
     required this.accent,
-    required this.totalWorkouts,
   });
   @override
   State<_ProgressShareSheet> createState() => _ProgressShareSheetState();
@@ -13757,17 +13882,23 @@ class _ProgressShareSheetState extends State<_ProgressShareSheet> {
       if (boundary == null) return;
 
       // Capture the chart at high resolution
-      final chartImage = await boundary.toImage(pixelRatio: 4.0);
+      final chartImage = await boundary.toImage(pixelRatio: 6.0);
       final chartBytes = await chartImage.toByteData(format: ui.ImageByteFormat.png);
       if (chartBytes == null) return;
 
       // Build composed image using PictureRecorder (2x scale for higher quality)
       const double s = 2.0;
       const double w = 1080 * s;
+      const double hPad = 20.0 * s; // horizontal padding
+      final double chartW = w - 2 * hPad; // chart fills content width
       const double cardSize = 220.0 * s;
       final double badgesH = (_includeStreak || _includeSessionCount || _includeTrend) ? (cardSize + 40.0 * s) : 0.0;
-      const double headerH = 300.0 * s;
-      final double chartH = (chartImage.height.toDouble() / chartImage.width.toDouble()) * w;
+      const double headerH = 260.0 * s; // reduced from 300
+
+      // Calculate chart height based on actual chart image dimensions
+      final chartAspect = chartImage.width / chartImage.height;
+      const double gap = 16.0 * s;
+      final double chartH = chartW / chartAspect; // Height proportional to width
       final double totalH = headerH + chartH + badgesH + 40 * s;
 
       final recorder = ui.PictureRecorder();
@@ -13780,39 +13911,66 @@ class _ProgressShareSheetState extends State<_ProgressShareSheet> {
       final bgPaint = Paint()..color = const Color(0xFF0E0E10);
       canvas.drawRect(Rect.fromLTWH(0, 0, w, totalH), bgPaint);
 
+      // Colored border for 3D effect
+      final borderPaint = Paint()
+        ..color = widget.accent.withAlpha(120)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3 * s;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, w, totalH), Radius.circular(32 * s)),
+        borderPaint,
+      );
+
       // Header: icon + "GymApp"
       final codec = await ui.instantiateImageCodec(
         (await rootBundle.load('assets/icon_client.png')).buffer.asUint8List(),
-        targetWidth: (200 * s).round(),
-        targetHeight: (200 * s).round(),
+        targetWidth: (180 * s).round(),
+        targetHeight: (180 * s).round(),
       );
       final frame = await codec.getNextFrame();
-      const double iconSz = 200.0 * s;
+      const double iconSz = 180.0 * s;
       final iconX = (w - iconSz) / 2;
       canvas.drawImageRect(
         frame.image,
         Rect.fromLTWH(0, 0, frame.image.width.toDouble(), frame.image.height.toDouble()),
-        Rect.fromLTWH(iconX, 20 * s, iconSz, iconSz),
+        Rect.fromLTWH(iconX, 16 * s, iconSz, iconSz),
         Paint(),
+      );
+
+      // Border around icon with rounded corners
+      final iconBorderPaint = Paint()
+        ..color = widget.accent.withAlpha(150)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5 * s;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(Rect.fromLTWH(iconX, 16 * s, iconSz, iconSz), Radius.circular(16 * s)),
+        iconBorderPaint,
       );
       final tp = TextPainter(
         text: TextSpan(
           text: 'GymApp',
           style: TextStyle(
             color: widget.accent,
-            fontSize: 52 * s,
+            fontSize: 48 * s,
             fontWeight: FontWeight.w900,
             letterSpacing: 2.0,
           ),
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      tp.paint(canvas, Offset((w - tp.width) / 2, (20 + 200 + 16) * s));
+      tp.paint(canvas, Offset((w - tp.width) / 2, (16 + 180 + 12) * s));
 
-      // Draw chart below header
+      // Chart background (dark box behind the transparent chart)
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(Rect.fromLTWH(hPad, headerH, chartW, chartH), const Radius.circular(16 * s)),
+        Paint()..color = const Color(0xFF1C1C1E),
+      );
+
+      // Draw chart below header, filling content width
       final chartUi = await ui.instantiateImageCodec(chartBytes.buffer.asUint8List());
       final chartFrame = await chartUi.getNextFrame();
-      final dst = Rect.fromLTWH(0, headerH, w, chartH);
+      final double innerPad = 12.0 * s;
+      final dst = Rect.fromLTWH(hPad + innerPad, headerH + innerPad, chartW - 2 * innerPad, chartH - 2 * innerPad);
       canvas.drawImageRect(
         chartFrame.image,
         Rect.fromLTWH(0, 0, chartImage.width.toDouble(), chartImage.height.toDouble()),
@@ -13830,12 +13988,11 @@ class _ProgressShareSheetState extends State<_ProgressShareSheet> {
         final isMicrocycle = widget.points.isNotEmpty && widget.points.first.dayName.startsWith('Microciclo');
 
         final activeCards = <(Color, String, String, String)>[];
-        if (_includeSessionCount) activeCards.add((const Color(0xFF00BCD4), '📅', '${widget.totalWorkouts}', AppL.lang == 'en' ? 'Workouts' : 'Allenamenti'));
-        if (_includeStreak) activeCards.add((const Color(0xFFFF6B00), '🔥', '${widget.streak}', AppL.lang == 'en' ? 'Microcycles' : 'Microcicli'));
+        if (_includeSessionCount) activeCards.add((const Color(0xFF00BCD4), '📅', '${widget.points.length}', isMicrocycle ? (AppL.lang == 'en' ? 'Microcycles' : 'Microcicli') : (AppL.lang == 'en' ? 'Sessions' : 'Sessioni')));
+        if (_includeStreak) activeCards.add((const Color(0xFFFF6B00), '🔥', '${widget.streak}', 'Streak'));
         if (_includeTrend) activeCards.add((trendUp ? Colors.greenAccent : Colors.redAccent, trendUp ? '📈' : '📉', '${trendUp ? '+' : ''}${trendPct.toStringAsFixed(0)}%', 'Trend'));
 
         if (activeCards.isNotEmpty) {
-          const double gap = 16.0 * s;
           final double totalCardsW = activeCards.length * cardSize + (activeCards.length + 1) * gap;
           final double firstCardX = (w - totalCardsW) / 2 + gap;
 
@@ -13846,6 +14003,8 @@ class _ProgressShareSheetState extends State<_ProgressShareSheet> {
             );
             canvas.drawRRect(rect, Paint()..color = cardColor.withAlpha(25));
             canvas.drawRRect(rect, Paint()..color = cardColor.withAlpha(130)..style = PaintingStyle.stroke..strokeWidth = 2 * s);
+            // Glow effect
+            canvas.drawRRect(rect, Paint()..color = Colors.white.withAlpha(15)..style = PaintingStyle.stroke..strokeWidth = 1 * s);
             final emojiTp = TextPainter(
               text: TextSpan(text: emoji, style: TextStyle(fontSize: 44 * s)),
               textDirection: TextDirection.ltr,
@@ -13881,8 +14040,8 @@ class _ProgressShareSheetState extends State<_ProgressShareSheet> {
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'image/png')],
         text: AppL.lang == 'en'
-            ? '💪 My GymApp progress! #GymApp #Fitness'
-            : '💪 I miei progressi su GymApp! #GymApp #Fitness',
+            ? '💪 My GymApp progress!'
+            : '💪 I miei progressi su GymApp!',
       );
     } finally {
       if (mounted) setState(() => _sharing = false);
@@ -15865,10 +16024,6 @@ class _OverallProgressPageState extends State<_OverallProgressPage> {
   }
 
   Future<void> _shareProgress(BuildContext context) async {
-    // Read total workouts
-    final prefs = await SharedPreferences.getInstance();
-    final totalWorkouts = prefs.getInt('total_workouts_count') ?? 0;
-    
     // Show composer sheet with options
     await showModalBottomSheet(
       context: context,
@@ -15879,7 +16034,6 @@ class _OverallProgressPageState extends State<_OverallProgressPage> {
         streak: widget.streak,
         points: _computePoints(),
         accent: widget.accent,
-        totalWorkouts: totalWorkouts,
       ),
     );
   }
@@ -15957,42 +16111,42 @@ class _OverallProgressPageState extends State<_OverallProgressPage> {
                       children: [
                         _buildStatsRow(points, accent),
                         const SizedBox(height: 20),
-                        RepaintBoundary(
-                          key: _chartKey,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1C1C1E),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 4,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        color: accent,
-                                        borderRadius: BorderRadius.circular(2),
-                                      ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1C1C1E),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 4,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      color: accent,
+                                      borderRadius: BorderRadius.circular(2),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _filterDay == null && widget.routine.length > 1
-                                          ? (AppL.lang == 'en' ? 'Progress per microcycle' : 'Progressi per microciclo')
-                                          : (AppL.lang == 'en' ? 'Progress per session' : 'Progressi per sessione'),
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _filterDay == null && widget.routine.length > 1
+                                        ? (AppL.lang == 'en' ? 'Progress per microcycle' : 'Progressi per microciclo')
+                                        : (AppL.lang == 'en' ? 'Progress per session' : 'Progressi per sessione'),
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                SizedBox(
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              RepaintBoundary(
+                                key: _chartKey,
+                                child: SizedBox(
                                   height: 220,
                                   child: CustomPaint(
                                     size: Size.infinite,
@@ -16002,9 +16156,9 @@ class _OverallProgressPageState extends State<_OverallProgressPage> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -16224,22 +16378,7 @@ class _OverallProgressPainter extends CustomPainter {
       canvas.drawCircle(Offset(x, y), 4, dotPaint);
 
       if (n <= 8 || i % ((n / 6).ceil()) == 0 || i == n - 1) {
-        final d = points[i].date;
-        final label = '${d.day}/${d.month}';
-        final tp = TextPainter(
-          text: TextSpan(
-            text: label,
-            style: const TextStyle(color: Colors.white38, fontSize: 9),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
-        tp.paint(
-          canvas,
-          Offset(
-            (x - tp.width / 2).clamp(0, size.width - tp.width),
-            chartH + 4,
-          ),
-        );
+        // Date labels removed from share card
       }
     }
   }

@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import io.flutter.plugins.googlemobileads.GoogleMobileAdsPlugin
@@ -26,11 +27,13 @@ class WorkoutNativeAdFactory(
         val bodyView = adView.findViewById<TextView>(R.id.ad_body)
         val ctaView = adView.findViewById<Button>(R.id.ad_call_to_action)
         val iconView = adView.findViewById<ImageView>(R.id.ad_app_icon)
+        val mediaView = adView.findViewById<MediaView>(R.id.ad_media)
 
         adView.headlineView = headlineView
         adView.bodyView = bodyView
         adView.callToActionView = ctaView
         adView.iconView = iconView
+        adView.mediaView = mediaView
 
         headlineView.text = nativeAd.headline
         bodyView.text = nativeAd.body
@@ -49,6 +52,15 @@ class WorkoutNativeAdFactory(
         } else {
             iconView.visibility = View.VISIBLE
             iconView.setImageDrawable(nativeAd.icon!!.drawable)
+        }
+
+        // Show MediaView only when the ad contains image or video content
+        val mediaContent = nativeAd.mediaContent
+        if (mediaContent != null) {
+            mediaView.mediaContent = mediaContent
+            mediaView.visibility = View.VISIBLE
+        } else {
+            mediaView.visibility = View.GONE
         }
 
         adView.setNativeAd(nativeAd)

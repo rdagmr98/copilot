@@ -1,0 +1,35 @@
+{
+    "name": "GymLogbook",
+    "short_name": "GymLogbook",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0B0B0D",
+    "theme_color": "#0B0B0D",
+    "description": "GymLogbook: scheda, timer e progressi allenamento per atleti.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/gymlogbook-icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/gymlogbook-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/gymlogbook-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/gymlogbook-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
