@@ -168,6 +168,9 @@ class MainActivity : FlutterActivity() {
 
                             val views = RemoteViews(packageName, R.layout.notification_timer)
                             views.setTextViewText(R.id.notif_label, subtitle)
+                            // Force visible colors for dark notification panels (Xiaomi MIUI, etc.)
+                            views.setInt(R.id.notif_time, "setTextColor", 0xFFFFFFFF.toInt())
+                            views.setInt(R.id.notif_label, "setTextColor", 0xFFFFFFFF.toInt())
                             val durationMs = remainingSeconds.coerceAtLeast(0L) * 1000L
                             val chronometerBase = SystemClock.elapsedRealtime() + durationMs
                             views.setChronometer(R.id.notif_time, chronometerBase, null, true)
@@ -179,11 +182,12 @@ class MainActivity : FlutterActivity() {
 
                             val notification = NotificationCompat.Builder(this, channelId)
                                 .setSmallIcon(R.drawable.ic_notification)
+                                .setColor(0xFFFF6B00.toInt())
                                 .setOngoing(true)
                                 .setSilent(true)
                                 .setAutoCancel(false)
                                 .setOnlyAlertOnce(true)
-                                .setTimeoutAfter(durationMs + 1000L)
+                                .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
                                 .setCustomContentView(views)
                                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                                 .build()

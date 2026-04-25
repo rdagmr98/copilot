@@ -4,3 +4,7 @@ build/
 .dart_tool/
 .flutter/
 docs/
+
+# Large release files
+*.apk
+*.aab

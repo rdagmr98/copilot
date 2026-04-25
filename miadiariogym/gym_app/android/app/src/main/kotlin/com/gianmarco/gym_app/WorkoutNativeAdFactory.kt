@@ -28,12 +28,14 @@ class WorkoutNativeAdFactory(
         val ctaView = adView.findViewById<Button>(R.id.ad_call_to_action)
         val iconView = adView.findViewById<ImageView>(R.id.ad_app_icon)
         val mediaView = adView.findViewById<MediaView>(R.id.ad_media)
+        val advertiserView = adView.findViewById<TextView>(R.id.ad_advertiser)
 
         adView.headlineView = headlineView
         adView.bodyView = bodyView
         adView.callToActionView = ctaView
         adView.iconView = iconView
         adView.mediaView = mediaView
+        adView.advertiserView = advertiserView
 
         headlineView.text = nativeAd.headline
         bodyView.text = nativeAd.body
@@ -52,6 +54,13 @@ class WorkoutNativeAdFactory(
         } else {
             iconView.visibility = View.VISIBLE
             iconView.setImageDrawable(nativeAd.icon!!.drawable)
+        }
+
+        if (nativeAd.advertiser.isNullOrBlank()) {
+            advertiserView.visibility = View.GONE
+        } else {
+            advertiserView.visibility = View.VISIBLE
+            advertiserView.text = nativeAd.advertiser
         }
 
         // Show MediaView only when the ad contains image or video content

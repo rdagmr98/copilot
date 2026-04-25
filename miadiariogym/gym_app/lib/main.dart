@@ -1374,7 +1374,7 @@ Future<int> updateStreak(String dayName, List<String> totalSessionNames) async {
     final lastStr = prefs.getString('last_session_date_$name');
     if (lastStr != null) {
       final last = DateTime.tryParse(lastStr);
-      if (last != null && now.difference(last).inDays > 7) {
+      if (last != null && now.difference(last).inDays > 13) {
         streak = 0;
         break;
       }
@@ -1382,16 +1382,24 @@ Future<int> updateStreak(String dayName, List<String> totalSessionNames) async {
   }
 
   // LOGICA MICROCICLO
+  final bool newCycleStarting = microDone.isEmpty;
   if (microDone.contains(dayName)) {
     // Questa sessione era già nel microciclo corrente → microciclo incompleto, si ricomincia
     streak = 0;
     microDone = {dayName};
+    await prefs.remove('microcycle_completed_at');
   } else {
+    if (newCycleStarting) {
+      // Prima sessione del nuovo microciclo — cancella lo stato "appena completato"
+      await prefs.remove('microcycle_completed_at');
+    }
     microDone.add(dayName);
     // Microciclo completo quando tutte le sessioni sono state fatte
     if (totalSessionNames.isNotEmpty &&
         totalSessionNames.every((n) => microDone.contains(n))) {
       streak++;
+      await prefs.setString('microcycle_completed_at', now.toIso8601String());
+      await prefs.setString('microcycle_last_sessions', jsonEncode(microDone.toList()));
       microDone = {}; // Azzera per il prossimo microciclo
     }
   }
@@ -1418,7 +1426,19 @@ Future<({int count, Set<String> done})> getStreakData() async {
   final prefs = await SharedPreferences.getInstance();
   final count = prefs.getInt('streak_count') ?? 0;
   final json = prefs.getString('microcycle_done') ?? '[]';
-  final done = Set<String>.from(jsonDecode(json));
+  Set<String> done = Set<String>.from(jsonDecode(json));
+  // Se il microciclo è stato appena completato (< 2 giorni fa) e non è ancora
+  // iniziato il successivo, mostra tutti i badge come conquistati
+  if (done.isEmpty) {
+    final completedAtStr = prefs.getString('microcycle_completed_at');
+    if (completedAtStr != null) {
+      final completedAt = DateTime.tryParse(completedAtStr);
+      if (completedAt != null && DateTime.now().difference(completedAt).inDays < 2) {
+        final lastJson = prefs.getString('microcycle_last_sessions') ?? '[]';
+        done = Set<String>.from(jsonDecode(lastJson));
+      }
+    }
+  }
   return (count: count, done: done);
 }
 
@@ -1898,6 +1918,35 @@ String exerciseAnimationAssetPath(String slug) =>
 
 String muscleAssetPath(String? fileName) =>
     'assets/muscle/${fileName!.replaceAll(RegExp(r"\.png$", caseSensitive: false), ".webp")}';
+
+/// Returns all category labels an exercise belongs to, derived from its
+/// primary [category] and its [muscleImages] list. Used by the browse screen
+/// so that e.g. a "petto" exercise with tricipiti.webp also appears under
+/// "braccia".
+Set<String> exerciseAllCategories(ExerciseInfo e) {
+  final cats = <String>{e.category};
+  for (final img in e.muscleImages) {
+    final base = img.replaceAll(RegExp(r'\.(png|webp)$', caseSensitive: false), '');
+    switch (base) {
+      case 'petto': cats.add('petto');
+      case 'dorso': cats.add('dorso');
+      case 'spalle': cats.add('spalle');
+      case 'braccia':
+      case 'bicipiti':
+      case 'tricipiti': cats.add('braccia');
+      case 'gambe':
+      case 'quadricipiti':
+      case 'femorali': cats.add('gambe');
+      case 'glutei': cats.add('glutei');
+      case 'addome':
+      case 'core': cats.add('core');
+      case 'cardio': cats.add('cardio');
+      case 'pull': cats.add('dorso');
+      case 'push': cats.add('petto');
+    }
+  }
+  return cats;
+}
 
 bool usesQuarterStepIncrement(double valueKg) {
   final centiKg = (valueKg.abs() * 100).round();
@@ -3576,8 +3625,8 @@ const List<Map<String, dynamic>> kWorkoutTemplates = [
     'days': [
       {
         'dayName': '1/4',
-        'bodyParts': [],
-        'muscleImage': null,
+        'bodyParts': ['dorso'],
+        'muscleImage': 'pull.png',
         'exercises': [
           {
             'name': 'Seated Row Machine',
@@ -3660,8 +3709,8 @@ const List<Map<String, dynamic>> kWorkoutTemplates = [
       },
       {
         'dayName': '2/4',
-        'bodyParts': [],
-        'muscleImage': null,
+        'bodyParts': ['glutei'],
+        'muscleImage': 'glutei.png',
         'exercises': [
           {
             'name': 'Squat con Bilanciere',
@@ -3733,8 +3782,8 @@ const List<Map<String, dynamic>> kWorkoutTemplates = [
       },
       {
         'dayName': '3/4',
-        'bodyParts': [],
-        'muscleImage': null,
+        'bodyParts': ['petto'],
+        'muscleImage': 'push.png',
         'exercises': [
           {
             'name': 'Distensioni con Manubri',
@@ -3806,8 +3855,8 @@ const List<Map<String, dynamic>> kWorkoutTemplates = [
       },
       {
         'dayName': '4/4',
-        'bodyParts': [],
-        'muscleImage': null,
+        'bodyParts': ['gambe'],
+        'muscleImage': 'gambe.png',
         'exercises': [
           {
             'name': 'Dumbbell Goblet Squat',
@@ -5344,6 +5393,43 @@ class _ClientMainPageState extends State<ClientMainPage>
                     ),
                   ),
                   _buildWorkoutProgressNativeAd(),
+                  if (!kIsWeb) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => _shareLastSession(context, day),
+                            icon: const Icon(Icons.share_rounded, size: 16),
+                            label: const Text('Condividi 🏋️'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: accent,
+                              side: BorderSide(color: accent.withAlpha(80)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(c);
+                              _showOverallProgressPage();
+                            },
+                            icon: const Icon(Icons.bar_chart_rounded, size: 16),
+                            label: Text(AppL.lang == 'en' ? 'Progress' : 'Progressi'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: accent,
+                              side: BorderSide(color: accent.withAlpha(80)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -6585,6 +6671,48 @@ class _ClientMainPageState extends State<ClientMainPage>
           accent: appAccentNotifier.value,
           buildAd: _buildOverallProgressNativeAd,
         ),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> _buildLastSessionExercises(String dayName) {
+    final Map<String, List<Map<String, dynamic>>> bySid = {};
+    final Map<String, DateTime> sidDate = {};
+    for (final h in history) {
+      if ((h['dayName'] as String?) != dayName) continue;
+      final sid = (h['session_id'] as String?)?.isNotEmpty == true
+          ? h['session_id'] as String
+          : ((h['date'] as String?) ?? '').substring(0, 10);
+      bySid.putIfAbsent(sid, () => []).add(Map<String, dynamic>.from(h));
+      sidDate.putIfAbsent(sid, () => DateTime.tryParse((h['date'] as String?) ?? '') ?? DateTime(2000));
+    }
+    if (bySid.isEmpty) return [];
+    final lastSid = sidDate.entries.reduce((a, b) => a.value.isAfter(b.value) ? a : b).key;
+    return bySid[lastSid]!.map((h) => {
+      'exercise': h['exercise'] as String? ?? '',
+      'series': (h['series'] as List?) ?? [],
+    }).toList();
+  }
+
+  void _shareLastSession(BuildContext ctx, WorkoutDay day) {
+    final exercises = _buildLastSessionExercises(day.dayName);
+    if (exercises.isEmpty) return;
+    final allNames = myRoutine.map((r) => r.dayName).toList();
+    final now = DateTime.now();
+    const months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+    final todayLabel = '${now.day} ${months[now.month - 1]}';
+    showModalBottomSheet(
+      context: ctx,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _WorkoutShareSheet(
+        dayName: day.dayName,
+        todayLabel: todayLabel,
+        exercises: exercises,
+        streak: _streak,
+        accent: appAccentNotifier.value,
+        streakDoneNames: Set<String>.from(_streakDone),
+        allSessionNames: allNames,
       ),
     );
   }
@@ -8743,14 +8871,21 @@ class _ScheduleBuilderScreenState extends State<ScheduleBuilderScreen>
 
           List<ExerciseInfo> filtered = selectedCategory != null
               ? kGifCatalog
-                    .where((e) => e.category == selectedCategory)
+                    .where(
+                      (e) => exerciseAllCategories(e).contains(selectedCategory),
+                    )
                     .toList()
               : kGifCatalog.where((e) => e.category != 'altro').toList();
 
           if (searchQuery.isNotEmpty) {
             final q = searchQuery.toLowerCase();
             filtered = filtered
-                .where((e) => e.name.toLowerCase().contains(q))
+                .where(
+                  (e) =>
+                      e.name.toLowerCase().contains(q) ||
+                      e.nameEn.toLowerCase().contains(q) ||
+                      e.aliases.any((a) => a.toLowerCase().contains(q)),
+                )
                 .toList();
           }
 
@@ -13352,7 +13487,7 @@ class _WorkoutShareSheetState extends State<_WorkoutShareSheet> {
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                name.length > 6 ? name.substring(0, 6) : name,
+                                name,
                                 style: TextStyle(fontSize: 7, color: done ? Colors.white : Colors.white38, fontWeight: FontWeight.w700),
                                 textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,
                               ),
@@ -13706,7 +13841,7 @@ class _StreakShareSheetState extends State<_StreakShareSheet> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              name.length > 5 ? name.substring(0, 5) : name,
+                              name,
                               style: TextStyle(
                                 fontSize: 9,
                                 color: done ? Colors.white : Colors.white24,
@@ -14974,23 +15109,6 @@ class _WorkoutProgressPainter extends CustomPainter {
       final y = size.height * 0.9 - (size.height * 0.8 * norm.clamp(0.0, 1.0));
       canvas.drawCircle(Offset(x, y), 5, dotBg);
       canvas.drawCircle(Offset(x, y), 4, dotPaint);
-
-      if (n <= 8 || i % ((n / 6).ceil()) == 0) {
-        final tp = TextPainter(
-          text: TextSpan(
-            text: labels[i],
-            style: const TextStyle(color: Colors.white38, fontSize: 9),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
-        tp.paint(
-          canvas,
-          Offset(
-            (x - tp.width / 2).clamp(0, size.width - tp.width),
-            size.height - 14,
-          ),
-        );
-      }
     }
   }
 
