@@ -10270,7 +10270,13 @@ class _WorkoutEngineState extends State<WorkoutEngine>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _appLifecycleState = state;
     if (state == AppLifecycleState.resumed) {
-      _clearTimerNotifications();
+      // Only clear notifications when the timer is NOT active.
+      // If timerActive == true the user may have just closed the notification
+      // shade and returned to the app — cancelling here would remove the
+      // running countdown notification.
+      if (!timerActive) {
+        _clearTimerNotifications();
+      }
     }
   }
 
